@@ -3,10 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>CELPIP Prep Course · Learnovate Qatar</title>
+<title>CELPIP Prep Course · Elevate with Ms. Maria</title>
+<meta name="description" content="CELPIP Prep Course. Elevate with Ms. Maria · Learnovate Qatar.">
+<meta name="theme-color" content="#14213D">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: matches Ms. Maria's course family (Lora + Poppins, navy ink, pastel panels).
    Sticky navy app bar, one 1080px column; session pages split into Live (pink pen) and Study Hub (green) tabs. */
@@ -388,11 +390,129 @@ table.sess td{vertical-align:middle}
 .minirungs{display:flex;align-items:flex-end;gap:6px;height:90px}
 .minirungs i{flex:1;border-radius:8px 8px 3px 3px;box-shadow:0 2px 8px rgba(27,42,74,.08);display:flex;justify-content:center;padding-top:4px}
 .minirungs i span{font-size:10.5px;font-weight:700;color:var(--surface);font-style:normal}
+
+/* ===== Elevate with Ms. Maria family style (matches the Logistics & SCM site) ===== */
+:root{--bg:#F4F6FA;--surface:#FFFFFF;--surface-2:#EEF1F6;--fg:#14213D;--muted:#4a5675;--line:#DFE4EE;--navy:#14213D;--navy-2:#1d2f57;--navy-fg:#FFFFFF;
+  --plan:#00B4B4;--source:#FF5A36;--make:#8338EC;--deliver:#1F7BFF;--return:#00B86B;--gold:#FFC300;
+  --band:linear-gradient(90deg,var(--plan) 0 20%,var(--source) 20% 40%,var(--make) 40% 60%,var(--deliver) 60% 80%,var(--return) 80% 100%);
+  --live:#D9441F;--live-soft:#FFEEEA;--hub:#008F55;--hub-soft:#E6F8F0;--good:#008F55;--blue:#E9F2FF;--lav:#F2EBFD;--peach:#FFF6D6;
+  --skO:#E6F8F0;--skL:#E9F2FF;--skR:#F2EBFD;--skW:#FFEEEA;--skS:#E6F8F8;--skT:#E6F8F0;
+  --skOi:#008F55;--skLi:#1A5FCC;--skRi:#6A2BC4;--skWi:#C93D1A;--skSi:#007F7F;--skTi:#008F55;
+  --display:Poppins,system-ui,-apple-system,"Segoe UI",sans-serif;--body:Poppins,system-ui,-apple-system,"Segoe UI",sans-serif;--shadow:0 6px 24px rgba(20,33,61,.07)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0e1730;--surface:#16213f;--surface-2:#1d2a4d;--fg:#EEF1F8;--muted:#a9b3c9;--line:#2c3a60;--navy:#0a1226;--navy-fg:#FFFFFF;
+  --live:#FF8466;--live-soft:#3a2224;--hub:#4fd99a;--hub-soft:#123528;--good:#4fd99a;--blue:#1b2f55;--lav:#2a2350;--peach:#3a3320;
+  --skO:#123528;--skL:#1b2f55;--skR:#2a2350;--skW:#3a2224;--skS:#103636;--skT:#123528;--skOi:#4fd99a;--skLi:#8bb6ff;--skRi:#bb9bff;--skWi:#ff9a80;--skSi:#55dcdc;--skTi:#4fd99a;--shadow:0 6px 24px rgba(0,0,0,.3)}}
+:root[data-theme="dark"]{--bg:#0e1730;--surface:#16213f;--surface-2:#1d2a4d;--fg:#EEF1F8;--muted:#a9b3c9;--line:#2c3a60;--navy:#0a1226;--navy-fg:#FFFFFF;
+  --live:#FF8466;--live-soft:#3a2224;--hub:#4fd99a;--hub-soft:#123528;--good:#4fd99a;--blue:#1b2f55;--lav:#2a2350;--peach:#3a3320;
+  --skO:#123528;--skL:#1b2f55;--skR:#2a2350;--skW:#3a2224;--skS:#103636;--skT:#123528;--skOi:#4fd99a;--skLi:#8bb6ff;--skRi:#bb9bff;--skWi:#ff9a80;--skSi:#55dcdc;--skTi:#4fd99a;--shadow:0 6px 24px rgba(0,0,0,.3)}
+body{background:var(--bg)!important;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-weight:700;letter-spacing:-.01em}
+.eyebrow{color:var(--fg);font-weight:600;letter-spacing:.16em}
+body::before{background:#14213D}
+header.bar{background:#14213D;color:#fff;border-bottom:0;box-shadow:0 2px 14px rgba(0,0,0,.18);backdrop-filter:none}
+header.bar::after{content:"";display:block;height:4px;background:var(--band)}
+header.bar .wrap{gap:12px;padding-block:10px}
+.brand{color:#fff}
+.logo{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);display:grid;place-items:center;flex:none}
+.brand-t{line-height:1.2;min-width:0;font-family:var(--body)}
+.brand-t b{display:block;font-size:16px;font-weight:600}
+.brand-t small{display:block;font-size:10px;letter-spacing:.14em;text-transform:uppercase;opacity:.8;font-weight:500}
+nav.main{background:rgba(255,255,255,.07);margin-left:auto}
+nav.main a{color:rgba(255,255,255,.85)}
+nav.main a[aria-current="page"]{background:#fff;color:#14213D;box-shadow:none}
+.ibtn{height:40px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#fff;display:inline-flex;gap:8px;align-items:center;cursor:pointer;font-weight:600;font-size:14px;text-decoration:none}
+.ibtn:hover{background:rgba(255,255,255,.14)}
+#tp-btn{margin-left:auto}
+@media(max-width:520px){#tp-btn span{display:none}}
+.sync{background:rgba(255,255,255,.1);color:#fff}.sync.ok{background:rgba(0,184,107,.2);color:#9ff0c9}.sync.warn{background:rgba(255,195,0,.2);color:#ffe08a}
+.hero2{background:radial-gradient(120% 140% at 100% 0%,#1d2f57 0%,#14213D 55%)!important;color:#fff;position:relative;overflow:hidden;padding-bottom:40px}
+.hero2::after{content:"";position:absolute;left:0;right:0;bottom:0;height:6px;background:var(--band)}
+.hero2 .eyebrow{color:#fff!important;opacity:.9}
+.hero2 .lead{color:rgba(255,255,255,.9)!important}
+.hero2 .btn:not(.primary){border-color:rgba(255,255,255,.4);color:#fff;background:transparent}
+.hero2 .upnext,.hero2 .ladder{color:var(--fg)}
+.hero2 .muted{color:rgba(255,255,255,.75)}.hero2 .upnext .muted,.hero2 .ladder .muted{color:var(--muted)}
+.hero2 .legend span{background:rgba(255,255,255,.1);color:#fff}
+.btn{border-color:var(--fg)}
+.btn.primary{background:#14213D;border-color:#14213D;color:#fff}
+.btn.hub{background:var(--hub)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.panel,.tool,.srow{border-radius:18px}
+footer{text-align:center}
+footer .foot1{font-size:14px;color:var(--fg);margin-bottom:6px}
+footer p{max-width:80ch;margin-inline:auto}
+/* sign-in pages */
+.authhero{padding:36px 40px 44px!important;border-radius:24px}
+.authhero h1{font-size:clamp(28px,4.6vw,44px);color:#fff}
+.hero-in{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:24px;align-items:center}
+@media(max-width:860px){.hero-in{grid-template-columns:minmax(0,1fr)}.authhero{padding:26px 22px 36px!important}.hero-art{max-width:340px}}
+.hero-art{justify-self:center;width:100%;max-width:440px}.hero-art .scene{width:100%;height:auto;max-width:100%}
+.hero-stats{display:flex;flex-wrap:wrap;gap:8px}
+.hero-stats span{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);font-size:13.5px}
+.hero-stats .dot{width:10px;height:10px;border-radius:50%;background:var(--gold)}.hero-stats .d1{background:var(--return)}.hero-stats .d2{background:var(--plan)}
+.login{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start;padding:0}
+@media(max-width:860px){.login{grid-template-columns:minmax(0,1fr)}}
+.logincard{background:var(--surface)!important;background-image:none!important;border:1px solid var(--line);border-radius:18px;padding:26px;box-shadow:var(--shadow);gap:12px;max-width:none}
+.logincard h2{font-size:24px}
+.logincard .lead{color:var(--muted);font-size:15px}
+.codein{text-align:left!important;letter-spacing:.14em}
+.field input{border-radius:12px;border-color:var(--fg)}
+.infocards{display:flex;flex-direction:column;gap:16px}
+.infocard{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:var(--shadow)}
+.infocard .stripe{height:8px;background:var(--band)}
+.ic-in{padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.ic-in .eyebrow{font-size:11px}
+.ic-in h3{font-size:18px}
+.ic-in p{color:var(--muted);font-size:14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.chips span{border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:12.5px;font-weight:600}
+.chips .gold{background:var(--gold);border-color:var(--gold);color:#14213D}
+
+/* ===== light pastel version of the family style ===== */
+body{background:radial-gradient(900px 520px at 0% -8%,var(--skL),transparent 62%),radial-gradient(800px 480px at 100% -4%,var(--skW),transparent 58%),radial-gradient(700px 500px at 50% 110%,var(--skR),transparent 60%),var(--bg)!important;background-attachment:fixed!important}
+body::before{background:var(--surface)}
+header.bar{background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--fg);box-shadow:0 2px 14px rgba(20,33,61,.06)}
+.brand{color:var(--fg)}
+.logo{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow)}
+nav.main{background:var(--surface-2)}
+nav.main a{color:var(--muted)}
+nav.main a[aria-current="page"]{background:#14213D;color:#fff}
+.ibtn{border:1px solid var(--line);background:var(--surface);color:var(--fg)}
+.ibtn:hover{background:var(--surface-2)}
+.sync{background:var(--surface-2);color:var(--muted)}.sync.ok{background:var(--hub-soft);color:var(--hub)}.sync.warn{background:var(--peach);color:var(--warn)}
+.hero2{background:linear-gradient(135deg,var(--skR) 0%,var(--skW) 45%,var(--skL) 100%)!important;color:var(--fg)}
+.hero2 .eyebrow{color:var(--fg)!important;opacity:.85}
+.hero2 .lead{color:var(--muted)!important}
+.hero2 .btn:not(.primary){border-color:var(--fg);color:var(--fg);background:var(--surface)}
+.hero2 .muted{color:var(--muted)}
+.hero2 .legend span{background:var(--surface);color:var(--fg)}
+.authhero h1{color:var(--fg)}
+.hero-stats span{background:var(--surface);border:1px solid var(--line);color:var(--fg)}
+/* board */
+.login{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
+.board{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px}
+.pathmap{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px 8px}
+.pathmap li{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.pn{width:38px;height:38px;border-radius:50%;background:var(--c);color:var(--ci);display:grid;place-items:center;font-weight:700;font-size:14px;box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--ci) 25%,transparent)}
+.pl{font-size:11px;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.howlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:13.5px;color:var(--muted)}
+.howlist b{color:var(--fg)}
+.infocards.student{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+@media(max-width:560px){.infocards.student{grid-template-columns:minmax(0,1fr)}}
+.infocard{background:var(--c);border:0}
+.infocard .stripe{background:var(--ci);height:6px}
+.infocard .ic-in .eyebrow{color:var(--ci)}
+.infocard .ic-in p{color:var(--fg);opacity:.75}
+.infocard .chips span{background:var(--surface);border-color:transparent}
+.infocard .chips .gold{background:var(--gold);color:#14213D}
+.authhero{display:block!important}
+.authhero .hero-art{max-width:470px}
+.login .logincard{align-self:start}
 </style>
 </head>
 <body>
 <header class="bar"><div class="wrap">
-  <a class="brand" href="#home"><span class="mark">CLB</span><span>CELPIP Prep Course<small>Learnovate Qatar</small></span></a>
+  <a class="brand" href="#home"><span class="logo" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 32 32"><rect x="5" y="20" width="4" height="7" rx="1" fill="#00B4B4"/><rect x="11" y="16" width="4" height="11" rx="1" fill="#FF5A36"/><rect x="17" y="12" width="4" height="15" rx="1" fill="#8338EC"/><rect x="23" y="7" width="4" height="20" rx="1" fill="#1F7BFF"/><circle cx="25" cy="4" r="2.4" fill="#FFC300"/></svg></span><span class="brand-t"><b>CELPIP Prep Course</b><small>Elevate with Ms. Maria</small></span></a>
   <nav class="main" aria-label="Main" hidden>
     <a href="#home" data-nav="home">My Dashboard</a>
     <a href="#syllabus" data-nav="syllabus">Syllabus</a>
@@ -401,10 +521,11 @@ table.sess td{vertical-align:middle}
     <a href="#teacher" data-nav="teacher" id="nav-teacher" hidden>Teacher Portal</a>
   </nav>
   <span id="sync" class="sync" hidden></span>
-  <button class="btn sm" id="signout" hidden>Sign out</button>
+  <a class="ibtn" href="#teacher" id="tp-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg><span>Teacher portal</span></a>
+  <button class="ibtn" id="signout" hidden>Sign out</button>
 </div></header>
 <main><div class="wrap" id="app"></div></main>
-<footer><div class="wrap"><b>Learnovate Qatar</b> · CELPIP Prep Course. Independent prep course for the CELPIP-General test. Not affiliated with or endorsed by the test publisher. All practice items are original. Your practice saves to your class with your personal access code.</div></footer>
+<footer><div class="wrap"><p class="foot1">© 2026 Elevate with Ms. Maria · Learnovate Qatar · <a href="#teacher">Teacher portal</a></p><p>Independent prep course for the CELPIP-General test. Not affiliated with or endorsed by the test publisher. All practice items are original. Your practice saves to your class with your personal access code.</p></div></footer>
 
 <script>
 /* ---------- settings ---------- */
@@ -461,7 +582,7 @@ function updateSyncBadge(){const el=document.getElementById('sync');if(!el)retur
   const [t,c]=M[cloud.code?cloud.state:(cloud.tpass?'teacher':'local')]||M.local;el.textContent=t;el.className='sync '+c}
 function renderNav(){const signed=!!(cloud.code||cloud.tpass);
   document.querySelector('nav.main').hidden=!signed;document.getElementById('nav-teacher').hidden=!cloud.tpass;
-  document.getElementById('signout').hidden=!signed;document.getElementById('sync').hidden=!signed;document.getElementById('nav-msg').hidden=!cloud.code;updateSyncBadge();updateMsgBadge()}
+  document.getElementById('signout').hidden=!signed;document.getElementById('tp-btn').hidden=signed;document.getElementById('sync').hidden=!signed;document.getElementById('nav-msg').hidden=!cloud.code;updateSyncBadge();updateMsgBadge()}
 function curRoute(){const h=(location.hash||'#home').slice(1);return h.startsWith('session-')?'session':(['syllabus','log','teacher','messages'].includes(h)?h:'home')}
 let pendingRefresh=false;
 function refreshIf(rs){if(!rs.includes(curRoute()))return;const a=document.activeElement;
@@ -499,23 +620,63 @@ function Showcase(kind){
     <div class="stats">${(kind==='teacher'?['Google Sheets backend','Email from your account','Works on any phone']:['12 live sessions','2 hours each','Teacher feedback','Progress you can see']).map(x=>`<span>${x}</span>`).join('')}</div>
     <div class="miniladder" aria-hidden="true"><div class="minirungs">${[4,5,6,7,8,9,10,11,12].map((v,i)=>`<i style="height:${22+i*9.5}%;background:var(--sk${'LRWSLRWSL'[i]});${i===5?'outline:2px solid var(--live);outline-offset:-2px;':''}"><span style="color:var(--sk${'LRWSLRWSL'[i]}i)">${v}</span></i>`).join('')}</div><small>CLB 4 → 12</small></div>
   </section>`}
-function LoginView(){return `<div class="login">${Showcase('student')}<section class="logincard">
-  <span class="mark big">CLB</span>
-  <div class="eyebrow">Learnovate Qatar · CELPIP Prep Course</div>
-  <h1>Welcome. Enter your access code.</h1>
-  <p class="lead">Your teacher gave you a personal code. It opens your dashboard and saves your practice to your class.</p>
+
+const HERO_ART=`<svg class="scene" viewBox="0 0 440 250" role="img" aria-label="A test screen with headphones, a speech bubble, a pencil and rising score bars">
+  <path d="M0 210 Q30 200 60 210 T120 210 T180 210" stroke="rgba(20,33,61,.15)" stroke-width="3" fill="none"/>
+  <rect x="96" y="44" width="200" height="132" rx="12" fill="#14213D" stroke="rgba(20,33,61,.1)" stroke-width="2"/>
+  <rect x="108" y="56" width="176" height="108" rx="6" fill="#FFFFFF"/>
+  <rect x="108" y="56" width="176" height="16" rx="6" fill="#DFE4EE"/><circle cx="118" cy="64" r="3" fill="#FF5A36"/><circle cx="128" cy="64" r="3" fill="#FFC300"/><circle cx="138" cy="64" r="3" fill="#00B86B"/>
+  <rect x="120" y="82" width="110" height="7" rx="3.5" fill="#14213D" opacity=".75"/>
+  <rect x="120" y="96" width="140" height="5" rx="2.5" fill="#7a849c" opacity=".5"/>
+  <circle cx="125" cy="115" r="5" fill="none" stroke="#7a849c" stroke-width="2"/><rect x="136" y="112" width="80" height="6" rx="3" fill="#7a849c" opacity=".45"/>
+  <circle cx="125" cy="131" r="5" fill="#00B4B4"/><rect x="136" y="128" width="96" height="6" rx="3" fill="#00B4B4" opacity=".7"/>
+  <circle cx="125" cy="147" r="5" fill="none" stroke="#7a849c" stroke-width="2"/><rect x="136" y="144" width="70" height="6" rx="3" fill="#7a849c" opacity=".45"/>
+  <rect x="180" y="176" width="32" height="14" fill="#14213D"/><rect x="160" y="188" width="72" height="6" rx="3" fill="#14213D"/>
+  <path d="M84 96 A112 70 0 0 1 308 96" stroke="#8338EC" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <rect x="70" y="92" width="26" height="44" rx="10" fill="#8338EC"/><rect x="296" y="92" width="26" height="44" rx="10" fill="#8338EC"/>
+  <rect x="318" y="28" width="96" height="54" rx="14" fill="#FF5A36"/><path d="M336 82 L330 98 L352 82 Z" fill="#FF5A36"/>
+  <circle cx="346" cy="55" r="5" fill="#fff"/><circle cx="366" cy="55" r="5" fill="#fff"/><circle cx="386" cy="55" r="5" fill="#fff"/>
+  <g transform="rotate(-35 46 60)"><rect x="20" y="54" width="56" height="12" rx="3" fill="#FFC300"/><path d="M76 54 L90 60 L76 66 Z" fill="#F4F6FA"/><rect x="14" y="54" width="8" height="12" rx="2" fill="#FF5A36"/></g>
+  <g><rect x="330" y="166" width="14" height="22" rx="3" fill="#00B4B4"/><rect x="350" y="152" width="14" height="36" rx="3" fill="#FF5A36"/><rect x="370" y="136" width="14" height="52" rx="3" fill="#8338EC"/><rect x="390" y="118" width="14" height="70" rx="3" fill="#1F7BFF"/><rect x="410" y="100" width="14" height="88" rx="3" fill="#00B86B"/></g>
+  <rect x="320" y="188" width="112" height="4" rx="2" fill="rgba(20,33,61,.15)"/>
+  <g><rect x="96" y="222" width="54" height="5" rx="2.5" fill="#00B4B4"/><rect x="150" y="222" width="54" height="5" fill="#FF5A36"/><rect x="204" y="222" width="54" height="5" fill="#8338EC"/><rect x="258" y="222" width="54" height="5" fill="#1F7BFF"/><rect x="312" y="222" width="54" height="5" fill="#00B86B"/><circle cx="372" cy="224.5" r="7" fill="#FFC300"/></g>
+</svg>`;
+function AuthHero(kind){return `<section class="hero2 authhero"><div class="hero-in"><div class="stack" style="gap:12px;min-width:0">
+  <div class="eyebrow">◆ Learnovate Qatar</div><h1>${kind==='teacher'?'Teacher Portal':'CELPIP Prep Course'}</h1>
+  <p class="lead">${kind==='teacher'?'Create batches, give each student an access code, follow their practice and coach them with messages and email tasks.':'Twelve live, teacher-led sessions and a personal Study Hub for CELPIP-General listening, reading, writing and speaking. Explained in plain English.'}</p>
+  <div class="hero-stats">${(kind==='teacher'?['Batches & codes','Progress & error logs','Messages & email']:['12 sessions','2 hours each','CLB 4 → 12']).map((x,i)=>`<span><i class="dot d${i}"></i>${x}</span>`).join('')}</div></div>
+  <div class="hero-art">${HERO_ART}</div></div></section>`}
+function PathBoard(){const ph=[['O','Start'],['L','Listening'],['L',''],['R','Reading'],['R',''],['W','Writing'],['W',''],['W',''],['S','Speaking'],['S',''],['S',''],['T','Test day']];
+  return `<section class="board"><div class="row"><div><div class="eyebrow">◆ Course board</div><h3>Your 12-session path</h3></div></div>
+    <ol class="pathmap">${SESSIONS.map((x,i)=>`<li style="${skv(x.k)}" title="Session ${x.n}: ${esc(x.title)}"><span class="pn">${x.n}</span><span class="pl">${ph[i][1]||'&nbsp;'}</span></li>`).join('')}</ol>
+    <ul class="howlist"><li><b>In class</b> · 2 hours of live teaching with Ms. Maria</li><li><b>Study Hub</b> · drills, timed writing and speaking on your own</li><li><b>Dashboard</b> · scores, error log and teacher messages</li></ul></section>`}
+function InfoCards(kind){
+  const cards=kind==='teacher'
+    ?[['Batches','Batches and access codes','Open a batch, add students and send each one a personal code by email or WhatsApp.',['Any number of batches','Codes you choose']],
+      ['Progress','Progress and error logs','See every student’s Hub tasks, scores, writing and the mistakes they logged.',['Per session','Per skill']],
+      ['Coaching','Messages and email tasks','Write to one student or a whole batch, and send CELPIP Writing Task 1 email prompts.',['In-site and email','27-minute replies']]]
+    :[['Listening','Hear it once. Answer with confidence.','Single-play audio, prediction and note-taking strategies, and distractor analysis.',['Sessions 2–3','Auto-graded']],
+      ['Reading','Scan fast. Match the paraphrase.','Correspondence, diagrams, information and viewpoints passages on a timer.',['Sessions 4–5','Timed']],
+      ['Writing','Write emails and survey responses.','27- and 26-minute tasks with a live word counter and a scoring rubric.',['Sessions 6–8','150–200 words']],
+      ['Speaking','Fill the time. Stay organized.','All 8 task types with real preparation and speaking timers.',['Sessions 9–11','Real timings']]];
+  const kk={Listening:'L',Reading:'R',Writing:'W',Speaking:'S',Batches:'O',Progress:'L',Coaching:'S'};
+  return `<div class="infocards ${kind}">${cards.map(([k,t,d,chips])=>`<article class="infocard" style="${skv(kk[k]||'O')}"><div class="stripe"></div><div class="ic-in"><div class="eyebrow">◆ ${k}</div><h3>${t}</h3><p>${d}</p>
+    <div class="chips">${chips.map(c=>`<span>${c}</span>`).join('')}<span class="gold">${kind==='teacher'?'Sign in with your password':'Sign in with your code'}</span></div></div></article>`).join('')}</div>`}
+function LoginView(){return `<div class="stack" style="gap:24px">${AuthHero('student')}<div class="login"><div class="stack" style="gap:24px">${''}<section class="logincard">
+  <h2>Sign in</h2>
+  <p class="lead">Use the access code from Ms. Maria. It opens your own dashboard and saves your practice.</p>
   <form id="login-form" class="stack" style="gap:12px" novalidate>
     <label class="field" for="login-code">Access code<input id="login-code" class="codein" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="CEL-AB12CD" maxlength="20"></label>
-    <button class="btn primary" type="submit" id="login-btn">Open my dashboard</button>
+    <button class="btn primary" type="submit" id="login-btn">Sign in</button>
     <p class="err" id="login-msg" role="alert"></p>
   </form>
-  <p class="muted" style="font-size:13px">No code yet? Ask your teacher. · <a href="#teacher">Teacher sign in</a></p></section></div>`}
+  <p class="muted" style="font-size:13px">No code yet? Ask your teacher. · <a href="#teacher">Teacher sign in</a></p></section>${PathBoard()}</div>${InfoCards('student')}</div></div>`}
 function bindLogin(){const f=document.getElementById('login-form');if(!f)return;const inp=document.getElementById('login-code');inp.focus();
   f.addEventListener('submit',async e=>{e.preventDefault();const code=inp.value.trim().toUpperCase();const msg=document.getElementById('login-msg');const btn=document.getElementById('login-btn');
     if(code.length<4){msg.textContent='Enter the code your teacher gave you.';return}
     btn.disabled=true;btn.textContent='Checking…';msg.textContent='';
     try{const j=await api('student.login',{code});PREFIX='bcs:'+j.student.code+':';applyStudent(j);location.hash='#home';view()}
-    catch(err){msg.textContent=errMsg(err);btn.disabled=false;btn.textContent='Open my dashboard'}})}
+    catch(err){msg.textContent=errMsg(err);btn.disabled=false;btn.textContent='Sign in'}})}
 
 const ago=t=>{t=Number(t);if(!t)return '–';const m=Math.round((Date.now()-t)/60000);if(m<2)return 'just now';if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' h ago';const d=Math.round(h/24);return d+' day'+(d>1?'s':'')+' ago'};
 const fmtDate=d=>{if(!d)return '';try{const x=new Date(d+'T12:00:00');return isNaN(x)?d:x.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}catch(e){return d}};
@@ -1117,7 +1278,7 @@ function MessagesView(){
       <label class="field" for="s-body">Message<textarea id="s-body" placeholder="Type your message…"></textarea></label>
       <div class="row"><button class="btn primary" id="s-send">Send message</button><span class="muted" id="s-msg" style="font-size:13px"></span></div></section>`;
   return `<div class="stack" style="gap:24px">
-    <section class="hero2 slim" style="background:var(--skL)"><div class="row"><div class="stack" style="gap:10px;flex:1;min-width:0"><div class="eyebrow" style="color:var(--skLi)">Messages</div><h1>Talk with your teacher</h1>
+    <section class="hero2 slim"><div class="row"><div class="stack" style="gap:10px;flex:1;min-width:0"><div class="eyebrow" style="color:var(--skLi)">Messages</div><h1>Talk with your teacher</h1>
       <p class="lead">Ask questions and read announcements. When Ms. Maria sends an <b>email-writing task</b>, reply here like CELPIP Writing Task 1: 150–200 words in 27 minutes.</p></div><button class="btn" id="s-refresh">Check for new messages</button></div></section>
     <section class="panel">${Thread(msgs,'student')}</section>${comp}</div>`}
 function bindMessages(){if(!cloud.code)return;
@@ -1188,19 +1349,18 @@ function stuStats(r){const tasks=r.tasks||{};const done=Object.values(tasks).fil
   const sc=skillScores(r.res||{});const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
   const log=r.log||[];return {done,cur,L:avg(sc.L),R:avg(sc.R),W:avg(sc.W),S:avg(sc.S),log,untagged:log.filter(e=>!e.cause).length}}
 
-function TeacherLogin(){return `<div class="login">${Showcase('teacher')}<section class="logincard">
-  <span class="mark big" style="background:var(--lav);color:var(--skRi)">${icon('O',24)}</span>
-  <div class="eyebrow" style="color:var(--skRi)">Teacher Portal</div><h1>Teacher sign in</h1>
+function TeacherLogin(){return `<div class="stack" style="gap:24px">${AuthHero('teacher')}<div class="login"><section class="logincard">
+  <h2>Teacher sign in</h2>
   <p class="lead">Use the teacher password you set in your Apps Script project.</p>
   <form id="tlogin-form" class="stack" style="gap:12px" novalidate>
     <label class="field" for="tlogin-pass">Password<input id="tlogin-pass" type="password" autocomplete="current-password"></label>
     <button class="btn primary" type="submit" id="tlogin-btn">Sign in</button><p class="err" id="tlogin-msg" role="alert"></p></form>
-  <p class="muted" style="font-size:13px"><a href="#home">Student sign in</a></p></section></div>`}
+  <p class="muted" style="font-size:13px"><a href="#home">Student sign in</a></p></section>${InfoCards('teacher')}</div></div>`}
 
 function TeacherView(){
   if(!cloud.tpass)return TeacherLogin();
   const t=cloud.t;
-  const head=`<section class="hero2 slim" style="background:var(--lav)"><div class="row" style="align-items:flex-start"><div class="stack" style="gap:10px;flex:1;min-width:0"><div class="eyebrow" style="color:var(--skRi)">Teacher Portal</div><h1>Batches and students</h1>
+  const head=`<section class="hero2 slim"><div class="row" style="align-items:flex-start"><div class="stack" style="gap:10px;flex:1;min-width:0"><div class="eyebrow" style="color:var(--skRi)">Teacher Portal</div><h1>Batches and students</h1>
     <p class="lead">Create a batch, add your students and give each one an access code. Their practice, scores and writing appear here.</p></div>
     <button class="btn" id="t-refresh" ${t.loading?'disabled':''}>${t.loading?'Refreshing…':'Refresh'}</button></div>${t.at?`<p class="muted" style="font-size:12.5px;margin-top:8px">Last updated ${ago(t.at)}</p>`:''}</section>`;
   if(!t.loaded)return `<div class="stack" style="gap:24px">${head}${t.error?`<div class="notice">${esc(t.error)} <button class="btn sm" id="t-retry">Try again</button></div>`:'<div class="panel empty">Loading your classes…</div>'}</div>`;
