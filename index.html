@@ -508,6 +508,17 @@ nav.main a[aria-current="page"]{background:#14213D;color:#fff}
 .authhero{display:block!important}
 .authhero .hero-art{max-width:470px}
 .login .logincard{align-self:start}
+
+.tlogin{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:28px;align-items:center;padding-block:8px}
+@media(max-width:900px){.tlogin{grid-template-columns:minmax(0,1fr)}}
+.tlogin .showcase{background:linear-gradient(140deg,#F2EBFD 0%,#FBE4EC 52%,#E9F2FF 100%)}
+.tlogin .showcase .eyebrow{color:var(--skRi)}
+.tlogin .showcase h1{font-size:clamp(30px,4.2vw,44px)}
+.minirungs i span{color:#fff}
+.logincard.tcard{padding:30px;border-radius:28px;background-image:radial-gradient(420px 200px at 100% 0%,#FBE4EC,transparent 70%),radial-gradient(420px 220px at 0% 100%,#E9F2FF,transparent 70%)!important}
+.tcard h2{font-size:30px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tlogin .showcase{background:linear-gradient(140deg,var(--skR),var(--skW) 52%,var(--skL))}}
+:root[data-theme="dark"] .tlogin .showcase{background:linear-gradient(140deg,var(--skR),var(--skW) 52%,var(--skL))}
 </style>
 </head>
 <body>
@@ -618,7 +629,7 @@ function Showcase(kind){
     <p class="lead">${kind==='teacher'?'Add students, track their practice, and coach them with messages and CELPIP-style email tasks.':'Twelve live, teacher-led sessions plus a personal Study Hub for listening, reading, writing and speaking practice.'}</p>
     <div class="sk4">${items.map(([k,t,d])=>`<div style="${skv(k)}"><span class="ic">${icon(k)}</span><span><b>${t}</b><small>${d}</small></span></div>`).join('')}</div>
     <div class="stats">${(kind==='teacher'?['Google Sheets backend','Email from your account','Works on any phone']:['12 live sessions','2 hours each','Teacher feedback','Progress you can see']).map(x=>`<span>${x}</span>`).join('')}</div>
-    <div class="miniladder" aria-hidden="true"><div class="minirungs">${[4,5,6,7,8,9,10,11,12].map((v,i)=>`<i style="height:${22+i*9.5}%;background:var(--sk${'LRWSLRWSL'[i]});${i===5?'outline:2px solid var(--live);outline-offset:-2px;':''}"><span style="color:var(--sk${'LRWSLRWSL'[i]}i)">${v}</span></i>`).join('')}</div><small>CLB 4 → 12</small></div>
+    <div class="miniladder" aria-hidden="true"><div class="minirungs">${[4,5,6,7,8,9,10,11,12].map((v,i)=>`<i style="height:${22+i*9.5}%;background:${['#1F7BFF','#8338EC','#FF5A36','#E0457B','#1F7BFF','#8338EC','#FF5A36','#E0457B','#00B4B4'][i]};opacity:.78"><span>${v}</span></i>`).join('')}</div><small>CLB 4 → 12</small></div>
   </section>`}
 
 const HERO_ART=`<svg class="scene" viewBox="0 0 440 250" role="img" aria-label="A test screen with headphones, a speech bubble, a pencil and rising score bars">
@@ -1349,13 +1360,15 @@ function stuStats(r){const tasks=r.tasks||{};const done=Object.values(tasks).fil
   const sc=skillScores(r.res||{});const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
   const log=r.log||[];return {done,cur,L:avg(sc.L),R:avg(sc.R),W:avg(sc.W),S:avg(sc.S),log,untagged:log.filter(e=>!e.cause).length}}
 
-function TeacherLogin(){return `<div class="stack" style="gap:24px">${AuthHero('teacher')}<div class="login"><section class="logincard">
+function TeacherLogin(){return `<div class="tlogin">${Showcase('teacher')}<section class="logincard tcard">
+  <span class="mark big" style="background:var(--lav);color:var(--skRi)">${icon('O',24)}</span>
+  <div class="eyebrow" style="color:var(--skRi)">Teacher Portal</div>
   <h2>Teacher sign in</h2>
   <p class="lead">Use the teacher password you set in your Apps Script project.</p>
   <form id="tlogin-form" class="stack" style="gap:12px" novalidate>
     <label class="field" for="tlogin-pass">Password<input id="tlogin-pass" type="password" autocomplete="current-password"></label>
     <button class="btn primary" type="submit" id="tlogin-btn">Sign in</button><p class="err" id="tlogin-msg" role="alert"></p></form>
-  <p class="muted" style="font-size:13px"><a href="#home">Student sign in</a></p></section>${InfoCards('teacher')}</div></div>`}
+  <p class="muted" style="font-size:13px"><a href="#home">Student sign in</a></p></section></div>`}
 
 function TeacherView(){
   if(!cloud.tpass)return TeacherLogin();
