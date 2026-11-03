@@ -519,6 +519,33 @@ nav.main a[aria-current="page"]{background:#14213D;color:#fff}
 .tcard h2{font-size:30px}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tlogin .showcase{background:linear-gradient(140deg,var(--skR),var(--skW) 52%,var(--skL))}}
 :root[data-theme="dark"] .tlogin .showcase{background:linear-gradient(140deg,var(--skR),var(--skW) 52%,var(--skL))}
+
+/* quick-access tiles + hover motion */
+.qtiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;background:color-mix(in srgb,var(--surface) 70%,transparent);border:1px solid var(--line);border-radius:22px;padding:12px;box-shadow:var(--shadow)}
+@media(max-width:720px){.qtiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.qtile{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;text-decoration:none;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px 10px 16px;min-width:0;
+  transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s,border-color .22s}
+.qic{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:var(--c);color:var(--ci);box-shadow:0 0 0 4px var(--surface),0 0 0 5px var(--line);transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.qtile b{font-size:15px;font-weight:600;margin-top:6px}
+.qtile small{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.qtile:hover,.qtile:focus-visible{transform:translateY(-4px);border-color:var(--ci);box-shadow:0 12px 28px rgba(20,33,61,.1)}
+.qtile:hover .qic,.qtile:focus-visible .qic{transform:scale(1.12) rotate(-6deg)}
+.qtile:active{transform:translateY(-1px) scale(.98)}
+.skcard,.infocard,.srow,.strip a,.tile,.board,.sk4>div,.upnext,.panel.classcard3>div{transition:transform .22s cubic-bezier(.2,.8,.2,1),box-shadow .22s}
+.skcard:hover,.infocard:hover,.strip a:hover,.sk4>div:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(20,33,61,.1)}
+.srow:hover{transform:translateX(4px)}
+.skcard .ic,.sk4 .ic,.infocard .eyebrow{transition:transform .3s cubic-bezier(.3,1.6,.5,1)}
+.skcard:hover .ic,.sk4>div:hover .ic{transform:scale(1.12) rotate(-6deg)}
+.btn{transition:transform .15s,background .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary:hover{box-shadow:0 6px 16px rgba(20,33,61,.18)}
+.hero-art .scene g:last-of-type circle{animation:pulse2 2.4s ease-in-out infinite;transform-origin:372px 224px;transform-box:fill-box}
+@keyframes pulse2{50%{transform:scale(1.35)}}
+@media (prefers-reduced-motion:reduce){.qtile,.qic,.skcard,.infocard,.srow,.strip a,.btn,.sk4>div{transition:none!important;transform:none!important}.hero-art .scene g:last-of-type circle{animation:none}}
+.qic{background:var(--qbg);color:#14213D}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .qic{background:var(--c);color:var(--ci)}}
+:root[data-theme="dark"] .qic{background:var(--c);color:var(--ci)}
+.qtile:hover,.qtile:focus-visible{border-color:color-mix(in srgb,#14213D 30%,var(--qbg))}
 </style>
 </head>
 <body>
@@ -966,6 +993,20 @@ const icon=(k,sz=22)=>`<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" fil
 const CHECK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-label="Complete"><path d="M5 12l5 5 9-10"/></svg>';
 const skv=k=>`--c:var(--sk${k});--ci:var(--sk${k}i)`;
 const SKSESS={L:[2,3],R:[4,5],W:[6,7,8],S:[9,10,11]};
+
+const QICON={
+ log:'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h5M14.5 16.5l1.5 1.5 3-3"/>',
+ msg:'<path d="M4 5h16v11H9l-5 4z"/><path d="M8 9h8M8 12h5"/>',
+ map:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/>',
+ flag:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>'};
+const qicon=k=>`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${QICON[k]||ICON[k]}</svg>`;
+function firstOpen(ns){const s=ns.map(n=>SESSIONS[n-1]).find(x=>sessionProgress(x).pct<100);return '#session-'+(s?s.n:ns[0])}
+function QuickTiles(){const log=store.get('log',[]);const unread=typeof unreadCount==='function'?unreadCount():0;
+  const T=[['L','Listening','Sessions 2–3',firstOpen([2,3]),'L'],['R','Reading','Sessions 4–5',firstOpen([4,5]),'R'],['W','Writing','Sessions 6–8',firstOpen([6,7,8]),'W'],['S','Speaking','Sessions 9–11',firstOpen([9,10,11]),'S'],
+    ['O','Syllabus','12 sessions','#syllabus','map'],['R','Error Log',log.length?`${log.length} to review`:'No errors yet','#log','log'],
+    ['W','Messages',cloud.code?(unread?`${unread} new`:'Write to your teacher'):'Students only',cloud.code?'#messages':'#home','msg'],['T','Test Day','Session 12','#session-12','flag']];
+  const PAS=['#D9F7E8','#DCEBFF','#FFF1BF','#ECE3FF','#FFE0E6','#D6F7F2','#FCE3F3','#F3E5FF'];
+  return `<section class="qtiles" aria-label="Quick access">${T.map(([k,t,sub,href,ic],i)=>`<a class="qtile" href="${href}" style="${skv(k)};--qbg:${PAS[i]}"><span class="qic">${qicon(ic)}</span><b>${t}</b><small>${esc(sub)}</small></a>`).join('')}</section>`}
 function Dashboard(){
   const nx=nextSession();const targets=store.get('targets',{L:9,R:9,W:9,S:9});const sc=skillScores();
   const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
@@ -987,6 +1028,7 @@ function Dashboard(){
       <div class="note">Each level you climb opens more immigration and citizenship options. Set your targets below.</div>
     </figure>
   </section>
+  ${QuickTiles()}
   <section>
     <div class="secthead"><h2>Your four skills</h2><span class="muted" style="font-size:13px">Pick the CLB level your application requires</span></div>
     <div class="skills4">${['L','R','W','S'].map(k=>{const ss=SKSESS[k].map(n=>SESSIONS[n-1]);const d=ss.reduce((a,x)=>a+sessionProgress(x).done,0),t=ss.reduce((a,x)=>a+x.tasks.length,0);
