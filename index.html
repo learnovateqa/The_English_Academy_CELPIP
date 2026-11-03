@@ -1389,7 +1389,51 @@ function addLog(entry){const log=store.get('log',[]);log.unshift(Object.assign({
 
 /* ---------- timers registry ---------- */
 let intervals=[];const every=(fn,ms)=>{const id=setInterval(fn,ms);intervals.push(id);return id};
-function clearAll(){intervals.forEach(clearInterval);intervals=[];try{speechSynthesis.cancel()}catch(e){}}
+function clearAll(){intervals.forEach(clearInterval);intervals=[];TTS.stopAll()}
+/* ---------- listening audio engine (browser voices) ---------- */
+const TTS=(()=>{
+  const OK='speechSynthesis' in window;
+  // macOS novelty / effect voices that sound robotic or silly
+  const NOVELTY=/^(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Junior|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Fred|Ralph|Kathy|Princess|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley)\b/i;
+  const FEM=/female|google us english|samantha|karen|moira|tessa|victoria|allison|ava\b|susan|zira|aria|jenny|clara|libby|sonia|serena|fiona|catherine|nicky|emma|michelle|natasha|hazel|kate\b|zoe|linda|heather|nora|olivia|sara|amy|joanna|kendra|kimberly|salli|ivy|ruth|nancy|sonia|maisie|isla|sienna/i;
+  const MAL=/\bmale|richard|daniel|alex\b|tom\b|oliver|david|mark\b|guy\b|ryan|liam|arthur|aaron|evan|nathan|thomas|george|james|rishi|christopher|eric|andrew|brian|william|matthew|roger|steffan|joey|justin|kevin|stephen|connor|elliot|davis|tony|jason|reed/i;
+  const GENDER={Dana:'f',Okafor:'m',Mei:'f',Jordan:'m',Librarian:'f',Farah:'f',Lucas:'m',Grace:'f',Reporter:'f',Customer:'f',Pharmacist:'m',Sam:'m',Priya:'f',Receptionist:'f',Leo:'m',Omar:'m',Lena:'f',Joy:'f'};
+  let voices=[],gen=0;
+  const load=()=>{try{voices=speechSynthesis.getVoices().filter(v=>/^en([-_]|$)/i.test(v.lang)&&!NOVELTY.test(v.name))}catch(e){voices=[]}};
+  const ready=()=>new Promise(res=>{if(!OK)return res();load();if(voices.length)return res();let done=false;const fin=()=>{if(done)return;done=true;load();res()};
+    try{speechSynthesis.addEventListener('voiceschanged',fin,{once:true})}catch(e){}setTimeout(fin,1500)});
+  const score=v=>{let s=0;const n=v.name;if(/natural|neural|premium|enhanced/i.test(n))s+=50;if(/google/i.test(n))s+=30;if(/microsoft/i.test(n)&&/online/i.test(n))s+=40;else if(/microsoft/i.test(n))s+=15;
+    // Canadian accent first (CELPIP is a Canadian test), then American, which sounds closest
+    if(/^en[-_]CA/i.test(v.lang))s+=70;else if(/^en[-_]US/i.test(v.lang))s+=45;else if(/^en[-_]GB/i.test(v.lang))s+=8;else if(/^en[-_](AU|NZ|IE)/i.test(v.lang))s+=4;
+    if(/samantha|daniel|karen|alex\b|aria|jenny|guy/i.test(n))s+=6;if(v.default)s+=1;return s};
+  const gOf=v=>FEM.test(v.name)?'f':MAL.test(v.name)?'m':'';
+  function cast(speakers){const pool=[...voices].sort((a,b)=>score(b)-score(a));const used=new Set(),map={},count={};
+    speakers.forEach((sp,i)=>{const want=GENDER[sp]||(i%2?'m':'f');
+      const free=pool.filter(x=>!used.has(x)),top=free.length?score(free[0]):0;
+      // a voice of the right gender only if it is nearly as good (same accent family)
+      const v=free.find(x=>gOf(x)===want&&score(x)>=top-25)||free[0]||pool.find(x=>gOf(x)===want)||pool[0]||null;
+      if(v)used.add(v);const k=v?v.name:'_';count[k]=(count[k]||0)+1;
+      // only when the device has too few voices: a small pitch change so speakers still sound different
+      map[sp]={voice:v,pitch:count[k]===1?1:count[k]===2?.92:1.1}});return map}
+  const clean=t=>String(t).replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/\bIT\b/g,'I.T.').replace(/…/g,'... ');
+  const split=t=>{const c=clean(t);let parts;try{parts=c.split(/(?<!\b(?:Mr|Mrs|Ms|Dr|St|a\.m|p\.m)\.)(?<=[.!?]["']?)\s+(?=["']?[A-Z0-9])/)}catch(e){parts=[c]}return parts.map(x=>x.trim()).filter(Boolean)};
+  function play(lines,o={}){const my=++gen;let timer=null;
+    if(!OK){o.onEnd&&o.onEnd(false);return ()=>{}}
+    (async()=>{try{speechSynthesis.cancel()}catch(e){}await ready();if(my!==gen)return;
+      const sp=[...new Set(lines.map(l=>l[0]))],cs=cast(sp),q=[];
+      lines.forEach(([who,text],li)=>split(text).forEach((t,pi)=>q.push({who,t,li,first:pi===0,pause:pi?160:li===0?0:who===lines[li-1][0]?350:who==='Reporter'?1500:450})));
+      let i=0;const next=()=>{clearTimeout(timer);if(my!==gen)return;if(i>=q.length){o.onEnd&&o.onEnd(true);return}
+        const it=q[i++];setTimeout(()=>{if(my!==gen)return;if(it.first&&o.onLine)o.onLine(it.li);
+          const u=new SpeechSynthesisUtterance(it.t),c=cs[it.who];if(c&&c.voice){u.voice=c.voice;u.lang=c.voice.lang}else u.lang='en-US';
+          u.pitch=c?c.pitch:1;u.rate=o.rate||.95;u.volume=1;let fired=false;const go=()=>{if(fired)return;fired=true;clearTimeout(timer);next()};u.onend=go;u.onerror=go;
+          TTS._u=u;const words=it.t.split(/\s+/).length;timer=setTimeout(()=>{try{speechSynthesis.cancel()}catch(e){}go()},(words/1.9/u.rate+5)*1000);
+          try{if(speechSynthesis.paused)speechSynthesis.resume();speechSynthesis.speak(u)}catch(e){go()}},it.pause)};
+      next()})();
+    return ()=>{if(my===gen){gen++;clearTimeout(timer);try{speechSynthesis.cancel()}catch(e){}}}}
+  const stopAll=()=>{gen++;try{speechSynthesis.cancel()}catch(e){}};
+  const test=()=>play([['Reporter','This is a sound check. If you can hear this clearly, you are ready to start.']]);
+  return {OK,play,stopAll,test,ready,voices:()=>(load(),voices)}})();
+
 const fmt=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
 let audioCtx=null;function beep(f=880){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.25)}catch(e){}}
 
@@ -1585,8 +1629,9 @@ function buildSteps(s){stepCleanup();
     if(intro){intro.innerHTML=`<div class="si-box" style="${skv(m.k)}"><div class="eyebrow">Step ${i+1} · ${esc(m.type)}</div><p class="si-what">${esc(m.what)}</p>
       <ul class="si-list">${m.info.map(x=>`<li>${esc(x)}</li>`).join('')}${m.need?`<li>You need: ${esc(m.need)}</li>`:''}</ul>
       ${done?`<p class="muted" style="font-size:13.5px">You finished this step (${esc(resultLabel(t,v))}). You can do it again to improve.</p>`:''}
-      <button class="btn primary" data-si-start>${done?'Try again':'Start'} →</button></div>`;
-      intro.querySelector('[data-si-start]').addEventListener('click',()=>{started[t]=true;paint(i);host.dispatchEvent(new Event('stepstart'));const f=card.querySelector('.tool-body button,.tool-body textarea');if(f)f.focus({preventScroll:true})})}
+      <div class="row" style="gap:8px"><button class="btn primary" data-si-start>${done?'Try again':'Start'} →</button>${m.k==='L'&&QUIZ[t]?'<button class="btn" data-si-sound>🔊 Sound check</button>':''}</div></div>`;
+      const sc=intro.querySelector('[data-si-sound]');if(sc)sc.addEventListener('click',()=>TTS.test());
+      intro.querySelector('[data-si-start]').addEventListener('click',()=>{TTS.stopAll();started[t]=true;paint(i);host.dispatchEvent(new Event('stepstart'));const f=card.querySelector('.tool-body button,.tool-body textarea');if(f)f.focus({preventScroll:true})})}
     const nx=card.querySelector('.step-next');const nextI=s.tools.findIndex((x,k)=>k>i&&!isDone(x));
     nx.innerHTML=done&&started[t]?`<span>${CHECK} Step ${i+1} done.</span><span class="spacer"></span>${nextI>=0?`<button class="btn primary sm" data-next>Next: Step ${nextI+1} →</button>`:'<b>All steps done. Great work!</b>'}`:'';
     const nb=nx.querySelector('[data-next]');if(nb)nb.addEventListener('click',()=>setOpen(nextI,true))};
@@ -1629,12 +1674,9 @@ function Quiz(host,s,key){
   const play=host.querySelector('[data-play]');
   if(play)play.addEventListener('click',()=>{if(played)return;played=true;play.disabled=true;const st=host.querySelector('[data-pstatus]');const pl=host.querySelector('[data-player]');
     const reveal=()=>{pl.classList.remove('playing');st.textContent='Audio finished. Answer the questions.';qsEl.hidden=false;host.querySelector('[data-submit]').hidden=false;startTimer()};
-    if(!('speechSynthesis' in window)){st.textContent='Audio is not available in this browser. Read the transcript once instead.';showTranscript();reveal();return}
+    if(!TTS.OK){st.textContent='Audio is not available in this browser. Read the transcript once instead.';showTranscript();reveal();return}
     pl.classList.add('playing');st.textContent='Playing… listen carefully.';
-    const voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));const speakers=[...new Set(q.audio.map(a=>a[0]))];
-    let i=0;const next=()=>{if(i>=q.audio.length){reveal();return}const [who,text]=q.audio[i++];const u=new SpeechSynthesisUtterance(text);u.lang='en-CA';u.rate=.98;
-      const idx=speakers.indexOf(who);if(voices.length)u.voice=voices[idx%voices.length];u.pitch=idx===1?.85:1.05;u.onend=next;u.onerror=next;speechSynthesis.speak(u)};
-    try{next()}catch(e){reveal()}});
+    TTS.play(q.audio,{onEnd:ok=>{if(!ok){st.textContent='Audio is not available. Read the transcript once instead.';showTranscript()}reveal()}})});
   function showTranscript(){if(host.querySelector('[data-transcript]'))return;const d=document.createElement('div');d.className='transcript';d.dataset.transcript='';d.innerHTML='<div class="eyebrow" style="margin-bottom:6px">Transcript</div>'+q.audio.map(([w,t])=>`<p><b>${esc(w)}:</b> ${esc(t)}</p>`).join('');host.querySelector('[data-out]').before(d)}
   host.querySelector('[data-submit]').addEventListener('click',()=>grade(false));
   function grade(auto){if(submitted)return;submitted=true;if(timerId)clearInterval(timerId);let score=0;
@@ -2007,13 +2049,7 @@ function TeacherGuide(g){return `<section class="panel stack guide" style="gap:1
     <div><span class="lab">Watch for</span><ul>${b.watch.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div><p class="gtip">⏱ ${esc(b.tip)}</p></details>`).join('')}</section>`}
 
 /* ---------- Sessions 2 & 3 · live widgets ---------- */
-function ttsLines(lines,onLine,onEnd){
-  if(!('speechSynthesis' in window)){onEnd&&onEnd(false);return ()=>{}}
-  let stop=false,i=0;const voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));const sp=[...new Set(lines.map(l=>l[0]))];
-  const next=()=>{if(stop)return;if(i>=lines.length){onEnd&&onEnd(true);return}const idx=i++;const [who,text]=lines[idx];onLine&&onLine(idx);
-    const u=new SpeechSynthesisUtterance(text);u.lang='en-CA';u.rate=.95;const si=sp.indexOf(who);if(voices.length)u.voice=voices[si%voices.length];u.pitch=[1.05,.85,1.2][si%3];u.onend=next;u.onerror=next;speechSynthesis.speak(u)};
-  try{speechSynthesis.cancel();next()}catch(e){onEnd&&onEnd(false)}
-  return ()=>{stop=true;try{speechSynthesis.cancel()}catch(e){}}}
+function ttsLines(lines,onLine,onEnd){return TTS.play(lines,{onLine,onEnd})}
 
 const THINK_CLIP={context:'Part 1 · Problem Solving. Sam, a customer, calls Priya, an agent at an internet company.',cols:['Sam (customer)','Priya (agent)'],
  lines:[['Sam','Hi, my internet has been cutting out every evening since Monday.',0,'net ✗ evenings · since Mon','The problem comes first. Write it short: "net ✗".'],
