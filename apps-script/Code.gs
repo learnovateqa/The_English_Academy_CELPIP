@@ -7,6 +7,7 @@
  *   Feedback · your feedback to each student
  *
  *   Messages · messages and email-writing tasks between you and students
+ *   Settings · slide-deck links per session and each batch's session schedule
  *
  * Setup: see README.md. After pasting, reload the Sheet and use the
  * "CELPIP Course" menu: Set teacher password, Set up sheets, Send me a test email.
@@ -16,8 +17,11 @@ const SHEET_HEADERS = {
   Students: ['code', 'name', 'email', 'phone', 'batch', 'createdAt', 'updatedAt'],
   Progress: ['code', 'updatedAt', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'],
   Feedback: ['code', 'text', 'updatedAt'],
-  Messages: ['id', 'code', 'batch', 'from', 'kind', 'subject', 'body', 'createdAt', 'readS', 'readT', 'emailed', 'replyTo']
+  Messages: ['id', 'code', 'batch', 'from', 'kind', 'subject', 'body', 'createdAt', 'readS', 'readT', 'emailed', 'replyTo'],
+  Settings: ['key', 'value', 'updatedAt']
 };
+const SETTING_RE = /^(deck:([1-9]|1[0-2])|open:[A-Za-z0-9]{1,20})$/;
+const EMBED_HOSTS = /^https:\/\/(www\.canva\.com|canva\.link|docs\.google\.com|onedrive\.live\.com|view\.officeapps\.live\.com|pitch\.com|gamma\.app)\//;
 const CHUNK = 45000;          // a Sheets cell holds at most 50,000 characters
 const CODE_RE = /^[A-Z0-9-]{4,20}$/;
 
@@ -106,7 +110,7 @@ function route_(q) {
     if (a === 'student.save') { saveProgress_(st.code, q.progress); return { savedAt: Date.now() }; }
     if (a === 'student.messages') {
       const fb0 = find_('Feedback', 'code', st.code);
-      return { messages: studentMsgs_(st), feedback: fb0 ? { text: String(fb0.text), updatedAt: Number(fb0.updatedAt) || 0 } : null };
+      return { messages: studentMsgs_(st), feedback: fb0 ? { text: String(fb0.text), updatedAt: Number(fb0.updatedAt) || 0 } : null, settings: readSettings_() };
     }
     if (a === 'student.send') {
       const body = clean_(q.body, 6000);
@@ -127,7 +131,8 @@ function route_(q) {
       batch: b ? pubBatch_(b) : null,
       progress: readProgress_(find_('Progress', 'code', st.code)),
       feedback: fb ? { text: String(fb.text), updatedAt: Number(fb.updatedAt) || 0 } : null,
-      messages: studentMsgs_(st)
+      messages: studentMsgs_(st),
+      settings: readSettings_()
     };
   }
 
@@ -226,6 +231,18 @@ function route_(q) {
         return { message: pubMsg_(row), email: result };
       }
 
+      case 'teacher.setting.save': {
+        const key = String(q.key || '');
+        if (!SETTING_RE.test(key)) fail_('bad_request', 'Unknown setting');
+        const value = clean_(q.value, 1000);
+        if (value && key.indexOf('deck:') === 0 && !EMBED_HOSTS.test(value)) fail_('bad_link', 'Use a Canva, Google Slides, PowerPoint Online, Pitch or Gamma link');
+        if (value && key.indexOf('open:') === 0) { try { JSON.parse(value); } catch (e) { fail_('bad_request', 'Schedule must be JSON'); } }
+        const existing = find_('Settings', 'key', key);
+        if (!value) { if (existing) sheet_('Settings').deleteRow(existing._row); return { settings: readSettings_() }; }
+        write_('Settings', { key: key, value: value, updatedAt: Date.now() }, existing && existing._row);
+        return { settings: readSettings_() };
+      }
+
       case 'teacher.read':
         markRead_('readT', q.ids, function () { return true; });
         return {};
@@ -251,7 +268,8 @@ function teacherData_() {
     batches: rows_('Batches').map(pubBatch_),
     students: rows_('Students').map(pubStudent_),
     progress: progress, feedback: feedback,
-    messages: rows_('Messages').map(pubMsg_)
+    messages: rows_('Messages').map(pubMsg_),
+    settings: readSettings_()
   };
 }
 
@@ -317,6 +335,11 @@ function notifyTeacher_(st, row) {
     MailApp.sendEmail(Session.getEffectiveUser().getEmail(), 'New message from ' + st.name + (row.subject ? ': ' + row.subject : ''),
       row.body + '\n\nOpen the Teacher Portal to reply.');
   } catch (e) {}
+}
+function readSettings_() {
+  const o = {};
+  rows_('Settings').forEach(function (r) { if (SETTING_RE.test(String(r.key))) o[String(r.key)] = String(r.value || ''); });
+  return o;
 }
 function newId_(p) { return p + Utilities.getUuid().replace(/-/g, '').slice(0, 10); }
 

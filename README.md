@@ -48,6 +48,21 @@ API_URL:'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'
 3. Click **Copy message** and send it to the student by email, text or WhatsApp.
 4. The student opens the link, types the code, and their dashboard opens.
 
+## Slide decks
+
+- Each session's PowerPoint is in `decks/`. Session 1 is ready, and more are coming.
+- In the **Teacher Portal → Slide decks**, click **Download PowerPoint**.
+- In Canva, use **Create a design → Import file** and make the deck your own.
+- In Canva, use **Share → More → Embed** (or a Public view link). Paste it into the session's **Canva link** box in the Teacher Portal and click **Save**. The deck appears on that session's page for everyone.
+- `tools/session-01-deck.js` regenerates the PowerPoint with pptxgenjs.
+
+## Session schedule per batch
+
+- In the **Teacher Portal**, open a batch, then **Session schedule**.
+- Set each session to **Open**, **Locked** or **Opens on…** a date.
+- **Fill weekly dates from start date** adds two sessions per week. **Save schedule** applies it.
+- Students in that batch see 🔒 on sessions that aren't open yet. You always see every session.
+
 ## Messaging and email
 
 - **Students** have a **Messages** page. They can write to you and reply to your tasks, and a red badge shows unread messages.
