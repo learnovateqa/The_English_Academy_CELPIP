@@ -1,4 +1,6 @@
 // Session 1 deck · CELPIP Prep Course · Elevate with Ms. Maria · Learnovate Qatar
+// Build:  NODE_PATH=<folder with pptxgenjs, react-icons, react, react-dom, sharp>/node_modules \
+//         APPLY_THEME=<pptx skill>/scripts/apply_theme.js node tools/session-01-deck.js decks/session-01.pptx
 const pptxgen = require('pptxgenjs');
 const React = require('react');
 const { renderToStaticMarkup } = require('react-dom/server');
@@ -7,17 +9,23 @@ const Lu = require('react-icons/lu');
 const { applyTheme } = require(process.env.APPLY_THEME || './apply_theme.js');
 
 const THEME = { name: 'Elevate Pastel', headFontFace: 'Poppins', bodyFontFace: 'Poppins',
-  colors: { dk1: '14213D', lt1: 'FFFFFF', dk2: '4A5675', lt2: 'F4F6FA', accent1: '1A5FCC', accent2: '6A2BC4', accent3: 'C93D1A',
-    accent4: '007F7F', accent5: '008F55', accent6: 'FFC300', hlink: '1A5FCC', folHlink: '6A2BC4' } };
-// skill palette: [pastel fill, ink]
-const SK = { L: ['E9F2FF', '1A5FCC'], R: ['F2EBFD', '6A2BC4'], W: ['FFEEEA', 'C93D1A'], S: ['E6F8F8', '007F7F'], O: ['E6F8F0', '008F55'], G: ['FFF6D6', '8A6A00'] };
-const NAVY = '14213D', MUTED = '4A5675';
+  colors: { dk1: '14213D', lt1: 'FFFFFF', dk2: '5B6782', lt2: 'F6F7FB', accent1: '1A5FCC', accent2: '6A2BC4', accent3: 'C93D1A',
+    accent4: '007F7F', accent5: '008F55', accent6: 'E0A800', hlink: '1A5FCC', folHlink: '6A2BC4' } };
+// [soft fill, ink]
+const SK = { L: ['EAF2FF', '1A5FCC'], R: ['F3ECFE', '6A2BC4'], W: ['FFEFEA', 'C93D1A'], S: ['E5F7F6', '007F7F'], O: ['E7F7EF', '008F55'], G: ['FFF7DB', '8A6A00'] };
+const NAVY = '14213D', MUTED = '5B6782', LINE = 'E6E9F2';
 
 async function icon(name, color, size = 256) {
-  const svg = renderToStaticMarkup(React.createElement(Lu[name], { color: '#' + color, size: String(size) }));
-  const png = await sharp(Buffer.from(svg)).png().toBuffer();
-  return 'image/png;base64,' + png.toString('base64');
+  const svg = renderToStaticMarkup(React.createElement(Lu[name], { color: '#' + color, size: String(size), strokeWidth: 1.75 }));
+  return 'image/png;base64,' + (await sharp(Buffer.from(svg)).png().toBuffer()).toString('base64');
 }
+async function gradient(w, h, stops) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">${stops.map(([o, c]) => `<stop offset="${o}" stop-color="#${c}"/>`).join('')}</linearGradient>
+    <radialGradient id="r" cx="0.85" cy="0.15" r="0.6"><stop offset="0" stop-color="#ffffff" stop-opacity="0.55"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient></defs>
+    <rect width="100%" height="100%" fill="url(#g)"/><rect width="100%" height="100%" fill="url(#r)"/></svg>`;
+  return 'image/png;base64,' + (await sharp(Buffer.from(svg)).png().toBuffer()).toString('base64');
+}
+const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14, offset: 3, angle: 90 });
 
 (async () => {
   const pres = new pptxgen();
@@ -26,244 +34,267 @@ async function icon(name, color, size = 256) {
   pres.title = 'Session 1 · Decode the Test Engine and Set Your CLB Target';
   pres.theme = { headFontFace: THEME.headFontFace, bodyFontFace: THEME.bodyFontFace };
   const C = pres.SchemeColor;
+  const titleBg = await gradient(1920, 1080, [[0, 'F3ECFE'], [0.5, 'FFEFEA'], [1, 'EAF2FF']]);
+  const closeBg = await gradient(1920, 1080, [[0, 'EAF2FF'], [1, 'E7F7EF']]);
 
-  pres.defineSlideMaster({ title: 'TITLE', background: { color: 'F2EBFD' },
+  pres.defineSlideMaster({ title: 'TITLE', background: { data: titleBg },
     objects: [
-      { placeholder: { options: { name: 'title', type: 'title', x: 0.8, y: 2.2, w: 8.4, h: 2.0, fontSize: 44, bold: true, color: C.text1, valign: 'top' }, text: '' } },
-      { placeholder: { options: { name: 'body', type: 'body', x: 0.8, y: 4.35, w: 8.4, h: 0.8, fontSize: 18, color: C.text2 }, text: '' } },
-      { text: { text: 'ELEVATE WITH MS. MARIA  ·  LEARNOVATE QATAR', options: { x: 0.8, y: 1.45, w: 8.4, h: 0.4, fontSize: 12, bold: true, color: C.text1, charSpacing: 4, margin: 0 } } }
+      { placeholder: { options: { name: 'title', type: 'title', x: 0.75, y: 2.3, w: 7.6, h: 2.3, fontSize: 42, bold: true, color: C.text1, valign: 'top', align: 'left', margin: 0 }, text: '' } },
+      { placeholder: { options: { name: 'body', type: 'body', x: 0.75, y: 4.75, w: 7.6, h: 0.6, fontSize: 18, color: C.text2, align: 'left', margin: 0 }, text: '' } },
+      { text: { text: 'ELEVATE WITH MS. MARIA  ·  LEARNOVATE QATAR', options: { x: 0.75, y: 6.6, w: 8, h: 0.35, fontSize: 10, bold: true, color: C.text2, charSpacing: 3, margin: 0 } } }
     ] });
-  pres.defineSlideMaster({ title: 'CONTENT', background: { color: 'FFFFFF' }, margin: [0.5, 0.6, 0.6, 0.6],
-    objects: [
-      { placeholder: { options: { name: 'title', type: 'title', x: 0.6, y: 0.4, w: 12.1, h: 0.85, fontSize: 36, bold: true, color: C.text1, valign: 'middle', margin: 0 }, text: '' } },
-      { text: { text: 'CELPIP Prep Course · Session 1', options: { x: 0.6, y: 6.95, w: 6, h: 0.3, fontSize: 10, color: C.text2, margin: 0 } } }
-    ],
-    slideNumber: { x: 12.2, y: 6.95, w: 0.5, h: 0.3, fontSize: 10, color: '4A5675', align: 'right' } });
-  pres.defineSlideMaster({ title: 'CLOSING', background: { color: 'E9F2FF' },
-    objects: [
-      { placeholder: { options: { name: 'title', type: 'title', x: 0.6, y: 0.4, w: 12.1, h: 0.85, fontSize: 36, bold: true, color: C.text1, valign: 'middle', margin: 0 }, text: '' } },
-      { text: { text: 'CELPIP Prep Course · Session 1', options: { x: 0.6, y: 6.95, w: 6, h: 0.3, fontSize: 10, color: C.text2, margin: 0 } } }
-    ],
-    slideNumber: { x: 12.2, y: 6.95, w: 0.5, h: 0.3, fontSize: 10, color: '4A5675', align: 'right' } });
+  const contentObjects = () => [
+    { placeholder: { options: { name: 'title', type: 'title', x: 0.75, y: 0.88, w: 11.8, h: 0.8, fontSize: 32, bold: true, color: C.text1, valign: 'top', align: 'left', margin: 0 }, text: '' } },
+    { text: { text: 'CELPIP Prep Course  ·  Session 1', options: { x: 0.75, y: 6.95, w: 6, h: 0.3, fontSize: 9, color: C.text2, margin: 0 } } }];
+  pres.defineSlideMaster({ title: 'CONTENT', background: { color: 'FFFFFF' }, objects: contentObjects(),
+    slideNumber: { x: 12.08, y: 6.95, w: 0.5, h: 0.3, fontSize: 9, color: '5B6782', align: 'right' } });
+  pres.defineSlideMaster({ title: 'CLOSING', background: { data: closeBg }, objects: contentObjects(),
+    slideNumber: { x: 12.08, y: 6.95, w: 0.5, h: 0.3, fontSize: 9, color: '5B6782', align: 'right' } });
 
-  // helpers
-  const card = (s, x, y, w, h, fill, name) => s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius: 0.18, fill: { color: fill }, line: { color: fill }, objectName: name });
-  const circleIcon = async (s, x, y, d, key, ic, name) => {
-    s.addShape(pres.shapes.OVAL, { x, y, w: d, h: d, fill: { color: 'FFFFFF' }, line: { color: SK[key][1], width: 1.5 }, objectName: name + ' circle' });
-    s.addImage({ data: await icon(ic, SK[key][1]), x: x + d * 0.22, y: y + d * 0.22, w: d * 0.56, h: d * 0.56, altText: name });
-  };
-  const numDot = (s, x, y, d, key, label, name) => {
-    s.addShape(pres.shapes.OVAL, { x, y, w: d, h: d, fill: { color: SK[key][1] }, line: { color: SK[key][1] }, objectName: name });
-    s.addText(String(label), { x, y, w: d, h: d, align: 'center', valign: 'middle', fontSize: 14, bold: true, color: 'FFFFFF', margin: 0, isTextBox: true });
-  };
-  const tipBox = (s, x, y, w, h, tips, name) => {
-    card(s, x, y, w, h, SK.G[0], name);
-    s.addText(tips.map((t, i) => ({ text: t, options: { bullet: true, breakLine: i < tips.length - 1, paraSpaceAfter: 6 } })),
-      { x: x + 0.25, y: y + 0.15, w: w - 0.5, h: h - 0.3, fontSize: 14, color: NAVY, valign: 'top', isTextBox: true });
-  };
+  // ---------- helpers ----------
   const title = (s, t) => s.addText(t, { placeholder: 'title' });
+  const eyebrow = (s, text, k) => s.addText(text.toUpperCase(), { x: 0.75, y: 0.5, w: 11, h: 0.32, fontSize: 11, bold: true, color: SK[k][1], charSpacing: 3, margin: 0, isTextBox: true });
+  const card = (s, x, y, w, h, fill, name, sh) => s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius: 0.22, fill: { color: fill }, line: { color: fill }, objectName: name, ...(sh ? { shadow: shadow() } : {}) });
+  const chip = async (s, x, y, d, k, ic, name, onWhite) => {
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w: d, h: d, rectRadius: d * 0.3, fill: { color: onWhite ? SK[k][0] : 'FFFFFF' }, line: { color: onWhite ? SK[k][0] : 'FFFFFF' }, objectName: name + ' chip' });
+    s.addImage({ data: await icon(ic, SK[k][1]), x: x + d * 0.24, y: y + d * 0.24, w: d * 0.52, h: d * 0.52, altText: name });
+  };
+  const badge = (s, x, y, d, k, label, name, solid = true) => {
+    s.addShape(pres.shapes.OVAL, { x, y, w: d, h: d, fill: { color: solid ? SK[k][1] : 'FFFFFF' }, line: { color: SK[k][1], width: solid ? 0 : 1.25 }, objectName: name });
+    s.addText(String(label), { x, y, w: d, h: d, align: 'center', valign: 'middle', fontSize: 12, bold: true, color: solid ? 'FFFFFF' : SK[k][1], margin: 0, isTextBox: true });
+  };
+  const tips = async (s, x, y, w, h, list, name, headline = 'Pro tips') => {
+    card(s, x, y, w, h, 'FFFFFF', name, true);
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius: 0.22, fill: { color: 'FFFFFF', transparency: 100 }, line: { color: LINE, width: 1 }, objectName: name + ' outline' });
+    if (h < 1.6) {
+      await chip(s, x + 0.3, y + (h - 0.55) / 2, 0.55, 'G', 'LuLightbulb', 'Tip', true);
+      s.addText([{ text: headline + '   ', options: { bold: true } }, { text: list.join(' ') }], { x: x + 1.05, y: y + 0.1, w: w - 1.35, h: h - 0.2, fontSize: 14, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+      return;
+    }
+    await chip(s, x + 0.3, y + 0.3, 0.55, 'G', 'LuLightbulb', 'Tip', true);
+    s.addText(headline, { x: x + 1.0, y: y + 0.3, w: w - 1.3, h: 0.55, fontSize: 15, bold: true, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+    s.addText(list.map((t, i) => ({ text: t, options: { bullet: { indent: 14 }, breakLine: i < list.length - 1, paraSpaceAfter: 8 } })),
+      { x: x + 0.3, y: y + 1.0, w: w - 0.6, h: h - 1.2, fontSize: 14, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+  };
+  // a clean list of rows (replaces tables): label left, value pill right
+  const rows = (s, x, y, w, rowH, gap, items, k, name) => items.forEach(([label, val, sub], i) => {
+    const yy = y + i * (rowH + gap);
+    card(s, x, yy, w, rowH, i % 2 ? 'FFFFFF' : 'F6F7FB', name + ' row ' + (i + 1));
+    s.addText(label, { x: x + 0.3, y: yy, w: w - 2.1, h: rowH, fontSize: 15, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+    if (sub) s.addText(sub, { x: x + w - 3.55, y: yy, w: 1.6, h: rowH, fontSize: 12, color: MUTED, valign: 'middle', align: 'right', margin: 0, isTextBox: true });
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: x + w - 1.75, y: yy + (rowH - 0.4) / 2, w: 1.5, h: 0.4, rectRadius: 0.2, fill: { color: SK[k][0] }, line: { color: SK[k][0] }, objectName: name + ' value ' + (i + 1) });
+    s.addText(val, { x: x + w - 1.75, y: yy + (rowH - 0.4) / 2, w: 1.5, h: 0.4, fontSize: 12, bold: true, color: SK[k][1], align: 'center', valign: 'middle', margin: 0, isTextBox: true });
+  });
 
   // 1 · Title
   pres.addSection({ title: 'Welcome' });
   let s = pres.addSlide({ masterName: 'TITLE', sectionTitle: 'Welcome' });
+  s.addText('SESSION 01', { x: 0.75, y: 1.75, w: 4, h: 0.4, fontSize: 13, bold: true, color: '6A2BC4', charSpacing: 4, margin: 0, isTextBox: true });
   s.addText('Decode the Test Engine and Set Your CLB Target', { placeholder: 'title' });
-  s.addText('Session 1 · CELPIP Prep Course', { placeholder: 'body' });
-  const keys = ['L', 'R', 'W', 'S']; const ics = ['LuHeadphones', 'LuBookOpen', 'LuPenLine', 'LuMic'];
+  s.addText('CELPIP Prep Course  ·  2-hour live class', { placeholder: 'body' });
+  const four = [['L', 'LuHeadphones', 'Listening'], ['R', 'LuBookOpen', 'Reading'], ['W', 'LuPenLine', 'Writing'], ['S', 'LuMic', 'Speaking']];
   for (let i = 0; i < 4; i++) {
-    const x = 9.7 + (i % 2) * 1.55, y = 2.2 + Math.floor(i / 2) * 1.55;
-    card(s, x, y, 1.35, 1.35, SK[keys[i]][0], 'Skill tile ' + keys[i]);
-    s.addImage({ data: await icon(ics[i], SK[keys[i]][1]), x: x + 0.37, y: y + 0.37, w: 0.6, h: 0.6, altText: ['Listening', 'Reading', 'Writing', 'Speaking'][i] });
+    const [k, ic, n] = four[i], x = 9.05 + (i % 2) * 1.85, y = 2.0 + Math.floor(i / 2) * 2.05;
+    card(s, x, y, 1.65, 1.85, 'FFFFFF', n + ' tile', true);
+    await chip(s, x + 0.43, y + 0.3, 0.8, k, ic, n, true);
+    s.addText(n, { x, y: y + 1.2, w: 1.65, h: 0.4, fontSize: 12, bold: true, color: NAVY, align: 'center', margin: 0, isTextBox: true });
   }
   s.addNotes('Welcome everyone. Say: "Today you learn exactly how the test works, how it is scored, and what level you need. Every slide is something you will use on test day."');
 
   // 2 · Outcomes
-  pres.addSection({ title: 'The test' });
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Welcome' });
-  title(s, 'By the end of today you can…');
+  eyebrow(s, "Today's outcomes", 'R'); title(s, 'By the end of today you can…');
   const outs = ['Name every part of the test and its timing', 'Explain how your level is scored', 'Find the CLB level your program needs', 'Avoid the 10 mistakes that cost the most points', 'Set a target for each skill'];
   outs.forEach((t, i) => {
-    const y = 1.55 + i * 0.98, k = ['L', 'R', 'O', 'W', 'S'][i];
-    card(s, 0.6, y, 7.6, 0.8, SK[k][0], 'Outcome ' + (i + 1));
-    numDot(s, 0.8, y + 0.15, 0.5, k, i + 1, 'Outcome number ' + (i + 1));
-    s.addText(t, { x: 1.5, y, w: 6.6, h: 0.8, fontSize: 18, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+    const y = 1.95 + i * 0.86, k = ['L', 'R', 'O', 'W', 'S'][i];
+    badge(s, 0.75, y + 0.12, 0.46, k, i + 1, 'Outcome ' + (i + 1));
+    s.addText(t, { x: 1.45, y, w: 6.6, h: 0.7, fontSize: 18, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
   });
-  card(s, 8.7, 1.55, 4.0, 4.72, SK.G[0], 'Agenda card');
-  s.addText('Today · 2 hours', { x: 8.95, y: 1.7, w: 3.5, h: 0.5, fontSize: 18, bold: true, color: NAVY, margin: 0, isTextBox: true });
-  const ag = [['0:00', 'Map the test'], ['0:20', 'How scoring works'], ['0:45', 'The test screen'], ['1:15', 'Mistakes and error causes'], ['1:45', 'Set your targets']];
-  s.addText(ag.map(([a, b], i) => ([{ text: a + '  ', options: { bold: true, color: '8A6A00' } }, { text: b, options: { breakLine: i < ag.length - 1 } }])).flat(),
-    { x: 8.95, y: 2.3, w: 3.5, h: 3.7, fontSize: 16, color: NAVY, valign: 'top', paraSpaceAfter: 14, isTextBox: true });
+  card(s, 8.6, 1.95, 4.0, 4.3, 'F6F7FB', 'Agenda');
+  s.addText('2 HOURS', { x: 8.95, y: 2.2, w: 3.3, h: 0.3, fontSize: 11, bold: true, color: MUTED, charSpacing: 3, margin: 0, isTextBox: true });
+  [['0:00', 'Map the test'], ['0:20', 'How scoring works'], ['0:45', 'The test screen'], ['1:15', 'Mistakes & error causes'], ['1:45', 'Set your targets']].forEach(([a, b], i) => {
+    const y = 2.65 + i * 0.68;
+    s.addText(a, { x: 8.95, y, w: 0.8, h: 0.5, fontSize: 14, bold: true, color: '6A2BC4', valign: 'middle', margin: 0, isTextBox: true });
+    s.addText(b, { x: 9.8, y, w: 2.6, h: 0.5, fontSize: 14, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+  });
   s.addNotes('Read the outcomes aloud. Return to this slide at the end and ask students to tick each one.');
 
-  // 3 · Pick the right test
+  // 3 · Right test
+  pres.addSection({ title: 'The test' });
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The test' });
-  title(s, 'Pick the right test');
-  const tests = [['L', 'LuAward', 'CELPIP-General', 'All four skills. For permanent residence: Express Entry and other economic programs.'],
-    ['S', 'LuMic', 'CELPIP-General LS', 'Listening and Speaking only. For Canadian citizenship.'],
-    ['G', 'LuSearch', 'Before you book', 'Check which test and which levels your program asks for.']];
+  eyebrow(s, 'Before you book', 'L'); title(s, 'Pick the right test');
+  const tests = [['L', 'LuAward', 'CELPIP-General', 'All four skills', 'For permanent residence: Express Entry and other economic programs.'],
+    ['S', 'LuMic', 'CELPIP-General LS', 'Listening + Speaking', 'For Canadian citizenship applications.'],
+    ['G', 'LuSearch', 'Check first', 'Which test? Which levels?', 'Confirm with your program before you pay for a test.']];
   for (let i = 0; i < 3; i++) {
-    const [k, ic, h, b] = tests[i], x = 0.6 + i * 4.1;
-    card(s, x, 1.6, 3.85, 4.4, SK[k][0], 'Test card ' + (i + 1));
-    await circleIcon(s, x + 0.3, 1.9, 0.9, k === 'G' ? 'O' : k, ic, h);
-    s.addText(h, { x: x + 0.3, y: 3.0, w: 3.25, h: 0.6, fontSize: 22, bold: true, color: NAVY, margin: 0, isTextBox: true });
-    s.addText(b, { x: x + 0.3, y: 3.65, w: 3.25, h: 2.1, fontSize: 16, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+    const [k, ic, h, tag, b] = tests[i], x = 0.75 + i * 4.0;
+    card(s, x, 1.95, 3.7, 4.3, SK[k][0], h);
+    await chip(s, x + 0.35, 2.3, 0.85, k, ic, h);
+    s.addText(h, { x: x + 0.35, y: 3.4, w: 3.0, h: 0.55, fontSize: 21, bold: true, color: NAVY, margin: 0, isTextBox: true });
+    s.addText(tag, { x: x + 0.35, y: 3.95, w: 3.0, h: 0.4, fontSize: 13, bold: true, color: SK[k][1], margin: 0, isTextBox: true });
+    s.addText(b, { x: x + 0.35, y: 4.5, w: 3.0, h: 1.5, fontSize: 15, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
   }
   s.addNotes('Booking the wrong version costs money and time. Ask who is applying for PR and who for citizenship.');
 
-  // 4 · Test at a glance
+  // 4 · Glance
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The test' });
-  title(s, 'The test at a glance');
-  const glance = [['L', 'LuHeadphones', 'Listening', '47–55 min', '6 parts · 38 questions'], ['R', 'LuBookOpen', 'Reading', '55–60 min', '4 parts · 38 questions'],
-    ['W', 'LuPenLine', 'Writing', '53–60 min', '2 tasks'], ['S', 'LuMic', 'Speaking', '15–20 min', '8 tasks']];
+  eyebrow(s, 'The test at a glance', 'O'); title(s, 'Four skills, about 3 hours, one sitting');
+  const g = [['L', 'LuHeadphones', 'Listening', '47–55', 'min', '6 parts · 38 Qs'], ['R', 'LuBookOpen', 'Reading', '55–60', 'min', '4 parts · 38 Qs'], ['W', 'LuPenLine', 'Writing', '53–60', 'min', '2 tasks'], ['S', 'LuMic', 'Speaking', '15–20', 'min', '8 tasks']];
   for (let i = 0; i < 4; i++) {
-    const [k, ic, n, t, c] = glance[i], x = 0.6 + i * 3.08;
-    card(s, x, 1.55, 2.85, 3.0, SK[k][0], n + ' card');
-    await circleIcon(s, x + 0.25, 1.8, 0.8, k, ic, n);
-    s.addText(n, { x: x + 0.25, y: 2.75, w: 2.4, h: 0.5, fontSize: 22, bold: true, color: SK[k][1], margin: 0, isTextBox: true });
-    s.addText([{ text: t, options: { bold: true, breakLine: true } }, { text: c }], { x: x + 0.25, y: 3.3, w: 2.4, h: 1.0, fontSize: 16, color: NAVY, margin: 0, valign: 'top', isTextBox: true });
-    if (i < 3) s.addText('→', { x: x + 2.82, y: 2.7, w: 0.3, h: 0.5, fontSize: 20, bold: true, color: MUTED, align: 'center', margin: 0, isTextBox: true });
+    const [k, ic, n, big, unit, sub] = g[i], x = 0.75 + i * 3.0;
+    card(s, x, 1.95, 2.75, 3.05, SK[k][0], n);
+    await chip(s, x + 0.3, 2.25, 0.7, k, ic, n);
+    s.addText(String(i + 1).padStart(2, '0'), { x: x + 1.9, y: 2.3, w: 0.6, h: 0.4, fontSize: 12, bold: true, color: SK[k][1], align: 'right', margin: 0, isTextBox: true });
+    s.addText(n, { x: x + 0.3, y: 3.1, w: 2.2, h: 0.45, fontSize: 18, bold: true, color: NAVY, margin: 0, isTextBox: true });
+    s.addText([{ text: big, options: { fontSize: 30, bold: true, color: SK[k][1] } }, { text: ' ' + unit, options: { fontSize: 14, color: MUTED } }], { x: x + 0.3, y: 3.55, w: 2.3, h: 0.7, margin: 0, valign: 'middle', isTextBox: true });
+    s.addText(sub, { x: x + 0.3, y: 4.3, w: 2.3, h: 0.45, fontSize: 13, color: MUTED, margin: 0, isTextBox: true });
   }
-  tipBox(s, 0.6, 4.85, 12.1, 1.35, ['Order: Listening → Reading → Writing → Speaking, about 3 hours in one sitting.', 'Train your stamina: do full timed practice before test day. Speaking comes last, when you are tired.'], 'Tips');
-  s.addNotes('Walk through each skill. Stress stamina: Speaking comes last. Confirm current details on the official CELPIP website before class.');
+  await tips(s, 0.75, 5.25, 11.75, 1.5, ['Order: Listening → Reading → Writing → Speaking. Train stamina with full timed practice; Speaking comes last.'], 'Glance tip', 'Test-day tip');
+  s.addNotes('Walk through each skill. Stress stamina. Confirm current details on the official CELPIP website before class.');
 
-  // 5 · Listening
+  // 5–6 · Listening & Reading
   pres.addSection({ title: 'The four skills' });
-  const partSlide = async (k, ic, ttl, rows, head, tips, notes) => {
+  const skillSlide = async (k, ic, eb, ttl, items, tipList, notes, rowH = 0.52) => {
     const sl = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The four skills' });
-    title(sl, ttl);
-    const tb = [head.map(h => ({ text: h, options: { bold: true, color: SK[k][1], fill: { color: SK[k][0] } } }))].concat(rows.map(r => r.map(c => ({ text: c }))));
-    sl.addTable(tb, { x: 0.6, y: 1.55, w: 7.4, colW: head.length === 3 ? [4.0, 1.6, 1.8] : [5.6, 1.8], fontSize: 15, color: NAVY, border: { type: 'solid', pt: 0.75, color: 'DFE4EE' }, rowH: 0.48, margin: [4, 8, 4, 8] });
-    await circleIcon(sl, 8.6, 1.55, 0.8, k, ic, ttl);
-    sl.addText('How to score higher', { x: 9.55, y: 1.6, w: 3.2, h: 0.7, fontSize: 18, bold: true, color: NAVY, margin: 0, valign: 'middle', isTextBox: true });
-    tipBox(sl, 8.6, 2.55, 4.1, 3.9, tips, 'Strategies');
+    eyebrow(sl, eb, k); title(sl, ttl);
+    rows(sl, 0.75, 1.95, 7.2, rowH, 0.1, items, k, ttl);
+    await tips(sl, 8.35, 1.95, 4.15, 4.6, tipList, 'Strategies', 'How to score higher');
     sl.addNotes(notes);
   };
-  await partSlide('L', 'LuHeadphones', 'Listening · 6 parts, 38 questions',
-    [['Part 1 · Problem Solving', '8'], ['Part 2 · Daily Life Conversation', '5'], ['Part 3 · Listening for Information', '6'], ['Part 4 · Listening to a News Item', '5'], ['Part 5 · Listening to a Discussion (video)', '8'], ['Part 6 · Listening to Viewpoints', '6']],
-    ['Part', 'Questions'],
-    ['Audio plays once: read the context screen and predict before it starts.', 'The first answer you hear is often corrected later. Wait for the final decision.', 'Take short notes: who, what, when, change of plan.'],
-    'Model one prediction from a context screen. Then give a quick example of a corrected detail (Thursday → tomorrow).');
-  await partSlide('R', 'LuBookOpen', 'Reading · 4 parts, 38 questions',
-    [['Part 1 · Reading Correspondence', '11'], ['Part 2 · Reading to Apply a Diagram', '8'], ['Part 3 · Reading for Information', '9'], ['Part 4 · Reading for Viewpoints', '10']],
-    ['Part', 'Questions'],
+  await skillSlide('L', 'LuHeadphones', 'Listening · 6 parts · 38 questions', 'Hear it once. Answer with confidence.',
+    [['Part 1 · Problem Solving', '8 Qs'], ['Part 2 · Daily Life Conversation', '5 Qs'], ['Part 3 · Listening for Information', '6 Qs'], ['Part 4 · Listening to a News Item', '5 Qs'], ['Part 5 · Listening to a Discussion (video)', '8 Qs'], ['Part 6 · Listening to Viewpoints', '6 Qs']],
+    ['Audio plays once: read the context screen and predict first.', 'The first answer you hear is often corrected. Wait for the final decision.', 'Note who, what, when, and any change of plan.'],
+    'Model one prediction from a context screen. Give a quick example of a corrected detail (Thursday → tomorrow).');
+  await skillSlide('R', 'LuBookOpen', 'Reading · 4 parts · 38 questions', 'Scan fast. Match the paraphrase.',
+    [['Part 1 · Reading Correspondence', '11 Qs'], ['Part 2 · Reading to Apply a Diagram', '8 Qs'], ['Part 3 · Reading for Information', '9 Qs'], ['Part 4 · Reading for Viewpoints', '10 Qs']],
     ['Read the questions first, then scan for the answer.', 'Answers are paraphrased: "postponed" = "moved to a later date".', 'About one minute per question. Never get stuck.'],
-    'Show one paraphrase pair. Ask who reads every word first; explain why question-first scanning saves time.');
+    'Show one paraphrase pair. Ask who reads every word first; explain why question-first scanning saves time.', 0.72);
 
   // 7 · Writing
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The four skills' });
-  title(s, 'Writing · 2 tasks, what raters score');
-  const wt = [['Task 1 · Email', '27 minutes', '150–200 words · cover all 3 bullets'], ['Task 2 · Survey', '26 minutes', '150–200 words · choose one option and defend it']];
-  for (let i = 0; i < 2; i++) {
-    const x = 0.6 + i * 4.05;
-    card(s, x, 1.55, 3.8, 2.4, SK.W[0], wt[i][0]);
-    s.addText(wt[i][0], { x: x + 0.3, y: 1.75, w: 3.2, h: 0.5, fontSize: 20, bold: true, color: SK.W[1], margin: 0, isTextBox: true });
-    s.addText([{ text: wt[i][1], options: { bold: true, breakLine: true } }, { text: wt[i][2] }], { x: x + 0.3, y: 2.35, w: 3.2, h: 1.4, fontSize: 16, color: NAVY, margin: 0, valign: 'top', isTextBox: true });
-  }
-  card(s, 8.75, 1.55, 3.95, 2.4, SK.R[0], 'Raters score');
-  s.addText('Raters score', { x: 9.05, y: 1.75, w: 3.4, h: 0.5, fontSize: 20, bold: true, color: SK.R[1], margin: 0, isTextBox: true });
-  s.addText(['Content & coherence', 'Vocabulary', 'Readability', 'Task fulfillment'].map((t, i, a) => ({ text: t, options: { bullet: true, breakLine: i < a.length - 1 } })),
-    { x: 9.05, y: 2.3, w: 3.4, h: 1.55, fontSize: 16, color: NAVY, valign: 'top', isTextBox: true });
-  tipBox(s, 0.6, 4.3, 12.1, 1.9, ['Plan 3 minutes, write 20, proofread 3.', 'Give each bullet its own paragraph so the rater can find it.', 'Match the tone: formal for a manager, friendly for a friend.'], 'Writing strategies');
+  eyebrow(s, 'Writing · 2 tasks', 'W'); title(s, 'Write to the task, not around it');
+  [['Task 1 · Email', '27', 'Cover all three bullets in 150–200 words.'], ['Task 2 · Survey', '26', 'Choose one option and defend it in 150–200 words.']].forEach(([h, m, b], i) => {
+    const x = 0.75 + i * 3.95;
+    card(s, x, 1.95, 3.7, 2.55, SK.W[0], h);
+    s.addText(h, { x: x + 0.35, y: 2.2, w: 3.0, h: 0.45, fontSize: 17, bold: true, color: NAVY, margin: 0, isTextBox: true });
+    s.addText([{ text: m, options: { fontSize: 34, bold: true, color: SK.W[1] } }, { text: ' min', options: { fontSize: 14, color: MUTED } }], { x: x + 0.35, y: 2.7, w: 3.0, h: 0.7, margin: 0, valign: 'middle', isTextBox: true });
+    s.addText(b, { x: x + 0.35, y: 3.45, w: 3.0, h: 0.9, fontSize: 14, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+  });
+  card(s, 8.65, 1.95, 3.85, 2.55, SK.R[0], 'Raters score');
+  s.addText('RATERS SCORE', { x: 9.0, y: 2.2, w: 3.2, h: 0.3, fontSize: 11, bold: true, color: SK.R[1], charSpacing: 3, margin: 0, isTextBox: true });
+  ['Content & coherence', 'Vocabulary', 'Readability', 'Task fulfillment'].forEach((t, i) => {
+    badge(s, 9.0, 2.65 + i * 0.44, 0.3, 'R', '✓', 'Criterion ' + (i + 1));
+    s.addText(t, { x: 9.45, y: 2.6 + i * 0.44, w: 2.9, h: 0.4, fontSize: 14, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+  });
+  await tips(s, 0.75, 4.7, 11.75, 2.1, ['Plan 3 minutes, write 20, proofread 3.', 'Give each bullet its own paragraph so the rater can find it.', 'Match the tone: formal for a manager, friendly for a friend.'], 'Writing tips', 'How to score higher');
   s.addNotes('Ask: "What happens if you skip a bullet?" Task fulfillment drops. Show a one-line plan per bullet.');
 
   // 8 · Speaking
-  await partSlide('S', 'LuMic', 'Speaking · 8 tasks, what raters score',
-    [['1 · Giving Advice', '30 s', '90 s'], ['2 · Personal Experience', '30 s', '60 s'], ['3 · Describing a Scene', '30 s', '60 s'], ['4 · Making Predictions', '30 s', '60 s'], ['5 · Comparing and Persuading', '60 + 60 s', '60 s'], ['6 · Dealing with a Difficult Situation', '60 s', '60 s'], ['7 · Expressing Opinions', '30 s', '90 s'], ['8 · Describing an Unusual Situation', '30 s', '60 s']],
-    ['Task', 'Prep', 'Speak'],
-    ['Raters score content & coherence, vocabulary, listenability and task fulfillment.', 'Use prep time to plan 2–3 points, not full sentences.', 'Keep talking until time ends: add an example or a summary.'],
-    'Ask a volunteer to speak for 60 seconds about a favourite place, so everyone feels how long 60 seconds is. Task 5 has 60 seconds to choose, then 60 seconds to prepare.');
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The four skills' });
+  eyebrow(s, 'Speaking · 8 tasks · 15–20 minutes', 'S'); title(s, 'Fill the time. Stay organized.');
+  const tasks = [['Giving Advice', '30 / 90 s'], ['Personal Experience', '30 / 60 s'], ['Describing a Scene', '30 / 60 s'], ['Making Predictions', '30 / 60 s'], ['Comparing & Persuading', '60+60 / 60 s'], ['Difficult Situation', '60 / 60 s'], ['Expressing Opinions', '30 / 90 s'], ['Unusual Situation', '30 / 60 s']];
+  tasks.forEach(([t, v], i) => {
+    const col = i < 4 ? 0 : 1, x = 0.75 + col * 3.75, y = 1.95 + (i % 4) * 1.12;
+    card(s, x, y, 3.55, 0.95, i % 2 ? 'FFFFFF' : 'F6F7FB', 'Task ' + (i + 1));
+    badge(s, x + 0.2, y + 0.24, 0.46, 'S', i + 1, 'Task number ' + (i + 1));
+    s.addText([{ text: t, options: { bold: true, fontSize: 14, breakLine: true } }, { text: 'prep / speak  ' + v, options: { fontSize: 11, color: MUTED } }], { x: x + 0.8, y, w: 2.65, h: 0.95, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+  });
+  await tips(s, 8.35, 1.95, 4.15, 4.4, ['Raters score content & coherence, vocabulary, listenability and task fulfillment.', 'Plan 2–3 points in prep time, not full sentences.', 'Keep talking until time ends: add an example or a summary.'], 'Speaking tips', 'How to score higher');
+  s.addNotes('Ask a volunteer to speak for 60 seconds about a favourite place. Task 5 has 60 seconds to choose, then 60 seconds to prepare.');
 
   // 9 · Scoring
   pres.addSection({ title: 'Scores and targets' });
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Scores and targets' });
-  title(s, 'How scoring works');
-  const sc = [['L', '4', 'levels', 'You receive a CELPIP level for each skill: Listening, Reading, Writing and Speaking.'], ['R', '7 = 7', 'CELPIP = CLB', 'A CELPIP level lines up with the same CLB level. Programs ask for CLB per skill.'], ['O', '0', 'penalty', 'Wrong answers cost nothing. Never leave a question blank.']];
-  for (let i = 0; i < 3; i++) {
-    const [k, big, lab, txt] = sc[i], x = 0.6 + i * 4.1;
-    card(s, x, 1.6, 3.85, 4.5, SK[k][0], 'Scoring fact ' + (i + 1));
-    s.addText(big, { x: x + 0.3, y: 1.85, w: 3.25, h: 1.2, fontSize: 60, bold: true, color: SK[k][1], margin: 0, isTextBox: true });
-    s.addText(lab, { x: x + 0.3, y: 3.05, w: 3.25, h: 0.5, fontSize: 16, bold: true, color: NAVY, margin: 0, isTextBox: true });
-    s.addText(txt, { x: x + 0.3, y: 3.65, w: 3.25, h: 2.2, fontSize: 16, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
-  }
+  eyebrow(s, 'How scoring works', 'R'); title(s, 'One level per skill. No penalty for guessing.');
+  [['L', '4', 'levels', 'One CELPIP level each for Listening, Reading, Writing and Speaking.'], ['R', '7=7', 'CELPIP = CLB', 'A CELPIP level matches the same CLB level. Programs ask for CLB per skill.'], ['O', '0', 'penalty', 'A wrong answer costs nothing. Never leave a question blank.']].forEach(([k, big, lab, txt], i) => {
+    const x = 0.75 + i * 4.0;
+    card(s, x, 1.95, 3.7, 4.5, SK[k][0], 'Fact ' + (i + 1));
+    s.addText(big, { x: x + 0.35, y: 2.25, w: 3.0, h: 1.5, fontSize: 72, bold: true, color: SK[k][1], margin: 0, valign: 'middle', isTextBox: true });
+    s.addText(lab.toUpperCase(), { x: x + 0.35, y: 3.85, w: 3.0, h: 0.35, fontSize: 12, bold: true, color: NAVY, charSpacing: 3, margin: 0, isTextBox: true });
+    s.addText(txt, { x: x + 0.35, y: 4.35, w: 3.0, h: 1.8, fontSize: 15, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+  });
   s.addNotes('Listening and Reading are scored by the computer; Writing and Speaking by trained raters. Do not promise raw-score conversions; the official site publishes the score comparison.');
 
-  // 10 · What level do you need
+  // 10 · Requirements
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Scores and targets' });
-  title(s, 'What level do you need?');
-  const req = [['Program', 'Listening', 'Reading', 'Writing', 'Speaking'], ['Express Entry · Federal Skilled Worker', '7', '7', '7', '7'], ['Canadian Experience Class · TEER 0 or 1', '7', '7', '7', '7'], ['Canadian Experience Class · TEER 2 or 3', '5', '5', '5', '5'], ['Federal Skilled Trades', '5', '4', '4', '5'], ['Canadian citizenship (CELPIP-General LS)', '4', '–', '–', '4']];
-  s.addTable(req.map((r, i) => r.map((c, j) => ({ text: c, options: i === 0 ? { bold: true, color: SK.L[1], fill: { color: SK.L[0] }, align: j ? 'center' : 'left' } : { align: j ? 'center' : 'left', bold: j > 0 } }))),
-    { x: 0.6, y: 1.55, w: 12.1, colW: [5.3, 1.7, 1.7, 1.7, 1.7], fontSize: 16, color: NAVY, border: { type: 'solid', pt: 0.75, color: 'DFE4EE' }, rowH: 0.55, margin: [4, 10, 4, 10] });
-  tipBox(s, 0.6, 5.15, 12.1, 1.3, ['Aim one level above the minimum: it protects you and higher levels (especially CLB 9+) add Express Entry points.', 'Rules change. Always confirm current requirements on the official IRCC website.'], 'Target tips');
+  eyebrow(s, 'Minimum CLB by program', 'L'); title(s, 'What level do you need?');
+  const head = ['Listening', 'Reading', 'Writing', 'Speaking'];
+  head.forEach((h, j) => s.addText(h.toUpperCase(), { x: 6.6 + j * 1.5, y: 1.95, w: 1.4, h: 0.35, fontSize: 10, bold: true, color: MUTED, charSpacing: 2, align: 'center', margin: 0, isTextBox: true }));
+  [['Express Entry · Federal Skilled Worker', [7, 7, 7, 7]], ['Canadian Experience Class · TEER 0 or 1', [7, 7, 7, 7]], ['Canadian Experience Class · TEER 2 or 3', [5, 5, 5, 5]], ['Federal Skilled Trades', [5, 4, 4, 5]], ['Citizenship (CELPIP-General LS)', [4, '–', '–', 4]]].forEach(([p, v], i) => {
+    const y = 2.4 + i * 0.66;
+    card(s, 0.75, y, 11.75, 0.56, i % 2 ? 'FFFFFF' : 'F6F7FB', 'Program ' + (i + 1));
+    s.addText(p, { x: 1.05, y, w: 5.4, h: 0.56, fontSize: 15, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+    v.forEach((n, j) => s.addText(String(n), { x: 6.6 + j * 1.5, y, w: 1.4, h: 0.56, fontSize: 17, bold: true, color: n === '–' ? MUTED : SK.L[1], align: 'center', valign: 'middle', margin: 0, isTextBox: true }));
+  });
+  await tips(s, 0.75, 5.8, 11.75, 1.0, ['Aim one level above the minimum: it protects you and CLB 9+ adds Express Entry points. Always confirm current rules on the official IRCC website.'], 'Target tip', 'Aim higher');
   s.addNotes('Enter a sample profile (e.g. 8/7/6/7) in the website’s Requirements Checker and show which programs it meets.');
 
   // 11 · Test screen
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Scores and targets' });
-  title(s, 'What the test screen does');
-  const scr = [['L', 'LuHeadphones', 'Listening', 'Audio plays once. No pause, no replay. Questions appear after the audio.'], ['R', 'LuBookOpen', 'Reading', 'Change answers until you press Next. After Next, you cannot go back.'], ['W', 'LuTimer', 'Writing', 'A timer runs for each task. Plan, write and leave time to proofread.'], ['S', 'LuMic', 'Speaking', 'Recording starts by itself when preparation ends. Silence is recorded too.']];
+  eyebrow(s, 'The test screen', 'S'); title(s, 'Know the rules before test day');
+  const scr = [['L', 'LuHeadphones', 'Listening', 'Audio plays once. No pause, no replay. Questions appear after the audio.'], ['R', 'LuBookOpen', 'Reading', 'Change answers until you press Next. After Next, there is no going back.'], ['W', 'LuTimer', 'Writing', 'A timer runs for each task. Plan, write, then proofread.'], ['S', 'LuMic', 'Speaking', 'Recording starts by itself after prep time. Silence is recorded too.']];
   for (let i = 0; i < 4; i++) {
-    const [k, ic, n, t] = scr[i], x = 0.6 + (i % 2) * 6.1, y = 1.55 + Math.floor(i / 2) * 2.45;
-    card(s, x, y, 5.95, 2.2, SK[k][0], n + ' screen');
-    await circleIcon(s, x + 0.3, y + 0.3, 0.8, k, ic, n);
-    s.addText(n, { x: x + 1.3, y: y + 0.3, w: 4.4, h: 0.6, fontSize: 20, bold: true, color: SK[k][1], margin: 0, valign: 'middle', isTextBox: true });
-    s.addText(t, { x: x + 1.3, y: y + 0.95, w: 4.4, h: 1.1, fontSize: 16, color: NAVY, margin: 0, valign: 'top', isTextBox: true });
+    const [k, ic, n, t] = scr[i], x = 0.75 + (i % 2) * 5.95, y = 1.95 + Math.floor(i / 2) * 2.4;
+    card(s, x, y, 5.8, 2.15, SK[k][0], n + ' rule');
+    await chip(s, x + 0.35, y + 0.35, 0.75, k, ic, n);
+    s.addText(n, { x: x + 1.35, y: y + 0.35, w: 4.2, h: 0.5, fontSize: 18, bold: true, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+    s.addText(t, { x: x + 1.35, y: y + 0.9, w: 4.2, h: 1.05, fontSize: 15, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
   }
   s.addNotes('Demo the Test Screen Simulator on the website. Key messages: no replay, Next is final, speaking records automatically.');
 
-  // 12 · 10 mistakes
+  // 12 · Mistakes
   pres.addSection({ title: 'Mistakes' });
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Mistakes' });
-  title(s, '10 mistakes that cost points');
-  const mis = ['Leaving a question blank', 'Missing a bullet in the email', 'Writing under 150 words', 'Wrong tone: too casual or too stiff', 'Picking an answer you only heard first', 'Spending 3 minutes on one question', 'Stopping your speaking answer early', 'Going off topic to "sound smart"', 'Memorized answers that do not fit the task', 'Skipping the proofreading pass'];
-  mis.forEach((t, i) => {
-    const col = i < 5 ? 0 : 1, row = i % 5, x = 0.6 + col * 6.1, y = 1.5 + row * 1.0, k = ['W', 'R', 'L', 'S', 'O'][row];
-    card(s, x, y, 5.95, 0.82, SK[k][0], 'Mistake ' + (i + 1));
-    numDot(s, x + 0.2, y + 0.16, 0.5, k, i + 1, 'Mistake number ' + (i + 1));
-    s.addText(t, { x: x + 0.9, y, w: 4.9, h: 0.82, fontSize: 17, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+  eyebrow(s, 'Avoid these', 'W'); title(s, '10 mistakes that cost points');
+  ['Leaving a question blank', 'Missing a bullet in the email', 'Writing under 150 words', 'Wrong tone: too casual or too stiff', 'Picking the first answer you hear', 'Spending 3 minutes on one question', 'Stopping your answer early', 'Going off topic to "sound smart"', 'Memorized answers that miss the task', 'Skipping the proofreading pass'].forEach((t, i) => {
+    const col = i < 5 ? 0 : 1, x = 0.75 + col * 5.95, y = 1.95 + (i % 5) * 0.96;
+    card(s, x, y, 5.8, 0.8, i % 2 ? 'FFFFFF' : 'F6F7FB', 'Mistake ' + (i + 1));
+    badge(s, x + 0.25, y + 0.17, 0.46, 'W', i + 1, 'Mistake number ' + (i + 1), false);
+    s.addText(t, { x: x + 0.95, y, w: 4.7, h: 0.8, fontSize: 16, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
   });
-  s.addNotes('Ask students which of these they have made before. These become the checklist for every Study Hub task.');
+  s.addNotes('Ask which of these students have made before. These become the checklist for every Study Hub task.');
 
-  // 13 · Four causes
+  // 13 · Error causes
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Mistakes' });
-  title(s, 'The four causes of errors');
-  const causes = [['W', 'LuTarget', 'Distractor', 'You chose a detail that was mentioned but later corrected.'], ['L', 'LuBookOpen', 'Vocabulary', 'You missed a paraphrase or did not know a word.'], ['S', 'LuClock', 'Timing', 'You ran out of time or rushed.'], ['R', 'LuBrain', 'Inference', 'You missed what was implied, not said.']];
+  eyebrow(s, 'Your error log', 'R'); title(s, 'Every mistake has one of four causes');
+  const causes = [['W', 'LuTarget', 'Distractor', 'You chose a detail that was mentioned, then corrected.'], ['L', 'LuBookOpen', 'Vocabulary', 'You missed a paraphrase or a word.'], ['S', 'LuClock', 'Timing', 'You ran out of time or rushed.'], ['R', 'LuBrain', 'Inference', 'You missed what was implied, not said.']];
   for (let i = 0; i < 4; i++) {
-    const [k, ic, n, t] = causes[i], x = 0.6 + (i % 2) * 6.1, y = 1.55 + Math.floor(i / 2) * 2.2;
-    card(s, x, y, 5.95, 1.95, SK[k][0], n);
-    await circleIcon(s, x + 0.3, y + 0.3, 0.8, k, ic, n);
-    s.addText(n, { x: x + 1.3, y: y + 0.3, w: 4.4, h: 0.6, fontSize: 22, bold: true, color: SK[k][1], margin: 0, valign: 'middle', isTextBox: true });
-    s.addText(t, { x: x + 1.3, y: y + 0.95, w: 4.4, h: 0.85, fontSize: 16, color: NAVY, margin: 0, valign: 'top', isTextBox: true });
+    const [k, ic, n, t] = causes[i], x = 0.75 + i * 3.0;
+    card(s, x, 1.95, 2.75, 3.6, SK[k][0], n);
+    await chip(s, x + 0.3, 2.25, 0.75, k, ic, n);
+    s.addText(n, { x: x + 0.3, y: 3.2, w: 2.2, h: 0.5, fontSize: 19, bold: true, color: NAVY, margin: 0, isTextBox: true });
+    s.addText(t, { x: x + 0.3, y: 3.75, w: 2.2, h: 1.6, fontSize: 14, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
   }
-  tipBox(s, 0.6, 6.0, 12.1, 0.75, ['Tag every mistake in your Error Log. Your top cause tells you what to practise.'], 'Error log tip');
+  await tips(s, 0.75, 5.8, 11.75, 0.95, ['Tag every Study Hub mistake in your Error Log. Your top cause tells you what to practise next.'], 'Error log tip', 'Make it a habit');
   s.addNotes('Give one example of each from the diagnostic. Model tagging two errors live in the Error Log.');
 
-  // 14 · Set targets
+  // 14 · Targets
   pres.addSection({ title: 'Wrap-up' });
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Wrap-up' });
-  title(s, 'Set your targets now');
-  const st = [['O', 'Find the level your program needs'], ['L', 'Add +1 as a safety margin if you can'], ['R', 'Set each skill on your dashboard'], ['W', 'Write down your weakest skill']];
-  for (let i = 0; i < 4; i++) {
-    const [k, t] = st[i], x = 0.6 + i * 3.08;
-    card(s, x, 1.8, 2.85, 2.9, SK[k][0], 'Step ' + (i + 1));
-    numDot(s, x + 0.3, 2.1, 0.7, k, i + 1, 'Step number ' + (i + 1));
-    s.addText(t, { x: x + 0.3, y: 3.0, w: 2.3, h: 1.5, fontSize: 18, bold: true, color: NAVY, margin: 0, valign: 'top', isTextBox: true });
-    if (i < 3) s.addText('→', { x: x + 2.82, y: 2.95, w: 0.3, h: 0.5, fontSize: 20, bold: true, color: MUTED, align: 'center', margin: 0, isTextBox: true });
-  }
-  tipBox(s, 0.6, 5.0, 12.1, 1.0, ['Open the course website on your phone now: My Dashboard → Your four skills → Target CLB.'], 'Action');
+  eyebrow(s, 'Do it now', 'O'); title(s, 'Set your targets in 3 minutes');
+  [['O', 'Find the level your program needs'], ['L', 'Add +1 as a safety margin'], ['R', 'Set each skill on your dashboard'], ['W', 'Write down your weakest skill']].forEach(([k, t], i) => {
+    const x = 0.75 + i * 3.0;
+    card(s, x, 1.95, 2.75, 2.9, SK[k][0], 'Step ' + (i + 1));
+    s.addText(String(i + 1).padStart(2, '0'), { x: x + 0.3, y: 2.2, w: 2, h: 0.9, fontSize: 40, bold: true, color: SK[k][1], margin: 0, isTextBox: true });
+    s.addText(t, { x: x + 0.3, y: 3.15, w: 2.2, h: 1.5, fontSize: 17, bold: true, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+  });
+  await tips(s, 0.75, 5.15, 11.75, 1.15, ['Open the course website on your phone: My Dashboard → Your four skills → Target CLB.'], 'Action', 'On your phone');
   s.addNotes('Give 3 minutes for students to set targets on their phones. Walk around and check.');
 
   // 15 · Before Session 2
   s = pres.addSlide({ masterName: 'CLOSING', sectionTitle: 'Wrap-up' });
-  title(s, 'Before Session 2');
-  const todo = ['Listening and reading checks', 'Baseline email (27 minutes)', 'Two baseline speaking answers', 'Save your starting point', 'Tag every error in your Error Log'];
+  eyebrow(s, 'Study Hub · Session 1', 'O'); title(s, 'Before Session 2');
+  const todo = ['Listening and reading checks', 'Baseline email · 27 minutes', 'Two baseline speaking answers', 'Save your starting point', 'Tag every error in your Error Log'];
   for (let i = 0; i < todo.length; i++) {
-    const y = 1.55 + i * 0.95;
-    card(s, 0.6, y, 7.6, 0.78, 'FFFFFF', 'To-do ' + (i + 1));
-    s.addImage({ data: await icon('LuListChecks', SK.O[1]), x: 0.8, y: y + 0.17, w: 0.44, h: 0.44, altText: 'Check' });
-    s.addText(todo[i], { x: 1.45, y, w: 6.6, h: 0.78, fontSize: 18, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+    const y = 1.95 + i * 0.86;
+    card(s, 0.75, y, 7.4, 0.7, 'FFFFFF', 'To-do ' + (i + 1), true);
+    badge(s, 0.97, y + 0.14, 0.42, 'O', '✓', 'Check ' + (i + 1));
+    s.addText(todo[i], { x: 1.6, y, w: 6.4, h: 0.7, fontSize: 16, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
   }
-  card(s, 8.7, 1.55, 4.0, 4.58, 'FFFFFF', 'Study Hub card');
-  await circleIcon(s, 8.95, 1.8, 0.9, 'O', 'LuFlag', 'Study Hub');
-  s.addText([{ text: 'Study Hub · Session 1', options: { bold: true, fontSize: 20, breakLine: true } }, { text: 'Your results open the next class, so finish before Session 2.', options: { fontSize: 16 } }],
-    { x: 8.95, y: 2.9, w: 3.5, h: 2.9, color: NAVY, valign: 'top', margin: 0, paraSpaceAfter: 10, isTextBox: true });
+  card(s, 8.6, 1.95, 3.9, 4.15, 'FFFFFF', 'Next class', true);
+  await chip(s, 8.95, 2.3, 0.85, 'O', 'LuFlag', 'Next class', true);
+  s.addText([{ text: 'Your results open the next class.', options: { bold: true, fontSize: 18, breakLine: true } }, { text: 'Finish the Study Hub before Session 2 so we can work on your real mistakes.', options: { fontSize: 14, color: MUTED } }],
+    { x: 8.95, y: 3.4, w: 3.25, h: 2.4, color: NAVY, valign: 'top', margin: 0, paraSpaceAfter: 10, isTextBox: true });
   s.addNotes('Open the Study Hub tab for Session 1 and show the diagnostic. Return to slide 2 and tick the outcomes together.');
 
   const out = process.argv[2] || 'session-01.pptx';

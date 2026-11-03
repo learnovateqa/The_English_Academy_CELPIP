@@ -622,15 +622,23 @@ nav.main a[aria-current="page"]{background:#14213D;color:#fff}
 .sn-mini{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--c);color:var(--ci);font-weight:700;font-size:12.5px}
 .schedp select,.schedp input[type=date],.deckin{padding:6px 8px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);font-size:13.5px;width:100%}
 .srow.locked{opacity:.7}.srow.locked .num{background:var(--surface-2)}
+
+.tclasses{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.tclass{background:var(--c);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:10px;transition:transform .22s,box-shadow .22s}
+.tclass:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(20,33,61,.1)}
+.tclass h3{display:flex;gap:10px;align-items:center}
+.tstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tstats div{background:var(--surface-2);border-radius:14px;padding:12px;display:flex;flex-direction:column}
+.tstats b{font-size:28px;line-height:1.1}.tstats span{font-size:12.5px;color:var(--muted)}
 </style>
 </head>
 <body>
 <header class="bar"><div class="wrap">
   <a class="brand" href="#home"><span class="logo" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 32 32"><rect x="5" y="20" width="4" height="7" rx="1" fill="#00B4B4"/><rect x="11" y="16" width="4" height="11" rx="1" fill="#FF5A36"/><rect x="17" y="12" width="4" height="15" rx="1" fill="#8338EC"/><rect x="23" y="7" width="4" height="20" rx="1" fill="#1F7BFF"/><circle cx="25" cy="4" r="2.4" fill="#FFC300"/></svg></span><span class="brand-t"><b>CELPIP Prep Course</b><small>Elevate with Ms. Maria</small></span></a>
   <nav class="main" aria-label="Main" hidden>
-    <a href="#home" data-nav="home">My Dashboard</a>
+    <a href="#home" data-nav="home" id="nav-home">My Dashboard</a>
     <a href="#syllabus" data-nav="syllabus">Syllabus</a>
-    <a href="#log" data-nav="log">Error Log</a>
+    <a href="#log" data-nav="log" id="nav-log">Error Log</a>
     <a href="#messages" data-nav="messages" id="nav-msg" hidden>Messages <span class="badge" id="msg-badge" hidden></span></a>
     <a href="#teacher" data-nav="teacher" id="nav-teacher" hidden>Teacher Portal</a>
   </nav>
@@ -696,7 +704,8 @@ function updateSyncBadge(){const el=document.getElementById('sync');if(!el)retur
   const [t,c]=M[cloud.code?cloud.state:(cloud.tpass?'teacher':'local')]||M.local;el.textContent=t;el.className='sync '+c}
 function renderNav(){const signed=!!(cloud.code||cloud.tpass);
   document.querySelector('nav.main').hidden=!signed;document.getElementById('nav-teacher').hidden=!cloud.tpass;
-  document.getElementById('signout').hidden=!signed;document.getElementById('tp-btn').hidden=signed;document.getElementById('sync').hidden=!signed;document.getElementById('nav-msg').hidden=!cloud.code;updateSyncBadge();updateMsgBadge()}
+  document.getElementById('signout').hidden=!signed;document.getElementById('tp-btn').hidden=signed;document.getElementById('sync').hidden=!signed;document.getElementById('nav-msg').hidden=!cloud.code;
+  const T=!!cloud.tpass&&!cloud.code;document.getElementById('nav-home').textContent=T?'Teaching':'My Dashboard';document.getElementById('nav-log').hidden=T;document.getElementById('nav-teacher').textContent=T?'Students & Batches':'Teacher Portal';updateSyncBadge();updateMsgBadge()}
 function curRoute(){const h=(location.hash||'#home').slice(1);return h.startsWith('session-')?'session':(['syllabus','log','teacher','messages'].includes(h)?h:'home')}
 let pendingRefresh=false;
 function refreshIf(rs){if(!rs.includes(curRoute()))return;const a=document.activeElement;
@@ -1249,6 +1258,7 @@ function view(soft){clearAll();const h=(location.hash||'#home').slice(1);
   else if(h==='teacher'){mark('teacher');app.innerHTML=TeacherView();bindTeacher()}
   else if(h==='messages'){mark('messages');app.innerHTML=MessagesView();bindMessages()}
   else if((m=h.match(/^session-(\d+)$/))&&SESSIONS[m[1]-1]){mark('syllabus');renderSession(SESSIONS[m[1]-1])}
+  else if(cloud.tpass&&!cloud.code){mark('home');app.innerHTML=TeacherHome();bindTeacherHome()}
   else {mark('home');app.innerHTML=Dashboard();bindDashboard()}
   if(!soft)window.scrollTo(0,0)}
 function mark(n){const a=document.querySelector(`[data-nav="${n}"]`);if(a)a.setAttribute('aria-current','page')}
@@ -1347,7 +1357,7 @@ function Syllabus(){
 
 function renderSession(s){
   const lockSt=sessionState(s.n);if(!lockSt.open){app.innerHTML=LockedSession(s,lockSt);return}
-  const tab=store.get('tab','live');const prev=SESSIONS[s.n-2];const gated=prev&&sessionProgress(prev).pct<100;
+  const TK=cloud.tpass&&!cloud.code?'ttab':'tab';const tab=store.get(TK,'live');const prev=SESSIONS[s.n-2];const gated=prev&&sessionProgress(prev).pct<100;
   const len=(a,b)=>{const m=x=>{const [h,mm]=x.split(':');return +h*60+ +mm};return m(b)-m(a)};
   app.innerHTML=`<div class="stack">
   <div class="row"><a href="#syllabus" class="muted" style="font-size:14px">← Syllabus</a><span class="spacer"></span>
@@ -1380,7 +1390,7 @@ function renderSession(s){
   bindDeck(s);if(cloud.tpass&&!cloud.t.loaded&&!cloud.t.loading&&!cloud.t.error)loadTeacher();
   {const pl=document.getElementById('pane-live');bindTestMap(pl);bindReq(pl);bindSim(pl);const pb=document.getElementById('present-btn');if(pb)pb.addEventListener('click',()=>openSlides(SLIDESETS[s.slides]))}
   const setProg=()=>{const p=sessionProgress(s);const el=document.getElementById('hubprog');if(el)el.textContent=`${p.done}/${p.total}`;const r=document.getElementById('hubring');if(r)r.style.setProperty('--p',p.pct)};setProg();
-  app.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{store.set('tab',b.dataset.tab);
+  app.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{store.set(TK,b.dataset.tab);
     app.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));
     document.getElementById('pane-live').hidden=b.dataset.tab!=='live';document.getElementById('pane-hub').hidden=b.dataset.tab!=='hub'}));
   app.querySelectorAll('[data-task]').forEach(c=>c.addEventListener('change',()=>{const t=tasksDone();t[c.dataset.task]=c.checked;store.set('tasks',t);setProg()}));
@@ -1860,6 +1870,40 @@ function bindDecks(){document.querySelectorAll('[data-decksave]').forEach(bt=>bt
   bt.disabled=true;msg.textContent='';try{const j=await tcall('teacher.setting.save',{key:'deck:'+n,value:v});cloud.settings=j.settings||{};msg.style.color='var(--hub)';msg.textContent=v?'Saved ✓':'Removed'}
   catch(e){msg.style.color='';msg.textContent=/Unknown/.test(e.message||'')?'Update Code.gs and deploy a new version first.':errMsg(e)}bt.disabled=false}))}
 
+
+/* ---------- teacher home (teaching side) ---------- */
+function nextForBatch(b){const sc=batchSchedule(b.id);const t=todayISO();
+  const dated=SESSIONS.map(x=>({x,v:sc[x.n]})).filter(o=>o.v&&/^\d{4}-\d{2}-\d{2}$/.test(o.v)&&o.v>=t).sort((a,c)=>a.v<c.v?-1:1);
+  if(dated.length)return {s:dated[0].x,date:dated[0].v,label:dated[0].v===t?'Today':'Next class'};
+  const locked=SESSIONS.find(x=>sc[x.n]==='locked');if(locked)return {s:locked,label:'Next to open'};
+  const open=SESSIONS.filter(x=>!sc[x.n]||sc[x.n]==='open');return {s:open.length?open[open.length-1]:SESSIONS[0],label:'Latest open session'}}
+function greet(){const h=new Date().getHours();return h<12?'Good morning':h<18?'Good afternoon':'Good evening'}
+function TeacherHome(){const t=cloud.t;const ready=t.loaded;const unread=ready?unreadFrom().length:0;const set=cloud.settings||{};
+  const ros=ready?tRoster():[];
+  const classes=ready&&t.batches.length?t.batches.map(b=>{const nx=nextForBatch(b);const n=nx.s.n;const cnt=ros.filter(r=>r.batch===b.id).length;
+    return `<article class="tclass" style="${skv(nx.s.k)}"><div class="row" style="gap:8px"><span class="chip" style="background:var(--surface);color:var(--ci)">${esc(nx.label)}${nx.date?' · '+esc(fmtDate(nx.date)):''}</span><span class="muted" style="font-size:12.5px">${esc(b.name)} · ${cnt} student${cnt===1?'':'s'}</span></div>
+      <h3><span class="sn-mini" style="background:var(--surface)">${n}</span> ${esc(nx.s.title)}</h3><p class="muted" style="font-size:14px">${esc(nx.s.obj)}</p>
+      <div class="row" style="gap:8px"><a class="btn primary sm" href="#session-${n}" data-live>Teaching plan</a>${set['deck:'+n]||SESSIONS[n-1].slides?`<button class="btn sm" data-present="${n}">▶ Present slides</button>`:''}${GUIDES_FOR(n)?`<a class="btn sm" href="#session-${n}" data-live>Teacher guide</a>`:''}</div></article>`}).join('')
+    :`<div class="panel empty">${ready?'Create a batch in <a href="#teacher">Students &amp; Batches</a> to see your upcoming classes here.':'Loading your classes…'}</div>`;
+  const T=[['O','Teaching plans','12 sessions','#syllabus','map'],['R','Slide decks',`${Object.keys(set).filter(k=>k.startsWith('deck:')).length} of 12 linked`,'#teacher','flag'],['L','Students & Batches',ready?`${t.students.length} student${t.students.length===1?'':'s'} · ${t.batches.length} batch${t.batches.length===1?'':'es'}`:'Open','#teacher','log'],['S','Inbox',unread?`${unread} new`:'No new messages','#teacher','msg']];
+  const PAS=['#D9F7E8','#F3E5FF','#DCEBFF','#FFE0E6'];
+  return `<div class="stack" style="gap:24px">
+   <section class="hero2"><div class="stack" style="gap:12px;min-width:0"><div class="eyebrow">Teaching · ${new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric'})}</div><h1>${greet()}, Ms. Maria</h1>
+     <p class="lead">Your classes, slides and teaching plans in one place. Students see their own dashboard; this page is only for you.</p></div>
+     <div class="ladder" style="gap:10px"><div class="eyebrow" style="opacity:1">At a glance</div>
+       <div class="tstats"><div><b>${ready?t.batches.length:'–'}</b><span>Batches</span></div><div><b>${ready?t.students.length:'–'}</b><span>Students</span></div><div><b>${unread}</b><span>New messages</span></div></div></div></section>
+   <section class="stack" style="gap:12px"><div class="secthead"><h2>Your next classes</h2><span class="muted" style="font-size:13px">From each batch's session schedule</span></div><div class="tclasses">${classes}</div></section>
+   <section class="qtiles" aria-label="Teaching shortcuts">${T.map(([k,tt,sub,href,ic],i)=>`<a class="qtile" href="${href}" style="${skv(k)};--qbg:${PAS[i]}"><span class="qic">${qicon(ic)}</span><b>${tt}</b><small>${esc(sub)}</small></a>`).join('')}</section>
+   <section class="panel stack" style="gap:12px"><div class="row"><h3>Course readiness</h3><span class="spacer"></span><span class="muted" style="font-size:13px">What's ready to teach</span></div>
+     <div class="tablewrap"><table class="log"><thead><tr><th></th><th>Session</th><th>Canva deck</th><th>PowerPoint</th><th>Built-in slides</th><th>Teacher guide</th><th></th></tr></thead><tbody>
+     ${SESSIONS.map(x=>{const ok=v=>v?'<span class="rchip good">✓ Ready</span>':'<span class="muted">–</span>';return `<tr><td><span class="sn-mini" style="${skv(x.k)}">${x.n}</span></td><td style="min-width:200px">${esc(x.title)}</td><td>${ok(set['deck:'+x.n])}</td><td>${ok(DECK_FILES[x.n])}</td><td>${ok(x.slides)}</td><td>${ok(GUIDES_FOR(x.n))}</td><td><a class="chip" href="#session-${x.n}" data-live>Open</a></td></tr>`}).join('')}
+     </tbody></table></div></section></div>`}
+function GUIDES_FOR(n){const x=SESSIONS[n-1];return !!(x&&x.guide)}
+function bindTeacherHome(){if(cloud.tpass&&!cloud.t.loaded&&!cloud.t.loading&&!cloud.t.error)loadTeacher();
+  app.querySelectorAll('[data-live]').forEach(a=>a.addEventListener('click',()=>store.set('ttab','live')));
+  app.querySelectorAll('[data-present]').forEach(b=>b.addEventListener('click',()=>{const n=+b.dataset.present;const url=(cloud.settings||{})['deck:'+n];
+    if(url){window.open(deckOpen(url),'_blank','noopener')}else if(SESSIONS[n-1].slides)openSlides(SLIDESETS[SESSIONS[n-1].slides])}))}
+
 /* ---------- Teacher portal ---------- */
 let tSel=null,tStudent=null,tNewOpen=false,tConfirmDel=false,tLogFilter='',tForm=null,tConfirmStuDel=false,tShare=null,tBatchMsg=false,tFlash='';const fbDraft={};
 const SAMPLE_TASKS=[
@@ -1892,7 +1936,7 @@ const tcall=(action,payload)=>api(action,Object.assign({pass:cloud.tpass},payloa
 async function loadTeacher(){if(cloud.t.loading)return;cloud.t.loading=true;cloud.t.error=null;refreshIf(['teacher']);
   try{const j=await tcall('teacher.data');Object.assign(cloud.t,{batches:j.batches||[],students:j.students||[],progress:j.progress||{},feedback:j.feedback||{},messages:j.messages||[],loaded:true,at:Date.now()});cloud.settings=j.settings||{}}
   catch(e){if(e.code==='bad_password'){writeTPass(null);cloud.tpass=null;renderNav()}cloud.t.error=errMsg(e)}
-  finally{cloud.t.loading=false;refreshIf(['teacher','session'])}}
+  finally{cloud.t.loading=false;refreshIf(['teacher','session','home'])}}
 function tRoster(){return cloud.t.students.map(st=>Object.assign({},cloud.t.progress[st.code]||{},{id:st.code,code:st.code,profile:{name:st.name,email:st.email,phone:st.phone},batch:st.batch}))}
 function stuStats(r){const tasks=r.tasks||{};const done=Object.values(tasks).filter(Boolean).length;
   const cur=SESSIONS.find(s=>s.tasks.some((_,i)=>!tasks[s.n+':'+i]))||SESSIONS[11];
