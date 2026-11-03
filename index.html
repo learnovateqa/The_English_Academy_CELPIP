@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>CELPIP Prep Course</title>
+<title>CELPIP Prep Course · Learnovate Qatar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap">
@@ -373,7 +373,7 @@ table.sess td{vertical-align:middle}
 </head>
 <body>
 <header class="bar"><div class="wrap">
-  <a class="brand" href="#home"><span class="mark">CLB</span><span>CELPIP Prep Course<small>with Ms. Maria</small></span></a>
+  <a class="brand" href="#home"><span class="mark">CLB</span><span>CELPIP Prep Course<small>Learnovate Qatar</small></span></a>
   <nav class="main" aria-label="Main" hidden>
     <a href="#home" data-nav="home">My Dashboard</a>
     <a href="#syllabus" data-nav="syllabus">Syllabus</a>
@@ -385,7 +385,7 @@ table.sess td{vertical-align:middle}
   <button class="btn sm" id="signout" hidden>Sign out</button>
 </div></header>
 <main><div class="wrap" id="app"></div></main>
-<footer><div class="wrap">Independent prep course for the CELPIP-General test. Not affiliated with or endorsed by the test publisher. All practice items are original. Your practice saves to your class with your personal access code.</div></footer>
+<footer><div class="wrap"><b>Learnovate Qatar</b> · CELPIP Prep Course. Independent prep course for the CELPIP-General test. Not affiliated with or endorsed by the test publisher. All practice items are original. Your practice saves to your class with your personal access code.</div></footer>
 
 <script>
 /* ---------- settings ---------- */
@@ -469,7 +469,7 @@ document.getElementById('signout').addEventListener('click',signOut);
 
 function LoginView(){return `<div class="login"><section class="logincard">
   <span class="mark big">CLB</span>
-  <div class="eyebrow">CELPIP Prep Course · with Ms. Maria</div>
+  <div class="eyebrow">Learnovate Qatar · CELPIP Prep Course</div>
   <h1>Welcome. Enter your access code.</h1>
   <p class="lead">Your teacher gave you a personal code. It opens your dashboard and saves your practice to your class.</p>
   <form id="login-form" class="stack" style="gap:12px" novalidate>
@@ -1144,7 +1144,7 @@ function bindComposer(px,to,after){const on=(id,ev,fn)=>{const el=document.getEl
 const TOTAL_TASKS=SESSIONS.reduce((a,s)=>a+s.tasks.length,0);
 const genCode=()=>{const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let c='CEL-';const r=crypto.getRandomValues(new Uint32Array(6));for(const x of r)c+=A[x%A.length];return c};
 const siteURL=()=>location.href.split('#')[0];
-const inviteText=st=>`Hi ${st.name}, welcome to the CELPIP Prep Course!\n\nOpen: ${siteURL()}\nYour access code: ${st.code}\n\nKeep this code private. It opens your dashboard and saves your practice.`;
+const inviteText=st=>`Hi ${st.name}, welcome to the Learnovate Qatar CELPIP Prep Course!\n\nOpen: ${siteURL()}\nYour access code: ${st.code}\n\nKeep this code private. It opens your dashboard and saves your practice.`;
 const tcall=(action,payload)=>api(action,Object.assign({pass:cloud.tpass},payload||{}));
 async function loadTeacher(){if(cloud.t.loading)return;cloud.t.loading=true;cloud.t.error=null;refreshIf(['teacher']);
   try{const j=await tcall('teacher.data');Object.assign(cloud.t,{batches:j.batches||[],students:j.students||[],progress:j.progress||{},feedback:j.feedback||{},messages:j.messages||[],loaded:true,at:Date.now()})}
@@ -1271,7 +1271,7 @@ function bindTeacher(){
   if(tStudent){bindComposer('sm',{code:tStudent});const ur=unreadFrom(tStudent);if(ur.length){const ids=ur.map(m=>m.id);ur.forEach(m=>m.readT=Date.now());tcall('teacher.read',{ids}).catch(()=>{})}
     const tb=app.querySelector('.threadbox');if(tb)tb.scrollTop=tb.scrollHeight}
   on('t-invite','click',async e=>{const st=cloud.t.students.find(x=>x.code===tStudent);if(!st)return;e.target.disabled=true;e.target.textContent='Emailing…';
-    try{const m=await tcall('teacher.send',{to:{code:st.code},kind:'invite',subject:'Your CELPIP Prep Course access code',body:'Here is your access code for the CELPIP Prep Course website.',email:true,siteUrl:siteURL()});cloud.t.messages.push(m.message);tFlash=m.email&&m.email.sent?`Access code emailed to ${st.email}.`:'The email could not be sent. Run testEmail in Apps Script to allow email.'}
+    try{const m=await tcall('teacher.send',{to:{code:st.code},kind:'invite',subject:'Your Learnovate Qatar CELPIP access code',body:'Here is your access code for the Learnovate Qatar CELPIP Prep Course website.',email:true,siteUrl:siteURL()});cloud.t.messages.push(m.message);tFlash=m.email&&m.email.sent?`Access code emailed to ${st.email}.`:'The email could not be sent. Run testEmail in Apps Script to allow email.'}
     catch(err){tFlash=errMsg(err)}view(true)});on('t-retry','click',()=>{cloud.t.error=null;loadTeacher()});
   app.querySelectorAll('[data-batch]').forEach(b=>b.addEventListener('click',()=>{tSel=b.dataset.batch;tStudent=null;tForm=null;tShare=null;tConfirmDel=false;view(true)}));
   on('t-new','click',()=>{tNewOpen=true;view(true);const i=document.getElementById('nb-name');if(i)i.focus()});
@@ -1298,7 +1298,7 @@ function bindTeacher(){
       if(i>=0)cloud.t.students[i]=st;else cloud.t.students.push(st);
       if(tForm.mode==='new'||(tForm.orig&&tForm.orig!==st.code))tShare=st.code;
       const inv=document.getElementById('sf-invite');
-      if(tForm.mode==='new'&&inv&&inv.checked&&st.email){try{const m=await tcall('teacher.send',{to:{code:st.code},kind:'invite',subject:'Your CELPIP Prep Course access code',body:'Welcome to the CELPIP Prep Course! Open the course website and sign in with your personal access code below.',email:true,siteUrl:siteURL()});cloud.t.messages.push(m.message);tFlash=m.email&&m.email.sent?`Access code emailed to ${st.email}.`:'The student was created, but the email could not be sent. Run testEmail in Apps Script to allow email, then use "Email access code".'}catch(e){tFlash='The student was created, but the email could not be sent: '+errMsg(e)}}
+      if(tForm.mode==='new'&&inv&&inv.checked&&st.email){try{const m=await tcall('teacher.send',{to:{code:st.code},kind:'invite',subject:'Your Learnovate Qatar CELPIP access code',body:'Welcome to the Learnovate Qatar CELPIP Prep Course! Open the course website and sign in with your personal access code below.',email:true,siteUrl:siteURL()});cloud.t.messages.push(m.message);tFlash=m.email&&m.email.sent?`Access code emailed to ${st.email}.`:'The student was created, but the email could not be sent. Run testEmail in Apps Script to allow email, then use "Email access code".'}catch(e){tFlash='The student was created, but the email could not be sent: '+errMsg(e)}}
       tSel=st.batch&&cloud.t.batches.some(b=>b.id===st.batch)?st.batch:'__none';tStudent=st.code;tForm=null;view(true)}
     catch(err){e.target.disabled=false;msg.textContent=errMsg(err)}});
   on('t-share-close','click',()=>{tShare=null;view(true)});
