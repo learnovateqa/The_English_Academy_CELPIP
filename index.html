@@ -677,6 +677,78 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 .studyn{display:flex;flex-direction:column;gap:2px;background:var(--surface-2);border-radius:12px;padding:10px 12px;font-size:14px}
 .studyn .chip{align-self:flex-start;text-decoration:none}
 .selfbox{background:var(--surface-2);border-radius:14px;padding:10px 14px}.selfbox summary{cursor:pointer;font-weight:600}
+
+.chk{display:inline-flex;gap:6px;align-items:center;font-size:13.5px}
+.th-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+.th-col{background:var(--surface-2);border-radius:12px;padding:10px 12px;min-height:110px}
+.th-col ul{margin:6px 0 0;padding-left:18px;font-family:ui-monospace,Menlo,monospace;font-size:13.5px}
+.th-col li{animation:pop .3s ease}
+@keyframes pop{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.th-say{background:var(--peach);border-radius:12px;padding:8px 12px;margin-top:10px;font-size:14px}
+.th-qs{margin-top:10px;font-size:14px}
+.pen{border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:5px 12px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.pen[aria-pressed="true"]{box-shadow:0 0 0 2px var(--fg) inset}
+.pen-d,.seg.m-d,.pen-an{background:#FDE2E2;color:#9b1c1c}.pen-c,.seg.m-c,.pen-ap{background:#DDF3E4;color:#17603a}.pen-s,.seg.m-s,.pen-ah{background:#FFF1BF;color:#7a5a00}.pen-ac{background:#E3EEFF;color:#1a4fa8}
+.seg.m-an{background:#FDE2E2;color:#9b1c1c}.seg.m-ap{background:#DDF3E4;color:#17603a}.seg.m-ah{background:#FFF1BF;color:#7a5a00}.seg.m-ac{background:#E3EEFF;color:#1a4fa8}
+.an-text{margin-top:10px;font-size:15px;line-height:1.9}
+.an-text p{margin:0 0 4px}
+.seg{cursor:pointer;border-radius:6px;padding:1px 3px;transition:background .2s}
+.seg:hover{outline:1.5px dashed var(--muted)}
+.seg.u{text-decoration:underline dotted;text-underline-offset:4px}
+.seg.ok{outline:2px solid var(--good)}.seg.no{outline:2px dashed var(--bad)}
+.an-out{background:var(--surface-2);border-radius:12px;padding:10px 14px;margin-top:10px;font-size:14px}
+.an-out ol,.th-qs ol{margin:6px 0 0;padding-left:20px}
+.poll-ctx{background:var(--blue);border-radius:12px;padding:10px 14px;font-size:14.5px}
+.poll-opts{display:grid;gap:8px}
+.poll-opt{position:relative;overflow:hidden;display:flex;gap:10px;align-items:center;text-align:left;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);border-radius:12px;padding:10px 12px;font:inherit;cursor:pointer}
+.poll-opt i{position:absolute;left:0;top:0;bottom:0;background:color-mix(in srgb,var(--skL) 60%,transparent);z-index:0;transition:width .6s ease}
+.poll-opt span{position:relative;z-index:1}.poll-opt .pt{flex:1}.poll-opt .pl{font-weight:700;width:1.6em}.poll-opt .pv{font-weight:600;font-size:13px;color:var(--muted)}
+.poll-opt.right{border-color:var(--good)}.poll-opt.right i{background:color-mix(in srgb,var(--good) 25%,transparent)}.poll-opt.dim{opacity:.75}
+.ns-list{margin:8px 0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:14.5px}
+.ns-list li{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+.ns-btns{display:flex;gap:6px;flex-wrap:wrap}
+.ns-cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}
+@media(max-width:760px){.ns-cols,.th-grid{grid-template-columns:minmax(0,1fr)}}
+.ns-col{background:var(--surface-2);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px;font-size:13.5px}
+.ns-col ul{margin:6px 0 0;padding-left:16px}.ns-col li.ok{color:var(--good)}.ns-col li.no{color:var(--bad);text-decoration:underline wavy}
+.tr-grid td:not(:first-child),.tr-grid th:not(:first-child){text-align:center;width:72px}
+.cell{width:34px;height:34px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--fg);font-weight:700;cursor:pointer}
+.cell[aria-pressed="true"]{background:var(--blue)}.cell.ok{background:var(--hub-soft);border-color:var(--good)}.cell.no{background:#FDE2E2;border-color:var(--bad)}.cell.key{border:2px solid var(--good);color:var(--good)}
+
+.steplist{display:flex;flex-direction:column;gap:12px}
+.stephost{scroll-margin-top:90px}
+.pathcard h3{margin-bottom:2px}
+.pbar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden;margin-top:8px}.pbar i{display:block;height:100%;background:var(--hub);border-radius:99px;transition:width .6s ease}
+.step-head{display:flex;gap:12px;align-items:center;padding:14px 18px;cursor:pointer;user-select:none;background:var(--surface);transition:background .2s}
+.step-head:hover{background:var(--surface-2)}
+.step-head .chev{transition:transform .2s;color:var(--muted);flex:none}
+.tool:not(.closed) .step-head .chev{transform:rotate(180deg)}
+.tool:not(.closed) .step-head{border-bottom:1px solid var(--line)}
+.st-dot{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:14px;background:var(--surface-2);color:var(--muted)}
+.tool.iscur .st-dot{background:var(--hub);color:#fff;box-shadow:0 0 0 4px var(--hub-soft)}
+.tool.isdone .st-dot{background:var(--hub-soft);color:var(--hub)}
+.st-ic{flex:none;width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--c);color:var(--ci)}
+.st-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.st-main b{font-size:15.5px;line-height:1.3}
+.st-meta{display:flex;flex-wrap:wrap;gap:6px}
+.st-meta span{font-size:12px;font-weight:600;color:var(--muted);background:var(--surface-2);border-radius:99px;padding:2px 9px}
+.st-meta span:first-child{background:var(--c,var(--surface-2))}
+.chip.upnext{background:var(--hub);color:#fff;border-color:transparent}
+.tool.iscur{box-shadow:0 0 0 2px var(--hub),var(--shadow)}
+.tool .tool-head.inner{cursor:default;background:transparent;padding:12px 18px 0}
+.tool .tool-head.inner h3{display:none}
+.tool.closed .tool-head.inner,.tool.closed .step-intro,.tool.closed .step-next{display:none}
+.tool.fresh .tool-head.inner,.tool.fresh .tool-body{display:none}
+.tool:not(.fresh) .step-intro{display:none}
+.step-intro{padding:18px}
+.si-box{background:var(--c);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.si-what{font-size:15.5px;max-width:60ch}
+.si-list{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:8px}
+.si-list li{background:var(--surface);border-radius:99px;padding:4px 12px;font-size:13px;font-weight:600}
+.step-next:empty{display:none}
+.step-next{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 18px;background:var(--hub-soft);color:var(--hub);font-weight:600;font-size:14px}
+@media(max-width:560px){.st-ic{display:none}.step-head{padding:12px 14px;gap:10px}.st-stat .chip{font-size:11px}}
+.todo summary{cursor:pointer;list-style:none}.todo summary::-webkit-details-marker{display:none}.todo[open] summary{margin-bottom:10px}
 </style>
 </head>
 <body>
@@ -706,7 +778,7 @@ const CONFIG={
 /* ---------- storage (each student's data is kept under their own code) ---------- */
 let PREFIX='bcs:guest:';
 const store={get(k,d){try{const v=localStorage.getItem(PREFIX+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
-  set(k,v){try{localStorage.setItem(PREFIX+k,JSON.stringify(v))}catch(e){}}};
+  set(k,v){try{localStorage.setItem(PREFIX+k,JSON.stringify(v))}catch(e){}if(k==='res')setTimeout(()=>{try{dispatchEvent(new Event('bcs-res'))}catch(e){}},0)}};
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let samplePromise=Promise.resolve(null);
 
@@ -871,19 +943,19 @@ const SESSIONS=[
   ['0:45','1:15','Model Note-Taking','Think aloud through a Part 1 clip using two-column notes (Speaker A / Speaker B).'],
   ['1:15','1:40','Break Down Distractors','Annotate a transcript. Show how a first-mentioned answer gets corrected later.'],
   ['1:40','2:00','Run Prediction Polls','Students commit to an answer. The instructor explains each option.']],
- liveTools:[['Think-Aloud Audio Stage','Paused playback with a live notes overlay.'],['Transcript Annotation Canvas','Colour-codes distractors and correct cues.'],['Prediction Poll','Shows the class answer split instantly.']],
- tasks:[['Drill the Problem-Solving Set','Use two-column notes while you listen.'],['Run the Transcript Audit','After grading, find the line that proves each answer.'],['Log Every Error','Tag each miss by cause.'],['Complete Set B: Daily Life Conversation','Listen once, then audit the transcript.'],['Complete Set C: Listening for Information','Note numbers, times and conditions.']],
- tools:['L1','L3','L4']},
+ liveTools:[['Think-Aloud Audio Stage','Line-by-line playback with live two-column notes.'],['Transcript Annotation Canvas','Colour-codes distractors, answer cues and signal words.'],['Prediction Poll','Shows the class answer split, then the reason.']],
+ tasks:[['Drill the Problem-Solving Set','Use two-column notes while you listen.'],['Run the Transcript Audit','After grading, find the line that proves each answer.'],['Log Every Error','Tag each miss by cause.'],['Complete Set B: Daily Life Conversation','Listen once, then audit the transcript.'],['Complete Set C: Listening for Information','Note numbers, times and conditions.'],['Complete Set D: Problem Solving at Work','A second Part 1 set. Two-column notes again.']],
+ tools:['L1','L7','L3','L4'],slides:'S2',widgets:['THINK','ANNOTATE','POLL'],guide:'S2'},
 {n:3,k:'L',title:'Decode Listening Parts 4–6',
  obj:'Students identify main ideas, attitudes and opinions in longer, denser audio.',
  live:[['0:00','0:15','Review Hub Data','Show error trends from Parts 1–3.'],
   ['0:15','0:45','Teach News Structure','Model the headline → details → impact pattern in news items.'],
-  ['0:45','1:15','Model Multi-Speaker Tracking','Use the discussion video. Track who holds which position.'],
+  ['0:45','1:15','Model Multi-Speaker Tracking','Use the Discussion Tracker. Track who holds which position.'],
   ['1:15','1:45','Decode Attitude Language','Teach hedges, contrast markers and tone signals.'],
   ['1:45','2:00','Analyze Inference Questions','Separate what is said from what is implied.']],
- liveTools:[['Video Discussion Player','Speaker-tracking overlay grid.'],['Attitude Marker Highlighter','Tags tone words in the transcript.']],
- tasks:[['Drill the News Item Set','Listen for the headline first, then the details.'],['Complete the Attitude Marker Sort','Classify each phrase.'],['Take Full Listening Mock #1','Scheduled by your instructor. One sitting.'],['Update the Error Log','Focus on inference errors.'],['Complete Set B: Three-Speaker Discussion','Track who says what in a grid.'],['Complete Set C: Viewpoints Report','Listen for attitude words and hedges.']],
- tools:['L2','T1','L5','L6']},
+ liveTools:[['News Structure Sorter','Headline → details → impact.'],['Discussion Tracker','Three-speaker grid: who said what.'],['Attitude Marker Highlighter','Tags positive, negative, hedge and contrast words.']],
+ tasks:[['Drill the News Item Set','Listen for the headline first, then the details.'],['Complete the Attitude Marker Sort','Classify each phrase.'],['Take Full Listening Mock #1','Scheduled by your instructor. One sitting.'],['Update the Error Log','Focus on inference errors.'],['Complete Set B: Three-Speaker Discussion','Track who says what in a grid.'],['Complete Set C: Viewpoints Report','Listen for attitude words and hedges.'],['Complete Set D: Storm News Report','Headline first, then details and impact.']],
+ tools:['L2','L8','T1','L5','L6'],slides:'S3',widgets:['NEWS','TRACK','ATTITUDE'],guide:'S3'},
 {n:4,k:'R',title:'Attack Reading Parts 1–2',
  obj:'Students scan efficiently and match text details to visual information.',
  live:[['0:00','0:15','Debrief Listening Mock #1','Class trends and fixes for the top three errors.'],
@@ -1093,6 +1165,33 @@ L6:{kind:'listen',title:'Listening Part 6 · Viewpoints',minutes:6,
   {q:'What did the Halifax principal notice after the ban?',o:['Students talked more at lunch.','Parents complained.','Test scores dropped.','Teachers used more apps.'],a:0,why:'"Students talked to each other more at lunch, and test scores rose slightly." Scores rose, not dropped.'},
   {q:'Why do some parents oppose phone bans?',o:['Phones help with homework.','They want to contact their children in emergencies.','Phones are expensive to replace.','Bans are unfair to teachers.'],a:1,why:'"They want to be able to reach their children in an emergency."'},
   {q:'What is the reporter’s attitude toward the middle path?',o:['Strongly against it','Completely sure it works','Cautiously positive','Not interested'],a:2,why:'"Encouraging, but the studies are still small." Positive with a hedge = cautiously positive.'}]},
+L7:{kind:'listen',title:'Listening Part 1 · Problem Solving (Set D: at work)',minutes:6,
+ context:'You will hear a conversation between two co-workers, Jordan and Mei. You will hear it once. Use two-column notes.',
+ audio:[['Jordan','Mei, my laptop just froze, and the client presentation is at two.'],
+  ['Mei','Did you try restarting it?'],
+  ['Jordan','Twice. Now it won’t even turn on, and all the slides are on it.'],
+  ['Mei','Didn’t you save them to the shared drive last week?'],
+  ['Jordan','I saved an old version. It doesn’t have the new sales numbers.'],
+  ['Mei','Okay. IT can usually recover files, but they’re busy until three. Let’s not wait for them. Do you have the numbers anywhere else?'],
+  ['Jordan','Yes, in an email I sent to Carlos on Monday.'],
+  ['Mei','Perfect. Use my laptop. Open the old version, and we’ll add the new numbers from the email. I’ll print handouts, in case the projector acts up.'],
+  ['Jordan','You’re a lifesaver. I’ll take my laptop to IT right after the meeting.']],
+ qs:[{q:'What is Jordan’s problem?',o:['He lost the client’s phone number.','His laptop stopped working before a presentation.','The projector is broken.','He missed a meeting with Carlos.'],a:1,why:'"My laptop just froze, and the client presentation is at two."'},
+  {q:'Why can’t Jordan just use the file on the shared drive?',o:['The drive is down.','He forgot the password.','It is missing the new sales numbers.','Carlos deleted it.'],a:2,why:'"I saved an old version. It doesn’t have the new sales numbers." Paraphrase: missing the latest numbers.'},
+  {q:'Why does Mei decide not to wait for IT?',o:['IT cannot recover files.','IT is busy until after the presentation.','IT is closed on Mondays.','Jordan does not trust IT.'],a:1,why:'IT is busy until three; the presentation is at two. You have to connect two details. "Usually recover files" is a distractor.'},
+  {q:'Where are the new sales numbers?',o:['On the shared drive','In an email to Carlos','On Mei’s laptop','In the printed handouts'],a:1,why:'"In an email I sent to Carlos on Monday."'},
+  {q:'What will Mei do?',o:['Call IT','Present the slides','Print handouts','Email Carlos'],a:2,why:'"I’ll print handouts, in case the projector acts up."'},
+  {q:'What will Jordan do after the meeting?',o:['Buy a new laptop','Take his laptop to IT','Send the slides to the client','Return Mei’s laptop to IT'],a:1,why:'"I’ll take my laptop to IT right after the meeting." Listen to the very end for "next" questions.'}]},
+L8:{kind:'listen',title:'Listening Part 4 · News Item (Set D: storm report)',minutes:5,
+ context:'You will hear a local news report. You will hear it once. Listen for the headline first, then the details.',
+ audio:[['Reporter','A winter storm left about twelve thousand homes in the Ottawa Valley without power last night. Hydro crews restored electricity to most homes by this morning, but around fifteen hundred customers in rural areas may have to wait until Thursday.'],
+  ['Reporter','The city has opened two warming centres, at the Riverside Community Centre and the main public library. Both will stay open twenty-four hours a day until power returns.'],
+  ['Reporter','Officials are reminding residents never to use barbecues or gas heaters indoors, because of the risk of carbon monoxide. They are also asking people to check on elderly neighbours.']],
+ qs:[{q:'What is the main news?',o:['A new library has opened.','A storm caused power outages.','Hydro prices are rising.','A community centre is closing.'],a:1,why:'The headline is in the first sentence: a winter storm left homes without power.'},
+  {q:'When may some rural customers get their power back?',o:['Last night','This morning','On Thursday','In twenty-four hours'],a:2,why:'"Around fifteen hundred customers in rural areas may have to wait until Thursday." "This morning" is for most homes, not rural ones.'},
+  {q:'What has the city done?',o:['Opened two warming centres','Sent heaters to homes','Closed the library','Cancelled school'],a:0,why:'"The city has opened two warming centres."'},
+  {q:'Why should residents not use barbecues indoors?',o:['They are noisy.','They use too much power.','They can cause carbon monoxide poisoning.','It is against city rules.'],a:2,why:'"Because of the risk of carbon monoxide."'},
+  {q:'What are residents asked to do?',o:['Stay at the library','Check on elderly neighbours','Call Hydro crews','Buy gas heaters'],a:1,why:'"They are also asking people to check on elderly neighbours." Impact sentences often become questions.'}]},
 R3:{kind:'read',title:'Reading Part 2 · Apply a Diagram',minutes:8,
  passage:`<p><b>Riverside Community Centre · Spring Classes (8 weeks)</b></p>
 <div class="tablewrap"><table class="log"><thead><tr><th>Class</th><th>Day &amp; time</th><th>Fee</th><th>Notes</th></tr></thead><tbody>
@@ -1430,32 +1529,81 @@ function renderSession(s){
     <div class="boundary hubb">${icon('W',20)}<p><b>Do this on your own before ${s.n<12?'Session '+(s.n+1):'your test'}.</b> Work through the steps in order. Your instructor opens the next class with your results.</p></div>
     ${gated?`<div class="notice" id="gate">Finish the Session ${prev.n} module first. You have done ${sessionProgress(prev).done} of ${prev.tasks.length} tasks. <a href="#session-${prev.n}">Go to Session ${prev.n}</a> · <button class="btn" id="gate-open" style="margin-left:6px">Preview anyway</button></div>`:''}
     <div id="hub-body" class="stack" ${gated?'hidden':''}>
-      <div class="panel"><div class="row" style="margin-bottom:10px;flex-wrap:nowrap"><div class="ring" id="hubring"><span id="hubprog"></span></div><div style="min-width:0"><h3>Your to-do list</h3><p class="muted" style="font-size:13.5px">Tick each task when it is done. The practice tools are below, in order.</p></div></div>
-        <ul class="tasks">${s.tasks.map(([t,d],i)=>`<li><input type="checkbox" id="t-${s.n}-${i}" data-task="${s.n}:${i}" ${tasksDone()[s.n+':'+i]?'checked':''}><label for="t-${s.n}-${i}"><b>${esc(t)}</b><span>${esc(d)}</span></label></li>`).join('')}</ul></div>
-      ${s.tools.map(t=>`<div id="tool-${t}"></div>`).join('')}
+      <div class="panel pathcard" id="pathcard"></div>
+      <div class="steplist">${s.tools.map(t=>`<div id="tool-${t}" class="stephost"></div>`).join('')}</div>
+      <details class="panel todo" id="todo"><summary class="row" style="flex-wrap:nowrap"><div class="ring" id="hubring"><span id="hubprog"></span></div><div style="min-width:0"><h3>Class checklist</h3><p class="muted" style="font-size:13.5px">Tick each task when it is done. Tap to open.</p></div></summary>
+        <ul class="tasks">${s.tasks.map(([t,d],i)=>`<li><input type="checkbox" id="t-${s.n}-${i}" data-task="${s.n}:${i}" ${tasksDone()[s.n+':'+i]?'checked':''}><label for="t-${s.n}-${i}"><b>${esc(t)}</b><span>${esc(d)}</span></label></li>`).join('')}</ul></details>
     </div>
   </section></div>`;
   bindDeck(s);if(cloud.tpass&&!cloud.t.loaded&&!cloud.t.loading&&!cloud.t.error)loadTeacher();
-  {const pl=document.getElementById('pane-live');bindTestMap(pl);bindReq(pl);bindSim(pl);const pb=document.getElementById('present-btn');if(pb)pb.addEventListener('click',()=>openSlides(SLIDESETS[s.slides]))}
+  {const pl=document.getElementById('pane-live');bindWidgets(pl);const pb=document.getElementById('present-btn');if(pb)pb.addEventListener('click',()=>openSlides(SLIDESETS[s.slides],s.n))}
   const setProg=()=>{const p=sessionProgress(s);const el=document.getElementById('hubprog');if(el)el.textContent=`${p.done}/${p.total}`;const r=document.getElementById('hubring');if(r)r.style.setProperty('--p',p.pct)};setProg();
   app.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{store.set(TK,b.dataset.tab);
     app.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));
     document.getElementById('pane-live').hidden=b.dataset.tab!=='live';document.getElementById('pane-hub').hidden=b.dataset.tab!=='hub'}));
   app.querySelectorAll('[data-task]').forEach(c=>c.addEventListener('change',()=>{const t=tasksDone();t[c.dataset.task]=c.checked;store.set('tasks',t);setProg()}));
   const go=document.getElementById('gate-open');if(go)go.addEventListener('click',()=>{document.getElementById('hub-body').hidden=false;document.getElementById('gate').hidden=true});
-  let opened=false;const res=results();
-  s.tools.forEach((t,i)=>{const host=document.getElementById('tool-'+t);
-    if(QUIZ[t])Quiz(host,s,t);else if(WRITE[t])Writer(host,s,t);else if(SPEAK[t])Speaker(host,s,t);else if(t==='READY')Ready(host);else if(t==='DIAG')Diag(host);
-    const card=host.querySelector('.tool'),head=host.querySelector('.tool-head');if(!card||!head)return;
-    head.insertAdjacentHTML('afterbegin',`<span class="stepno">Step ${i+1}</span>`);
-    head.insertAdjacentHTML('beforeend','<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>');
-    head.setAttribute('role','button');head.tabIndex=0;
-    const done=!!res[s.n+':'+t];if(done)head.insertAdjacentHTML('beforeend',`<span class="chip good" style="background:var(--surface)">${CHECK} Done</span>`);
-    if(done||opened)card.classList.add('closed');else opened=true;
-    head.setAttribute('aria-expanded',!card.classList.contains('closed'));
-    const tog=e=>{if(e.target.closest('button,select,input,a'))return;card.classList.toggle('closed');head.setAttribute('aria-expanded',!card.classList.contains('closed'))};
-    head.addEventListener('click',tog);head.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog(e)}})});
+  buildSteps(s);
 }
+
+/* ---------- Study Hub step path ---------- */
+function stepMeta(t){
+  if(QUIZ[t]){const q=QUIZ[t],n=q.qs.length;
+    if(q.kind==='listen')return {k:'L',type:'Listening',what:'Read the situation, press Play once, then answer. The audio does not repeat.',info:[`${q.minutes} min`,`${n} questions`,'Audio plays once'],need:'Headphones'};
+    if(q.kind==='read')return {k:'R',type:'Reading',what:'Read the questions first, then scan the text for the answers. The timer starts when you press Start.',info:[`${q.minutes} min`,`${n} questions`,'Timed']};
+    return {k:'O',type:'Drill',what:'Answer each question, then check your answers. There is no timer.',info:[`${n} questions`,'No timer']}}
+  if(WRITE[t]){const w=WRITE[t];return {k:'W',type:'Writing',what:'Plan for 3 minutes, write 150–200 words, then proofread. Cover every bullet point.',info:[`${w.minutes} min`,'150–200 words']}}
+  if(SPEAK[t]){const k=SPEAK[t];return {k:'S',type:'Speaking',what:'Prepare, then speak until the timer ends. Record your answer on your phone.',info:[`${k.prep}s prep`,`${k.speak}s speak`],need:'Phone voice recorder or microphone'}}
+  if(t==='DIAG')return {k:'O',type:'Summary',what:'See your four starting levels and save them as your baseline.',info:['2 min'],noIntro:true};
+  if(t==='READY')return {k:'O',type:'Readiness',what:'See how close each skill is to your target.',info:['5 min'],noIntro:true};
+  return {k:'O',type:'',what:'',info:[],noIntro:true}}
+let stepCleanup=()=>{};
+function buildSteps(s){stepCleanup();
+  const hosts=s.tools.map(t=>document.getElementById('tool-'+t));const started={};let openIdx=-1;
+  const isDone=t=>!!results()[s.n+':'+t];
+  const firstOpen=()=>{const k=s.tools.findIndex(t=>!isDone(t));return k};
+  const render=i=>{const t=s.tools[i],host=hosts[i];started[t]=false;
+    if(QUIZ[t])Quiz(host,s,t);else if(WRITE[t])Writer(host,s,t);else if(SPEAK[t])Speaker(host,s,t);else if(t==='READY')Ready(host);else if(t==='DIAG')Diag(host)};
+  const decorate=i=>{const t=s.tools[i],host=hosts[i],card=host.querySelector('.tool'),head=host.querySelector('.tool-head');if(!card||!head||card.querySelector('.step-head'))return;
+    const m=stepMeta(t);head.classList.add('inner');head.removeAttribute('role');
+    const sh=document.createElement('div');sh.className='step-head';sh.setAttribute('role','button');sh.tabIndex=0;
+    card.prepend(sh);
+    if(!m.noIntro){const intro=document.createElement('div');intro.className='step-intro';head.after(intro)}
+    const nx=document.createElement('div');nx.className='step-next';card.append(nx);
+    if(m.noIntro)started[t]=true;
+    const tog=()=>{openIdx===i?setOpen(-1):setOpen(i,true)};
+    sh.addEventListener('click',tog);sh.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog()}});
+    paint(i)};
+  const paint=i=>{const t=s.tools[i],host=hosts[i],card=host.querySelector('.tool');if(!card)return;const m=stepMeta(t),v=results()[s.n+':'+t],done=!!v,cur=i===firstOpen();
+    card.classList.toggle('closed',openIdx!==i);card.classList.toggle('fresh',!started[t]);card.classList.toggle('isdone',done);card.classList.toggle('iscur',cur&&!done);
+    const sh=card.querySelector('.step-head');sh.setAttribute('aria-expanded',openIdx===i);
+    sh.innerHTML=`<span class="st-dot">${done?CHECK:i+1}</span><span class="st-ic" style="${skv(m.k)}">${icon(m.k==='O'?'O':m.k,18)}</span>
+      <div class="st-main"><b>${esc(toolTitle(t))}</b><span class="st-meta">${m.type?`<span>${esc(m.type)}</span>`:''}${m.info.map(x=>`<span>${esc(x)}</span>`).join('')}</span></div>
+      <span class="st-stat">${done?`<span class="chip good">${CHECK} ${esc(resultLabel(t,v))}</span>`:cur?'<span class="chip upnext">Up next</span>':''}</span>
+      <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>`;
+    const intro=card.querySelector('.step-intro');
+    if(intro){intro.innerHTML=`<div class="si-box" style="${skv(m.k)}"><div class="eyebrow">Step ${i+1} · ${esc(m.type)}</div><p class="si-what">${esc(m.what)}</p>
+      <ul class="si-list">${m.info.map(x=>`<li>${esc(x)}</li>`).join('')}${m.need?`<li>You need: ${esc(m.need)}</li>`:''}</ul>
+      ${done?`<p class="muted" style="font-size:13.5px">You finished this step (${esc(resultLabel(t,v))}). You can do it again to improve.</p>`:''}
+      <button class="btn primary" data-si-start>${done?'Try again':'Start'} →</button></div>`;
+      intro.querySelector('[data-si-start]').addEventListener('click',()=>{started[t]=true;paint(i);host.dispatchEvent(new Event('stepstart'));const f=card.querySelector('.tool-body button,.tool-body textarea');if(f)f.focus({preventScroll:true})})}
+    const nx=card.querySelector('.step-next');const nextI=s.tools.findIndex((x,k)=>k>i&&!isDone(x));
+    nx.innerHTML=done&&started[t]?`<span>${CHECK} Step ${i+1} done.</span><span class="spacer"></span>${nextI>=0?`<button class="btn primary sm" data-next>Next: Step ${nextI+1} →</button>`:'<b>All steps done. Great work!</b>'}`:'';
+    const nb=nx.querySelector('[data-next]');if(nb)nb.addEventListener('click',()=>setOpen(nextI,true))};
+  const paintPath=()=>{const el=document.getElementById('pathcard');if(!el)return;const n=s.tools.filter(isDone).length,tot=s.tools.length,k=firstOpen();
+    el.innerHTML=`<div class="row" style="flex-wrap:nowrap;gap:14px"><div class="ring" style="--p:${Math.round(n/tot*100)}"><span>${n}/${tot}</span></div><div style="min-width:0;flex:1"><h3>Your practice path</h3>
+      <p class="muted" style="font-size:13.5px">${k<0?'Every step is done. Review your <a href="#log">Error Log</a> before the next class.':`Do the steps in order. Next: <b>Step ${k+1} · ${esc(toolTitle(s.tools[k]))}</b>`}</p>
+      <div class="pbar"><i style="width:${Math.round(n/tot*100)}%"></i></div></div>${k>=0?`<button class="btn primary" id="path-go">${n?'Continue':'Start'} →</button>`:''}</div>`;
+    const g=el.querySelector('#path-go');if(g)g.addEventListener('click',()=>setOpen(k,true))};
+  const setOpen=(i,scroll)=>{const prev=openIdx;openIdx=i;
+    if(prev>=0&&prev!==i)paint(prev);
+    if(i>=0){paint(i);if(scroll)hosts[i].scrollIntoView({behavior:'smooth',block:'start'})}};
+  hosts.forEach((host,i)=>{render(i);decorate(i);
+    const mo=new MutationObserver(()=>{if(!host.querySelector('.step-head')){const t=s.tools[i];decorate(i);started[t]=true;paint(i)}});mo.observe(host,{childList:true});
+    host._mo=mo});
+  const onRes=()=>{s.tools.forEach((_,i)=>paint(i));paintPath()};addEventListener('bcs-res',onRes);
+  stepCleanup=()=>{removeEventListener('bcs-res',onRes);hosts.forEach(h=>h&&h._mo&&h._mo.disconnect())};
+  const k=firstOpen();setOpen(k,false);paintPath()}
 
 /* ---------- Quiz tool (listening / reading / mc) ---------- */
 function Quiz(host,s,key){
@@ -1476,7 +1624,7 @@ function Quiz(host,s,key){
   qsEl.innerHTML=q.qs.map((x,i)=>`<fieldset class="q" style="border:0;margin:0;padding-inline:0"><legend class="qt">${i+1}. ${esc(x.q)}</legend>${x.o.map((o,j)=>`<label class="opt" data-opt="${i}-${j}"><input type="radio" name="${rk}-q${i}" value="${j}"><span>${esc(o)}</span></label>`).join('')}<div class="why" data-why="${i}" hidden></div></fieldset>`).join('');
   const timerEl=host.querySelector('[data-timer]');
   const startTimer=()=>{if(!q.minutes||timerId)return;timerId=every(()=>{remaining--;if(timerEl){timerEl.textContent=fmt(Math.max(0,remaining));timerEl.classList.toggle('low',remaining<=60)}if(remaining<=0){clearInterval(timerId);grade(true)}},1000)};
-  if(q.kind==='read')startTimer();
+  if(q.kind==='read'){if(host.querySelector('.step-head')||host.dataset.retake)startTimer();else host.addEventListener('stepstart',startTimer,{once:true})}
   if(q.kind==='mc'){}
   const play=host.querySelector('[data-play]');
   if(play)play.addEventListener('click',()=>{if(played)return;played=true;play.disabled=true;const st=host.querySelector('[data-pstatus]');const pl=host.querySelector('[data-player]');
@@ -1499,7 +1647,7 @@ function Quiz(host,s,key){
     if(q.kind==='listen')showTranscript();
     host.querySelector('[data-submit]').hidden=true;host.querySelector('[data-retake]').hidden=false;
     host.querySelector('[data-out]').innerHTML=`<div class="result"><span class="big mono">${score}/${q.qs.length}</span><div>${auto?'Time is up. Answers were submitted automatically. ':''}${score===q.qs.length?'Perfect set.':`${q.qs.length-score} miss${q.qs.length-score>1?'es':''} added to your <a href="#log">Error Log</a>. Tag each one with a cause.`}${q.kind==='listen'?' Now audit the transcript: find the line that proves each answer.':''}</div></div>`}
-  host.querySelector('[data-retake]').addEventListener('click',()=>Quiz(host,s,key));
+  host.querySelector('[data-retake]').addEventListener('click',()=>{host.dataset.retake='1';Quiz(host,s,key)});
 }
 
 /* ---------- Writing tool ---------- */
@@ -1778,7 +1926,7 @@ function bindSim(root){root.querySelectorAll('[data-widget="sim"]').forEach(w=>{
   w.querySelector('[data-sim-next]').addEventListener('click',()=>{i=Math.min(SIM_STEPS.length-1,i+1);draw()});
   w.querySelector('[data-sim-prev]').addEventListener('click',()=>{i=Math.max(0,i-1);draw()});draw()})}
 
-const SLIDESETS={get S1(){return S1_SLIDES}};const GUIDES={get S1(){return S1_GUIDE}};
+const SLIDESETS={get S1(){return S1_SLIDES},get S2(){return S2_SLIDES},get S3(){return S3_SLIDES}};const GUIDES={get S1(){return S1_GUIDE},get S2(){return S2_GUIDE},get S3(){return S3_GUIDE}};
 const LIVE_WIDGETS={TESTMAP:['Test Map','Click a skill to see every part, question count and time.',TestMap,bindTestMap],
  REQS:['Requirements Checker','Enter four CELPIP levels to see which immigration and citizenship minimums they meet.',ReqChecker,bindReq],
  SIM:['Test Screen Simulator','Walk through what each part of the test screen looks like and how it behaves.',Simulator,bindSim]};
@@ -1822,20 +1970,21 @@ const S1_SLIDES=[
  {k:'O',h:'Before Session 2',list:[['✓','Listening and reading checks'],['✓','Baseline email (27 minutes)'],['✓','Two baseline speaking answers'],['✓','Save your starting point'],['✓','Tag every error']],tips:['Your results open the next class, so finish before Session 2.'],
   notes:'Open the Study Hub tab for Session 1 and show the diagnostic. Return to slide 2 and tick the outcomes together.'}];
 
-function slideHTML(sl,i,n){const top=`<div class="sl-top"><span class="sl-brand">CELPIP Prep Course · Session 1</span><span>${i+1} / ${n}</span></div>`;
+let deckN=1;
+function slideHTML(sl,i,n){const top=`<div class="sl-top"><span class="sl-brand">CELPIP Prep Course · Session ${deckN}</span><span>${i+1} / ${n}</span></div>`;
   if(sl.layout==='title')return `<div class="slide sl-title" style="${skv(sl.k)}">${top}<div class="sl-center"><div class="eyebrow">◆ Learnovate Qatar</div><h1>${sl.h}</h1><p>${sl.sub}</p></div><div class="sl-band"></div></div>`;
   let body='';
   if(sl.list)body=`<ol class="sl-list">${sl.list.map(([a,b])=>`<li><span class="sl-num">${a}</span><span>${b}</span></li>`).join('')}</ol>`;
   if(sl.cards)body=`<div class="sl-cards">${sl.cards.map(([a,b],j)=>`<div class="sl-card" style="${skv('LRWSO'[j%5])}"><b>${a}</b><span>${b}</span></div>`).join('')}</div>`;
   if(sl.widget)body=`<div class="sl-widget">${LIVE_WIDGETS[sl.widget][2]()}</div>`;
   return `<div class="slide" style="${skv(sl.k)}">${top}<h2>${sl.h}</h2>${body}${(sl.tips||[]).length?`<ul class="sl-tips">${sl.tips.map(t=>`<li>💡 ${t}</li>`).join('')}</ul>`:''}<div class="sl-band"></div></div>`}
-function openSlides(slides){let i=0;const ov=document.createElement('div');ov.className='deck';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Session slides');document.body.appendChild(ov);
+function openSlides(slides,sn){deckN=sn||1;let i=0;const ov=document.createElement('div');ov.className='deck';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Session slides');document.body.appendChild(ov);
   let notesOn=!!cloud.tpass;const prevFocus=document.activeElement;
   const draw=()=>{ov.innerHTML=`<div class="deck-stage">${slideHTML(slides[i],i,slides.length)}</div>
     <div class="deck-bar"><button class="ibtn" data-d="prev" aria-label="Previous slide">←</button><span class="deck-n">${i+1} / ${slides.length}</span><button class="ibtn" data-d="next" aria-label="Next slide">→</button><span class="spacer"></span>
       ${cloud.tpass?`<button class="ibtn" data-d="notes">${notesOn?'Hide':'Show'} notes</button>`:''}<button class="ibtn" data-d="fs">Full screen</button><button class="ibtn" data-d="close">Close ✕</button></div>
     ${cloud.tpass&&notesOn?`<div class="deck-notes"><b>Speaker notes</b><p>${esc(slides[i].notes||'')}</p></div>`:''}`;
-    const st=ov.querySelector('.deck-stage');bindTestMap(st);bindReq(st);bindSim(st);
+    const st=ov.querySelector('.deck-stage');bindWidgets(st);
     ov.querySelectorAll('[data-d]').forEach(b=>b.addEventListener('click',()=>act(b.dataset.d)));ov.querySelector('[data-d="next"]').focus({preventScroll:true})};
   const act=d=>{if(d==='next'&&i<slides.length-1){i++;draw()}else if(d==='prev'&&i>0){i--;draw()}else if(d==='notes'){notesOn=!notesOn;draw()}
     else if(d==='fs'){try{document.fullscreenElement?document.exitFullscreen():ov.requestFullscreen()}catch(e){}}else if(d==='close')close()};
@@ -1856,6 +2005,252 @@ function TeacherGuide(g){return `<section class="panel stack guide" style="gap:1
     <div><span class="lab">Say</span><ul>${b.say.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
     <div><span class="lab">Ask</span><ul>${b.ask.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
     <div><span class="lab">Watch for</span><ul>${b.watch.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div></div><p class="gtip">⏱ ${esc(b.tip)}</p></details>`).join('')}</section>`}
+
+/* ---------- Sessions 2 & 3 · live widgets ---------- */
+function ttsLines(lines,onLine,onEnd){
+  if(!('speechSynthesis' in window)){onEnd&&onEnd(false);return ()=>{}}
+  let stop=false,i=0;const voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));const sp=[...new Set(lines.map(l=>l[0]))];
+  const next=()=>{if(stop)return;if(i>=lines.length){onEnd&&onEnd(true);return}const idx=i++;const [who,text]=lines[idx];onLine&&onLine(idx);
+    const u=new SpeechSynthesisUtterance(text);u.lang='en-CA';u.rate=.95;const si=sp.indexOf(who);if(voices.length)u.voice=voices[si%voices.length];u.pitch=[1.05,.85,1.2][si%3];u.onend=next;u.onerror=next;speechSynthesis.speak(u)};
+  try{speechSynthesis.cancel();next()}catch(e){onEnd&&onEnd(false)}
+  return ()=>{stop=true;try{speechSynthesis.cancel()}catch(e){}}}
+
+const THINK_CLIP={context:'Part 1 · Problem Solving. Sam, a customer, calls Priya, an agent at an internet company.',cols:['Sam (customer)','Priya (agent)'],
+ lines:[['Sam','Hi, my internet has been cutting out every evening since Monday.',0,'net ✗ evenings · since Mon','The problem comes first. Write it short: "net ✗".'],
+  ['Priya','I’m sorry about that. Is it only in the evening, or during the day too?',1,'? only eve / day','She is checking details. Wait for Sam’s answer.'],
+  ['Sam','Just evenings, around seven. I work from home on Tuesdays, so it’s a real problem.',0,'7 pm · WFH Tue','Numbers and days: always write them.'],
+  ['Priya','It sounds like a busy-network issue. I could send a technician on Friday.',1,'tech → Fri','A first offer. Careful: plans often change.'],
+  ['Sam','Friday? Actually, could it be sooner? Tuesday is my big day.',0,'✗ Fri → sooner?','"Actually" is a change signal. Get ready.'],
+  ['Priya','Let me check… Thursday is full. But I can upgrade your plan for free, and that should fix it tonight.',1,'Thu ✗ · free upgrade → tonight','The real solution: a free upgrade. Friday and Thursday are distractors.'],
+  ['Sam','Great, let’s do that instead. If it still cuts out, I’ll call back.',0,'✓ upgrade · call back if ✗','Decision + next step. Many questions come from the end.']],
+ qs:[['What is Sam’s problem?','His internet cuts out every evening.'],['What will Priya do?','Upgrade his plan for free (not send a technician).'],['What will Sam do if the problem continues?','Call back.']]};
+function ThinkStage(){return `<div class="think" data-widget="think"><p class="muted" style="font-size:13.5px">${esc(THINK_CLIP.context)}</p>
+  <div class="row" style="gap:8px"><button class="btn hub sm" data-th-play>▶ Play next line</button><button class="btn sm" data-th-skip>Next line (no audio)</button><button class="btn sm" data-th-reset>Start again</button>
+   <label class="chk"><input type="checkbox" data-th-tr> Show transcript</label><span class="spacer"></span><span class="muted" data-th-n style="font-size:12.5px"></span></div>
+  <div class="th-grid">${THINK_CLIP.cols.map((c,i)=>`<div class="th-col"><b>${esc(c)}</b><ul data-th-col="${i}"></ul></div>`).join('')}</div>
+  <div class="th-say" data-th-say hidden></div><div class="transcript" data-th-text hidden></div>
+  <details class="th-qs" data-th-qs hidden><summary><b>Questions (after the last line)</b></summary><ol>${THINK_CLIP.qs.map(([q,a])=>`<li>${esc(q)} <span class="muted">→ ${esc(a)}</span></li>`).join('')}</ol></details></div>`}
+function bindThink(root){root.querySelectorAll('[data-widget="think"]').forEach(w=>{let i=0,stop=()=>{};
+  const L=THINK_CLIP.lines,say=w.querySelector('[data-th-say]'),tr=w.querySelector('[data-th-text]'),cb=w.querySelector('[data-th-tr]');
+  const upd=()=>{w.querySelector('[data-th-n]').textContent=`Line ${i} of ${L.length}`;w.querySelector('[data-th-play]').disabled=i>=L.length;w.querySelector('[data-th-skip]').disabled=i>=L.length;w.querySelector('[data-th-qs]').hidden=i<L.length;
+    tr.innerHTML=L.slice(0,i).map(([who,t])=>`<p><b>${esc(who)}:</b> ${esc(t)}</p>`).join('');tr.hidden=!cb.checked||!i};
+  const show=()=>{const [, ,col,note,ta]=L[i];const li=document.createElement('li');li.textContent=note;w.querySelector(`[data-th-col="${col}"]`).appendChild(li);say.innerHTML=`<b>🎓 Think aloud:</b> ${esc(ta)}`;say.hidden=false;i++;upd()};
+  w.querySelector('[data-th-play]').addEventListener('click',e=>{if(i>=L.length)return;const b=e.currentTarget;b.disabled=true;const line=L[i];stop();stop=ttsLines([[line[0],line[1]]],null,()=>{show()})});
+  w.querySelector('[data-th-skip]').addEventListener('click',()=>{if(i<L.length){stop();show()}});
+  w.querySelector('[data-th-reset]').addEventListener('click',()=>{stop();i=0;w.querySelectorAll('[data-th-col]').forEach(u=>u.innerHTML='');say.hidden=true;upd()});
+  cb.addEventListener('change',upd);upd()})}
+
+const ANNO_CLIP={context:'Part 1 style. A receptionist at a dental clinic talks to a patient, Leo.',
+ lines:[['Receptionist',[['Dr. Lee can see you on '],['Monday at ten','d'],['.']]],
+  ['Leo',[['Monday is hard. I have a job interview that morning.']]],
+  ['Receptionist',[['Let me look… '],['oh wait','s'],[', she has a cancellation on '],['Wednesday at two','c'],['.']]],
+  ['Leo',[['Wednesday works. Should I bring anything?']]],
+  ['Receptionist',[['Just your health card. '],['You don’t need your X-rays','d'],['… '],['actually','s'],[', '],['please bring them','c'],['. She wants to compare.']]],
+  ['Leo',[['No problem. Is parking still free?']]],
+  ['Receptionist',[['It '],['used to be free','d'],[', '],['but now','s'],[' it’s '],['three dollars an hour','c'],['.']]]],
+ qs:[['When is Leo’s appointment?','Wednesday at two'],['What should Leo bring?','His health card and his X-rays'],['How much is parking?','Three dollars an hour']]};
+const ANNO_PENS={d:['Distractor','The trap: said first, then changed'],c:['Answer cue','The final, correct detail'],s:['Signal word','Warns you that something changes']};
+function Annotate(){return `<div class="anno" data-widget="annotate"><p class="muted" style="font-size:13.5px">${esc(ANNO_CLIP.context)} Choose a pen, then click a phrase.</p>
+  <div class="row" style="gap:8px">${Object.entries(ANNO_PENS).map(([k,[n,d]],j)=>`<button class="pen pen-${k}" data-pen="${k}" aria-pressed="${j===0}" title="${esc(d)}">${n}</button>`).join('')}<button class="pen" data-pen="" aria-pressed="false">Eraser</button>
+   <span class="spacer"></span><button class="btn sm" data-an-play>▶ Read aloud</button><button class="btn sm" data-an-key>Show answer key</button><button class="btn sm" data-an-clear>Clear</button></div>
+  <div class="an-text">${ANNO_CLIP.lines.map(([who,segs],li)=>`<p><b>${esc(who)}:</b> ${segs.map(([t,k],si)=>k?`<span class="seg" role="button" tabindex="0" data-seg="${li}-${si}" data-key="${k}">${esc(t)}</span>`:esc(t)).join('')}</p>`).join('')}</div>
+  <div class="an-out" data-an-out hidden></div></div>`}
+function bindAnnotate(root){root.querySelectorAll('[data-widget="annotate"]').forEach(w=>{let pen='d',stop=()=>{};
+  w.querySelectorAll('[data-pen]').forEach(b=>b.addEventListener('click',()=>{pen=b.dataset.pen;w.querySelectorAll('[data-pen]').forEach(x=>x.setAttribute('aria-pressed',x===b))}));
+  const mark=s=>{s.classList.remove('m-d','m-c','m-s','ok','no');if(pen)s.classList.add('m-'+pen);s.dataset.mark=pen};
+  w.querySelectorAll('.seg').forEach(s=>{s.addEventListener('click',()=>mark(s));s.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();mark(s)}})});
+  w.querySelector('[data-an-key]').addEventListener('click',()=>{let ok=0,n=0;w.querySelectorAll('.seg').forEach(s=>{n++;const good=s.dataset.mark===s.dataset.key;if(good)ok++;s.classList.remove('m-d','m-c','m-s');s.classList.add('m-'+s.dataset.key);s.classList.toggle('ok',good);s.classList.toggle('no',!good)});
+    const o=w.querySelector('[data-an-out]');o.hidden=false;o.innerHTML=`<b>${ok} of ${n} phrases marked correctly.</b><ol>${ANNO_CLIP.qs.map(([q,a])=>`<li>${esc(q)} <span class="muted">→ ${esc(a)}</span></li>`).join('')}</ol>`});
+  w.querySelector('[data-an-clear]').addEventListener('click',()=>{w.querySelectorAll('.seg').forEach(s=>{s.className='seg';delete s.dataset.mark});w.querySelector('[data-an-out]').hidden=true});
+  w.querySelector('[data-an-play]').addEventListener('click',()=>{stop();stop=ttsLines(ANNO_CLIP.lines.map(([who,segs])=>[who,segs.map(x=>x[0]).join('')]))})})}
+
+const POLL_ITEMS=[
+ {ctx:'Context screen: "You will hear a conversation between a hotel guest and a front-desk clerk."',q:'Before you listen: what is the guest most likely calling about?',o:['A problem with the room','Buying the hotel','A job interview','A bus schedule'],a:0,why:'The context screen tells you the topic. Guest + front desk = a request or a problem with the stay.'},
+ {ctx:'"I booked the six o’clock flight… oh, actually, I changed it to the eight-fifteen one last night."',q:'What time is the flight?',o:['6:00','8:15','6:15','8:00'],a:1,why:'"Actually" corrects the first detail. Six o’clock is the distractor.'},
+ {ctx:'"I’d love to join the hike on Saturday, but my sister is visiting, so maybe next time."',q:'Will the speaker go on the hike?',o:['Yes, on Saturday','Yes, with her sister','No','Only if it rains'],a:2,why:'"I’d love to… but…" is a polite no. Listen to what comes after "but".'},
+ {ctx:'"The pool is open to all members, except on Mondays, when it’s cleaned."',q:'When can members NOT use the pool?',o:['On weekends','On Mondays','In the evening','Every day'],a:1,why:'"Except" introduces the condition. Part 3 loves conditions.'},
+ {ctx:'"Sure, I can cover your shift… I mean, it’s my only day off, but fine."',q:'How does the speaker feel?',o:['Excited','Reluctant: not happy, but agrees','Angry, and refuses','Confused'],a:1,why:'The words say yes. "It’s my only day off" shows he is not happy. Part 2 tests feelings.'}];
+function Poll(){return `<div class="poll" data-widget="poll"><div class="poll-body"></div>
+  <div class="row" style="margin-top:10px"><button class="btn sm" data-po-prev>← Previous</button><span class="muted" data-po-n style="font-size:12.5px"></span><span class="spacer"></span><button class="btn sm" data-po-reset>Reset votes</button><button class="btn primary sm" data-po-reveal>Reveal answer</button><button class="btn sm" data-po-next>Next →</button></div></div>`}
+function bindPoll(root){root.querySelectorAll('[data-widget="poll"]').forEach(w=>{let i=0;const votes=POLL_ITEMS.map(p=>p.o.map(()=>0)),shown=POLL_ITEMS.map(()=>false);const body=w.querySelector('.poll-body');
+  const draw=()=>{const p=POLL_ITEMS[i],v=votes[i],tot=v.reduce((a,b)=>a+b,0),rev=shown[i];
+    body.innerHTML=`<div class="poll-ctx">${esc(p.ctx)}</div><p class="qt" style="margin:10px 0 8px">${esc(p.q)}</p>
+     <div class="poll-opts">${p.o.map((o,j)=>{const pct=tot?Math.round(v[j]/tot*100):0;return `<button class="poll-opt ${rev?(j===p.a?'right':'dim'):''}" data-vote="${j}"><span class="pl">${'ABCD'[j]}</span><span class="pt">${esc(o)}</span><span class="pv">${v[j]}${rev&&tot?` · ${pct}%`:''}</span><i style="width:${rev?pct:0}%"></i></button>`}).join('')}</div>
+     <p class="muted" style="font-size:12.5px;margin-top:6px">${rev?'':'Students commit first: count hands and tap each option once per vote.'}</p>${rev?`<div class="why" style="margin-top:6px">✓ ${esc(p.why)}</div>`:''}`;
+    body.querySelectorAll('[data-vote]').forEach(b=>b.addEventListener('click',()=>{if(shown[i])return;votes[i][+b.dataset.vote]++;draw()}));
+    w.querySelector('[data-po-n]').textContent=`Poll ${i+1} of ${POLL_ITEMS.length}`;w.querySelector('[data-po-reveal]').disabled=rev};
+  w.querySelector('[data-po-reveal]').addEventListener('click',()=>{shown[i]=true;draw()});
+  w.querySelector('[data-po-reset]').addEventListener('click',()=>{votes[i]=votes[i].map(()=>0);shown[i]=false;draw()});
+  w.querySelector('[data-po-prev]').addEventListener('click',()=>{i=Math.max(0,i-1);draw()});
+  w.querySelector('[data-po-next]').addEventListener('click',()=>{i=Math.min(POLL_ITEMS.length-1,i+1);draw()});draw()})}
+
+const NEWS_ITEM={context:'Part 4 style. A local news report about bike lanes.',
+ sents:[['Some shop owners worry that losing parking spaces will hurt their business.','i'],
+  ['Starting in May, the city of Westfield will add twenty kilometres of protected bike lanes downtown.','h'],
+  ['The new lanes will run along Main Street and King Avenue.','d'],
+  ['City officials expect the number of cycling trips to double within two years.','i'],
+  ['Construction will take about six weeks, mostly at night.','d'],
+  ['The project costs 3.2 million dollars, paid for by a federal climate grant.','d']]};
+const NEWS_CATS={h:['Headline','What happened: the main idea'],d:['Details','Who, where, when, how much'],i:['Impact','Results, reactions, what comes next']};
+function NewsSort(){return `<div class="news" data-widget="news"><p class="muted" style="font-size:13.5px">${esc(NEWS_ITEM.context)} Put each sentence in the right box.</p>
+  <ol class="ns-list">${NEWS_ITEM.sents.map(([t],j)=>`<li data-ns="${j}"><span>${esc(t)}</span><span class="ns-btns">${Object.entries(NEWS_CATS).map(([k,[n]])=>`<button class="pen pen-${k==='h'?'c':k==='d'?'s':'d'}" data-cat="${k}" aria-pressed="false">${n}</button>`).join('')}</span></li>`).join('')}</ol>
+  <div class="row"><button class="btn sm" data-ns-play>▶ Read in order</button><button class="btn primary sm" data-ns-check>Check</button><button class="btn sm" data-ns-clear>Clear</button><span class="muted" data-ns-out style="font-size:13.5px"></span></div>
+  <div class="ns-cols">${Object.entries(NEWS_CATS).map(([k,[n,d]])=>`<div class="ns-col"><b>${n}</b><small class="muted">${d}</small><ul data-col="${k}"></ul></div>`).join('')}</div></div>`}
+function bindNews(root){root.querySelectorAll('[data-widget="news"]').forEach(w=>{const pick={};let stop=()=>{};
+  const draw=()=>{Object.keys(NEWS_CATS).forEach(k=>{w.querySelector(`[data-col="${k}"]`).innerHTML=NEWS_ITEM.sents.map(([t],j)=>pick[j]===k?`<li data-c="${j}">${esc(t)}</li>`:'').join('')});
+    w.querySelectorAll('[data-ns]').forEach(li=>li.querySelectorAll('[data-cat]').forEach(b=>b.setAttribute('aria-pressed',pick[li.dataset.ns]===b.dataset.cat)))};
+  w.querySelectorAll('[data-ns]').forEach(li=>li.querySelectorAll('[data-cat]').forEach(b=>b.addEventListener('click',()=>{pick[li.dataset.ns]=b.dataset.cat;w.querySelector('[data-ns-out]').textContent='';draw()})));
+  w.querySelector('[data-ns-check]').addEventListener('click',()=>{let ok=0;NEWS_ITEM.sents.forEach(([,k],j)=>{const good=pick[j]===k;if(good)ok++;const li=w.querySelector(`[data-c="${j}"]`);if(li)li.className=good?'ok':'no'});
+    w.querySelector('[data-ns-out]').textContent=`${ok} of ${NEWS_ITEM.sents.length} correct.${ok<NEWS_ITEM.sents.length?' Red ones are in the wrong box.':' Headline → details → impact.'}`});
+  w.querySelector('[data-ns-clear]').addEventListener('click',()=>{Object.keys(pick).forEach(k=>delete pick[k]);w.querySelector('[data-ns-out]').textContent='';draw()});
+  w.querySelector('[data-ns-play]').addEventListener('click',()=>{stop();const order=['h','d','i'];stop=ttsLines(order.flatMap(c=>NEWS_ITEM.sents.filter(s=>s[1]===c).map(s=>['Reporter',s[0]])))});draw()})}
+
+const TRACK_CLIP={context:'Part 5 style. Three co-workers, Omar, Lena and Joy, discuss a four-day work week.',names:['Omar','Lena','Joy'],
+ lines:[['Omar','I think a four-day week would make people happier and more productive.'],
+  ['Lena','Happier, maybe. But our clients call five days a week. Who answers the phone on Fridays?'],
+  ['Joy','We could take turns. Half the team takes Friday off, and the other half takes Monday.'],
+  ['Omar','Exactly. That’s how our Toronto office does it, and it works well.'],
+  ['Lena','I’m still not convinced. Longer days might leave people exhausted by Thursday.'],
+  ['Joy','That’s fair. Why don’t we try it for three months, then survey everyone?'],
+  ['Omar','I’d support a trial.'],
+  ['Lena','Fine, a trial, as long as we also track customer complaints.']],
+ rows:[['Believes a four-day week makes people more productive',0],['Is worried about clients on Fridays',1],['Suggests a rotating schedule',2],['Gives an example from another office',0],['Thinks longer days could make people tired',1],['Proposes a three-month trial',2],['Agrees to the trial with a condition',1]]};
+function Track(){const T=TRACK_CLIP;return `<div class="track" data-widget="track"><p class="muted" style="font-size:13.5px">${esc(T.context)} Listen once, then tick who said each idea.</p>
+  <div class="row" style="gap:8px"><button class="btn hub sm" data-tr-play>▶ Play discussion</button><label class="chk"><input type="checkbox" data-tr-text> Show transcript</label><span class="spacer"></span><button class="btn primary sm" data-tr-check>Reveal</button><button class="btn sm" data-tr-clear>Clear</button></div>
+  <div class="tablewrap"><table class="log tr-grid"><thead><tr><th>Who says this?</th>${T.names.map(n=>`<th>${n}</th>`).join('')}</tr></thead>
+   <tbody>${T.rows.map(([s],r)=>`<tr><td>${esc(s)}</td>${T.names.map((n,c)=>`<td><button class="cell" data-r="${r}" data-c="${c}" aria-pressed="false" aria-label="${esc(n)}: ${esc(s)}"></button></td>`).join('')}</tr>`).join('')}</tbody></table></div>
+  <div class="transcript" data-tr-tx hidden>${T.lines.map(([w,t])=>`<p><b>${esc(w)}:</b> ${esc(t)}</p>`).join('')}</div><p class="muted" data-tr-out style="font-size:13.5px"></p></div>`}
+function bindTrack(root){root.querySelectorAll('[data-widget="track"]').forEach(w=>{let stop=()=>{};const T=TRACK_CLIP;
+  w.querySelectorAll('.cell').forEach(b=>b.addEventListener('click',()=>{w.querySelectorAll(`.cell[data-r="${b.dataset.r}"]`).forEach(x=>{x.setAttribute('aria-pressed',x===b);x.classList.remove('ok','no','key')});b.textContent='✓';w.querySelectorAll(`.cell[data-r="${b.dataset.r}"]`).forEach(x=>{if(x!==b)x.textContent=''})}));
+  w.querySelector('[data-tr-check]').addEventListener('click',()=>{let ok=0;T.rows.forEach(([,a],r)=>{w.querySelectorAll(`.cell[data-r="${r}"]`).forEach(x=>{const mine=x.getAttribute('aria-pressed')==='true',right=+x.dataset.c===a;x.classList.toggle('ok',mine&&right);x.classList.toggle('no',mine&&!right);x.classList.toggle('key',!mine&&right);if(right)x.textContent='✓';if(mine&&right)ok++})});
+    w.querySelector('[data-tr-out]').textContent=`${ok} of ${T.rows.length} correct. Green outline = the right speaker.`});
+  w.querySelector('[data-tr-clear]').addEventListener('click',()=>{w.querySelectorAll('.cell').forEach(x=>{x.setAttribute('aria-pressed','false');x.className='cell';x.textContent=''});w.querySelector('[data-tr-out]').textContent=''});
+  w.querySelector('[data-tr-text]').addEventListener('change',e=>{w.querySelector('[data-tr-tx]').hidden=!e.target.checked});
+  w.querySelector('[data-tr-play]').addEventListener('click',e=>{const b=e.currentTarget;stop();b.disabled=true;stop=ttsLines(T.lines,null,()=>{b.disabled=false})})})}
+
+const ATT_TEXT={context:'Part 6 style. A report about a new transit pass app.',
+ segs:[['The new transit pass app has been '],['a real success','p'],[' with students. '],['However','c'],[', seniors are '],['far less enthusiastic','n'],['. Many say the app is '],['frustrating','n'],[' to use. The city '],['seems to','h'],[' understand this, and '],['might','h'],[' offer a paper pass. '],['Although','c'],[' that would cost more, it is '],['probably','h'],[' worth it. Overall, riders are '],['fairly satisfied','p'],[', '],['but','c'],[' the launch '],['could have been smoother','n'],['.']],
+ qs:[['What is the reporter’s overall attitude?','Mostly positive, with some criticism ("fairly satisfied, but…")'],['How sure is the city about a paper pass?','Not sure: "seems to", "might"']]};
+const ATT_PENS={p:'Positive',n:'Negative',h:'Hedge (not sure)',c:'Contrast'};
+function Attitude(){return `<div class="att" data-widget="attitude"><p class="muted" style="font-size:13.5px">${esc(ATT_TEXT.context)} Choose a pen, then click each underlined phrase.</p>
+  <div class="row" style="gap:8px">${Object.entries(ATT_PENS).map(([k,n],j)=>`<button class="pen pen-a${k}" data-pen="${k}" aria-pressed="${j===0}">${n}</button>`).join('')}<span class="spacer"></span><button class="btn sm" data-at-play>▶ Read aloud</button><button class="btn sm" data-at-key>Show answer key</button><button class="btn sm" data-at-clear>Clear</button></div>
+  <p class="an-text">${ATT_TEXT.segs.map(([t,k],j)=>k?`<span class="seg u" role="button" tabindex="0" data-key="${k}" data-j="${j}">${esc(t)}</span>`:esc(t)).join('')}</p><div class="an-out" data-at-out hidden></div></div>`}
+function bindAttitude(root){root.querySelectorAll('[data-widget="attitude"]').forEach(w=>{let pen='p',stop=()=>{};
+  w.querySelectorAll('[data-pen]').forEach(b=>b.addEventListener('click',()=>{pen=b.dataset.pen;w.querySelectorAll('[data-pen]').forEach(x=>x.setAttribute('aria-pressed',x===b))}));
+  const mark=s=>{s.className='seg u m-a'+pen;s.dataset.mark=pen};
+  w.querySelectorAll('.seg').forEach(s=>{s.addEventListener('click',()=>mark(s));s.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();mark(s)}})});
+  w.querySelector('[data-at-key]').addEventListener('click',()=>{let ok=0,n=0;w.querySelectorAll('.seg').forEach(s=>{n++;const good=s.dataset.mark===s.dataset.key;if(good)ok++;s.className='seg u m-a'+s.dataset.key+(good?' ok':' no')});
+    const o=w.querySelector('[data-at-out]');o.hidden=false;o.innerHTML=`<b>${ok} of ${n} phrases correct.</b><ol>${ATT_TEXT.qs.map(([q,a])=>`<li>${esc(q)} <span class="muted">→ ${esc(a)}</span></li>`).join('')}</ol>`});
+  w.querySelector('[data-at-clear]').addEventListener('click',()=>{w.querySelectorAll('.seg').forEach(s=>{s.className='seg u';delete s.dataset.mark});w.querySelector('[data-at-out]').hidden=true});
+  w.querySelector('[data-at-play]').addEventListener('click',()=>{stop();stop=ttsLines([['Reporter',ATT_TEXT.segs.map(x=>x[0]).join('')]])})})}
+
+Object.assign(LIVE_WIDGETS,{
+ THINK:['Think-Aloud Audio Stage','Play the clip one line at a time. After each line, think aloud and show the two-column note.',ThinkStage,bindThink],
+ ANNOTATE:['Transcript Annotation Canvas','Mark the distractors, the answer cues and the signal words in a transcript.',Annotate,bindAnnotate],
+ POLL:['Prediction Poll','Students commit to an answer. Count hands, tap the votes, then reveal the split and the reason.',Poll,bindPoll],
+ NEWS:['News Structure Sorter','Sort a news report into headline, details and impact.',NewsSort,bindNews],
+ TRACK:['Discussion Tracker','Play a three-person discussion and tick who said each idea.',Track,bindTrack],
+ ATTITUDE:['Attitude Marker Highlighter','Tag positive, negative, hedge and contrast words in a report.',Attitude,bindAttitude]});
+function bindWidgets(root){Object.values(LIVE_WIDGETS).forEach(w=>w[3](root))}
+
+/* ---------- Session 2 slides & guide ---------- */
+const S2_SLIDES=[
+ {k:'L',layout:'title',h:'Master Listening Parts 1–3',sub:'Session 2 · CELPIP Prep Course · Learnovate Qatar',
+  notes:'Welcome back. Say: "Today we learn four steps for Parts 1 to 3: predict, take notes, catch the trap, and check with the transcript."\nCHECK: "How many times do you hear the audio on the test?" (Once.)'},
+ {k:'L',h:'By the end of today you can…',list:[['1','Predict from the context screen'],['2','Take fast two-column notes'],['3','Catch the distractor before it catches you'],['4','Hear numbers, times and conditions'],['5','Check every answer with a transcript audit']],
+  notes:'Read the outcomes aloud. Come back to this slide at the end and tick them together.\nCHECK: "Which of these do you already do?"'},
+ {k:'O',h:'8 words you will hear today',cards:[['Context screen','The short introduction before the audio.'],['Predict','Guess what you will hear before it starts.'],['Distractor','A wrong answer that is said first, then changed.'],['Signal word','A word that warns you something changes: "actually", "but".'],['Paraphrase','The same idea in different words.'],['Condition','"Only if", "unless", "except", "as long as".'],['Main idea','What the whole conversation is about.'],['Detail','One fact: a time, a place, a number.']],
+  notes:'Say each word slowly and have students repeat it. Give one quick example for "signal word".\nCHECK: "What is a distractor?" "Give me a signal word."'},
+ {k:'L',h:'Parts 1–3 at a glance',list:[['Part 1','Problem Solving · 8 Qs · in 3 sections'],['Part 2','Daily Life Conversation · 5 Qs'],['Part 3','Listening for Information · 6 Qs'],['All','Audio plays once · questions come after']],
+  tips:['You see the questions only after the audio. Your notes are your memory.','Part 1 is cut into sections, with questions after each section.'],
+  notes:'Point to the headphones icon. Stress: no replay, and the questions appear after the audio, so notes matter.\nCHECK: "When do you see the questions?" (After the audio.)'},
+ {k:'O',h:'What your diagnostic showed',cards:[['Look back','Open your Error Log. Which cause appears most?'],['Today’s fix','Distractor errors → predict + signal words. Vocabulary errors → paraphrase.'],['Goal','Fewer "I heard it, but I chose the first answer" mistakes.']],
+  notes:'Before class, open the Teacher Portal and look at each student’s Error Log. Share the top cause for the class, with no names.\nCHECK: "What is your most common cause?"'},
+ {k:'L',h:'Step 1 · Predict before you listen',list:[['Who?','Friends? Co-workers? A customer and an agent?'],['Where?','Home, work, a store, a clinic?'],['Problem?','What went wrong? What do they need?'],['Next?','What will they decide or do?']],
+  tips:['You get a few seconds with the context screen. Use every second.','Predictions are possibilities, not answers. Stay flexible.'],
+  notes:'Read a context line: "A hotel guest calls the front desk." Ask the four questions and collect two or three ideas for each.\nCHECK: "What are the four prediction questions?"'},
+ {k:'L',h:'Step 2 · Two-column notes',widget:'THINK',tips:['One column per speaker. Words, numbers, arrows. No full sentences.'],
+  notes:'Play one line at a time. After each line, think aloud, then show the note. Students copy the two columns on paper.\nCHECK after line 4: "Is Friday the final answer? How do you know?"'},
+ {k:'L',h:'Note shorthand',list:[['→','next / changes to'],['✗','no / cancelled / problem'],['✓','yes / agreed / final'],['?','asks / not sure'],['$  #','money / numbers'],['@','at a time or a place']],
+  tips:['Make your own symbols and use the same ones every time.'],
+  notes:'Write a short sentence on the board ("The meeting moved from Monday to Wednesday") and ask students to note it in under 5 seconds: "mtg Mon → Wed".\nCHECK: "How do you write cancelled?"'},
+ {k:'R',h:'Step 3 · Signal words warn you',cards:[['Change','actually · oh wait · on second thought · instead'],['Contrast','but · however · although · unfortunately'],['Condition','only if · unless · as long as · except'],['Decision','so let’s · okay, then · I’ll go with · in that case']],
+  tips:['The answer usually comes after the signal word.'],
+  notes:'Model: "Let’s meet Tuesday… oh wait, Tuesday’s busy, let’s do Wednesday." Ask which word warned them.\nCHECK: "Is the answer before or after the signal word?"'},
+ {k:'R',h:'Find the trap',widget:'ANNOTATE',tips:['Red = distractor · Green = answer cue · Yellow = signal word.'],
+  notes:'Read the transcript aloud once. Students tell you which pen to use for each phrase. Click "Show answer key" at the end.\nCHECK: "Why is Monday at ten wrong?"'},
+ {k:'L',h:'Question types in Parts 1–3',list:[['1','What is the problem?'],['2','What will the man do next?'],['3','Why does the woman suggest…?'],['4','How does the speaker feel?'],['5','What is true about…?'],['6','What does the speaker mean by…?']],
+  tips:['"Next" questions: listen to the very end.','"Feel" questions: listen to the tone and to what comes after "but".'],
+  notes:'For each type, ask: "Where in the conversation is the answer usually?" Problem = start, next = end, feel = tone.\nCHECK: "Where do you find the answer to a \'next\' question?"'},
+ {k:'S',h:'Part 2 · Listen for feelings',cards:[['Polite no','"I’d love to, but…" = no'],['Reluctant yes','"I guess I could…" = yes, but not happy'],['Surprise','"Wait, really?" = did not expect it'],['Relief','"Oh, thank goodness." = the worry is over']],
+  notes:'Say each phrase twice with different tones. Students guess the feeling.\nCHECK: "Your friend says \'I guess I could help.\' Is she happy?"'},
+ {k:'W',h:'Part 3 · Numbers, times, conditions',list:[['15 / 50','Fifteen vs fifty: listen to the stress'],['5:45','"Quarter to six"'],['$','"Two for ten dollars"'],['Except','The one exception is often a question'],['Only if','A condition is a likely question'],['Steps','First, then, after that, finally']],
+  tips:['Write every number you hear. Cross out the ones that change.'],
+  notes:'Say "fifteen" and "fifty" several times in random order; students write what they hear.\nCHECK: "What time is a quarter to six?"'},
+ {k:'L',h:'Prediction poll',widget:'POLL',tips:['Commit to an answer before the reveal. Then learn from the reason.'],
+  notes:'Count hands for each option and tap the votes. Reveal only after everyone has voted.\nCHECK: "Which word helped you decide?"'},
+ {k:'O',h:'Step 4 · The transcript audit',list:[['1','Grade your set first.'],['2','Open the transcript.'],['3','Find the exact line that proves each answer.'],['4','For each miss, tag the cause in your Error Log.']],
+  tips:['Do not just read the right answer. Find why the wrong answer looked right.'],
+  notes:'Model one audit with L1 from the Study Hub: find the proof line for Q2 and tag the distractor.\nCHECK: "What do you do after you grade a set?"'},
+ {k:'O',h:'Before Session 3',list:[['✓','Problem Solving sets (Part 1)'],['✓','Daily Life Conversation (Part 2)'],['✓','Listening for Information (Part 3)'],['✓','Transcript audit for every set'],['✓','Tag every error'],['✓','Bring a laptop + headphones']],
+  tips:['Your results open the next class, so finish before Session 3.'],
+  notes:'Open the Study Hub tab for Session 2 and show the sets. Go back to slide 2 and tick the outcomes together.\nCHECK: "What do you need to finish before Session 3?"'}];
+const S2_GUIDE=[
+ {t:'Before you start · Delivery tips',say:['Read each audio line once, at a natural speed, like the test.','Write every signal word on the board as it comes up.'],ask:['Use checking questions: "Where do you write what the agent says?" "Which word warned you?"'],watch:['Students writing full sentences. Stop them: words, numbers and arrows only.'],tip:'Have the Teacher Portal open in another tab so you can show real class errors.'},
+ {t:'0:00–0:15 · Debrief the diagnostic',say:['Open Teacher Portal → each student → Error Log. Share the top cause for the class, with no names.','"Mistakes are data. Today we fix the biggest one."'],ask:['Which listening question felt hardest? Why?'],watch:['Students who say the problem is "fast speakers". Usually it is distractors or no prediction.'],tip:'Maximum 15 minutes. Two examples, then move on.'},
+ {t:'0:15–0:45 · Teach prediction',say:['Show a context line. Ask Who / Where / Problem / Next before any audio.','Run Prediction Poll item 1 (the hotel guest).'],ask:['"What problems might a hotel guest have?" Collect three ideas.'],watch:['Students locking in one prediction. Predictions are possibilities, not answers.'],tip:'Count hands for each option, tap the votes, and reveal only after everyone commits.'},
+ {t:'0:45–1:15 · Model note-taking',say:['Use the Think-Aloud Stage line by line. After each line, say your thinking aloud, then show the note.','Students copy the two columns on paper.'],ask:['After line 4: "Is Friday the final answer? How do you know?"'],watch:['Students writing so long that they miss the next line.'],tip:'Run it twice: first you think aloud, then students take notes alone and compare.'},
+ {t:'1:15–1:40 · Break down distractors',say:['Use the Transcript Annotation Canvas. Red = distractor, green = answer cue, yellow = signal word.','"The first answer you hear is often the trap."'],ask:['"Which word told you the plan changed?"'],watch:['Students marking the first number they hear as the answer.'],tip:'Click "Show answer key" at the end and compare with the class.'},
+ {t:'1:40–2:00 · Prediction polls + Hub preview',say:['Run poll items 2–5: corrections, a polite no, a condition, a feeling.','Preview the Study Hub: Part 1, 2 and 3 sets plus the transcript audit.'],ask:['"What do you do after you grade each set?" (Find the proof line and tag the cause.)'],watch:['Students planning to skip the transcript audit. That is where the learning happens.'],tip:'Remind everyone: laptop and headphones, and finish the Hub before Session 3.'}];
+
+/* ---------- Session 3 slides & guide ---------- */
+const S3_SLIDES=[
+ {k:'L',layout:'title',h:'Decode Listening Parts 4–6',sub:'Session 3 · CELPIP Prep Course · Learnovate Qatar',
+  notes:'Welcome back. Say: "Parts 4 to 6 are longer, and they test main ideas and opinions. Today you learn how to follow the structure and hear attitude."\nCHECK: "Which parts did we practise last time?" (1 to 3.)'},
+ {k:'L',h:'By the end of today you can…',list:[['1','Follow a news report from headline to impact'],['2','Track who says what in a three-person discussion'],['3','Hear attitude words and hedges'],['4','Separate what is said from what is meant'],['5','Stay focused through longer audio']],
+  notes:'Read the outcomes aloud. Come back at the end and tick them together.\nCHECK: "Which outcome sounds hardest?"'},
+ {k:'O',h:'8 words you will hear today',cards:[['Main idea','The most important point of the whole audio.'],['Viewpoint','A person’s opinion about a topic.'],['Attitude','How someone feels about something: positive, negative or unsure.'],['Hedge','A word that shows you are not sure: "might", "seems", "probably".'],['Contrast word','A word that changes direction: "however", "although", "but".'],['Imply','To say something indirectly.'],['Infer','To understand what is implied.'],['Tone','The feeling in someone’s voice.']],
+  notes:'Say each word slowly and have students repeat it. Show the difference: the speaker implies, the listener infers.\nCHECK: "Is \'might\' a strong or a weak word?"'},
+ {k:'L',h:'Parts 4–6 at a glance',list:[['Part 4','Listening to a News Item · 5 Qs'],['Part 5','Listening to a Discussion (video) · 8 Qs'],['Part 6','Listening to Viewpoints · 6 Qs'],['All','Longer audio · plays once · questions after']],
+  tips:['These parts test main ideas, opinions and attitude more than single details.','Stay focused to the end: the conclusion often answers a question.'],
+  notes:'Contrast with Parts 1–3: there, details and plans; here, main ideas and opinions.\nCHECK: "Which part is a video?" (Part 5.)'},
+ {k:'O',h:'How did Parts 1–3 go?',cards:[['Your scores','Check your Session 2 results on your dashboard.'],['Your top cause','Open your Error Log. Is it still distractors?'],['Today’s focus','Inference errors: what the speaker means, not only says.']],
+  notes:'Before class, check the Session 2 results in the Teacher Portal. Share one class win and one class pattern.\nCHECK: "Did you do a transcript audit? Show me one tagged error."'},
+ {k:'L',h:'News follows a pattern',cards:[['1 · Headline','What happened. Usually the first one or two sentences.'],['2 · Details','Who, where, when, how much.'],['3 · Impact','Results, reactions and what happens next.']],
+  tips:['The main idea is almost always in the first sentence.','Reactions ("some residents worry…") are often a question.'],
+  notes:'Read a real-style headline: "The city will extend library hours in January." Ask: what details do you expect next?\nCHECK: "Where is the main idea in a news report?"'},
+ {k:'L',h:'Sort the news',widget:'NEWS',tips:['Ask: is this sentence the main event, a fact about it, or a result?'],
+  notes:'Students tell you which box each sentence goes in. Click Check, then "Read in order" so they hear the pattern.\nCHECK: "Why is the parking sentence an impact?"'},
+ {k:'S',h:'Part 5 · Who thinks what?',list:[['1','Learn the names and faces first'],['2','Draw one row per speaker'],['3','Note each idea in that speaker’s row'],['4','Mark agree ✓ and disagree ✗'],['5','Watch for a change of mind']],
+  tips:['On the test, Part 5 is a video. Faces help you remember who is who.'],
+  notes:'Draw a three-row grid on the board. Model filling it with one line.\nCHECK: "Why do you write names first?"'},
+ {k:'S',h:'Track the discussion',widget:'TRACK',tips:['Listen once, then tick who said each idea. Then check with the transcript.'],
+  notes:'Students draw the grid on paper first. Play once, collect answers, then click Reveal. Play again with the transcript.\nCHECK: "Who changed their mind? What made them change?"'},
+ {k:'S',h:'Agree, disagree, change your mind',cards:[['Agree','Exactly · I couldn’t agree more · Good point'],['Disagree','I see your point, but… · I’m not so sure'],['Partly agree','True, but… · To some extent'],['Change of mind','Okay, you’ve convinced me · Fine, as long as…']],
+  notes:'Say each phrase and have students show thumbs up, down or sideways.\nCHECK: "\'I see your point, but…\' Does she agree?"'},
+ {k:'R',h:'Attitude language',cards:[['Positive','encouraging · impressive · a real success'],['Negative','disappointing · frustrating · a waste'],['Hedge (not sure)','may · seems · probably · too early to say'],['Contrast','however · although · on the other hand']],
+  tips:['Positive + hedge = cautiously positive. This is a common right answer.'],
+  notes:'Give a sentence and ask which group: "The results are encouraging, but it is too early to say." (Positive + hedge.)\nCHECK: "Is \'seems\' strong or weak?"'},
+ {k:'R',h:'Highlight the attitude',widget:'ATTITUDE',tips:['Green = positive · Red = negative · Yellow = hedge · Blue = contrast.'],
+  notes:'Choose a pen and click each underlined phrase with the class. Show the answer key at the end and ask the two questions.\nCHECK: "What is the reporter’s overall attitude?"'},
+ {k:'W',h:'Said vs. meant',list:[['Said','"Well, it’s not exactly cheap."'],['Meant','It is expensive.'],['Said','"I’ll believe it when I see it."'],['Meant','I doubt it will happen.'],['Said','"Encouraging, but the studies are small."'],['Meant','Cautiously positive.']],
+  tips:['The right answer is often a paraphrase of the meaning, not the words.'],
+  notes:'Say each "said" line with natural tone. Students guess the meaning before you reveal it.\nCHECK: "Your friend says the movie was \'interesting\' and sighs. Did she like it?"'},
+ {k:'W',h:'Inference questions',list:[['1','What does the speaker imply about…?'],['2','How does Lena feel about…?'],['3','What is the reporter’s attitude?'],['4','What will probably happen next?']],
+  tips:['Choose the answer the speaker would agree with, not the one that only repeats words.'],
+  notes:'Show a wrong option that repeats words from the audio but changes the meaning. Explain why it is a trap.\nCHECK: "Is the answer always said directly?"'},
+ {k:'O',h:'Listening Mock #1',cards:[['What','All six parts in one sitting, like test day.'],['When','Your teacher will tell you the date.'],['Bring','Laptop, charger, and headphones with a microphone.']],
+  notes:'Announce the mock date. Remind students: no pausing, no replay, one sitting.\nCHECK: "What do you bring to the mock test?"'},
+ {k:'O',h:'Before Session 4',list:[['✓','News item sets (Part 4)'],['✓','Attitude Marker Sort'],['✓','Discussion set (Part 5)'],['✓','Viewpoints set (Part 6)'],['✓','Update your Error Log: inference'],['✓','Listening Mock #1 when it opens']],
+  tips:['Your results open the next class, so finish before Session 4.'],
+  notes:'Open the Study Hub tab for Session 3. Go back to slide 2 and tick the outcomes together.\nCHECK: "Which error cause will you focus on this week?"'}];
+const S3_GUIDE=[
+ {t:'Before you start · Delivery tips',say:['Read long audio at natural speed, but pause between paragraphs in class.','Write the four attitude groups on the board and keep them there.'],ask:['Use checking questions: "Is \'might\' sure or not sure?" "Who disagreed?"'],watch:['Students losing focus in long audio. Ask them to note one word per sentence.'],tip:'Point to the speaker names on the board every time you say them.'},
+ {t:'0:00–0:15 · Review Hub data',say:['Open the Teacher Portal and check the Session 2 results (Parts 1, 2 and 3).','Name one class win and one class pattern.'],ask:['Which part felt hardest: 1, 2 or 3?'],watch:['Students who skipped the transcript audit. Ask them to show one tagged error.'],tip:'Keep it to 15 minutes.'},
+ {t:'0:15–0:45 · News structure',say:['Headline → details → impact. Read the news item aloud once, then sort it with the News Sorter.'],ask:['"Which sentence would be the headline on TV?"'],watch:['Students choosing a detail, like a number, as the main idea.'],tip:'Ask: "If you heard only the first sentence, could you answer the main-idea question?"'},
+ {t:'0:45–1:15 · Track multiple speakers',say:['Students draw a three-row grid on paper. Play the discussion in the Discussion Tracker.','On the test, Part 5 is a video: names + faces.'],ask:['"Who changed their mind? What made them change?"'],watch:['Mixing up who suggested an idea and who only agreed with it.'],tip:'Play once, reveal the grid, then play again with the transcript.'},
+ {t:'1:15–1:45 · Attitude language',say:['Teach the four groups: positive, negative, hedge, contrast.','Use the Attitude Highlighter: choose a pen, click the phrase.'],ask:['"Encouraging, but the studies are small." Positive or negative? (Both: cautiously positive.)'],watch:['Students treating a hedge as a strong opinion.'],tip:'Ask the two questions under the answer key before you move on.'},
+ {t:'1:45–2:00 · Inference + mock',say:['Said vs. meant: the right answer is often a paraphrase of the meaning.','Announce Listening Mock #1 and the date.'],ask:['"I’ll believe it when I see it." What does the speaker think?'],watch:['Answer options that repeat words from the audio but change the meaning.'],tip:'Use the Teacher Portal schedule to open the next session for the batch when you are ready.'}];
 
 /* ---------- diagnostic summary ---------- */
 function band(v,k){if(v==null)return ['Not done yet',''];if(k==='L'||k==='R')return v>=75?['Strong','good']:v>=50?['Developing','mid']:['Building','low'];const s=v/20;return s>=3.75?['Strong','good']:s>=2.5?['Developing','mid']:['Building','low']}
@@ -1910,7 +2305,7 @@ function bindDeck(s){const on=(id,fn)=>{const el=document.getElementById(id);if(
 
 
 /* ---------- session schedule per batch + slide-deck library ---------- */
-const DECK_FILES={1:'decks/session-01.pptx'};
+const DECK_FILES={1:'decks/session-01.pptx',2:'decks/session-02.pptx',3:'decks/session-03.pptx'};
 const todayISO=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 function batchSchedule(batchId){try{return JSON.parse((cloud.settings||{})['open:'+batchId]||'{}')||{}}catch(e){return {}}}
 function sessionState(n){if(cloud.tpass||!cloud.code)return {open:true};const b=cloud.student&&cloud.student.batch;if(!b)return {open:true};

@@ -67,11 +67,12 @@ After a student submits a writing task, Claude (Anthropic's AI model) scores it 
 
 ## Slide decks
 
-- Each session's PowerPoint is in `decks/`. Session 1 is ready, and more are coming.
+- Each session's PowerPoint is in `decks/`. Sessions 1–3 are ready, and more are coming.
 - In the **Teacher Portal → Slide decks**, click **Download PowerPoint**.
 - In Canva, use **Create a design → Import file** and make the deck your own.
 - In Canva, use **Share → More → Embed** (or a Public view link). Paste it into the session's **Canva link** box in the Teacher Portal and click **Save**. The deck appears on that session's page for everyone.
-- `tools/session-01-deck.js` regenerates the PowerPoint with pptxgenjs.
+- `tools/session-01-deck.js` regenerates the Session 1 PowerPoint with pptxgenjs.
+- `tools/session-deck.js 2 decks/session-02.pptx` builds Session 2 (or 3) from the slides in `index.html`, so the PowerPoint and the website slides always match.
 
 ## Session schedule per batch
 
