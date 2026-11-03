@@ -933,7 +933,7 @@ const SESSIONS=[
   ['0:45','1:15','Model the Interface','Demo the timers, the Next button, no going back, and how speaking recording starts and stops.'],
   ['1:15','1:45','Teach the Error Taxonomy','Introduce the four error causes students log all course: distractor, vocabulary, timing, inference.'],
   ['1:45','2:00','Set Targets','Guide each student to set a CLB target per skill. Preview the Study Hub.']],
- liveTools:[['Test Map Infographic','Clickable diagram of every component and part.'],['Score Converter Widget','Instructor enters a raw score and shows the CLB result.'],['Interface Simulator','Replica test screen for live demos.']],
+ liveTools:[['Test Map','Click a skill to see every part, question count and time.'],['Requirements Checker','Enter four CELPIP levels to see which programs they meet.'],['Test Screen Simulator','Walk through what each test screen looks like and how it behaves.']],
  tasks:[['Set Your CLB Targets','Use the Requirements Checker in class, then set targets on your dashboard.'],['Complete the Listening Check','Two short clips. Audio plays once.'],['Complete the Reading Check','One email, five questions, timed.'],['Write the Baseline Email','27 minutes. 150–200 words.'],['Record Two Baseline Speaking Answers','Keep the files. You will compare them in Session 12.'],['Save Your Starting Point and Tag Your Errors','Save your diagnostic summary, then tag each miss in the Error Log.']],
  tools:['DL','DR','W7','DS1','DS2','DIAG'],slides:'S1',widgets:['TESTMAP','REQS','SIM'],guide:'S1'},
 {n:2,k:'L',title:'Master Listening Parts 1–3',
@@ -1561,7 +1561,6 @@ function renderSession(s){
   <section id="pane-live" ${tab==='live'?'':'hidden'} class="stack">
     <div class="boundary">${icon('S',20)}<p><b>What happens in class.</b> Your instructor teaches and models every strategy live. There are no quizzes and no quiet work during class time.</p></div>
     ${DeckPanel(s)}
-    ${s.slides?`<div class="present"><div><b>${(cloud.settings||{})['deck:'+s.n]?'Backup slides (built in)':'Class slides'}</b><span class="muted">${SLIDESETS[s.slides].length} slides · ${cloud.tpass?'press N for speaker notes':'follow along with your teacher'}</span></div><button class="btn primary" id="present-btn">▶ Present slides</button></div>`:''}
     <div class="grid g2" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
       <div class="panel"><h3 style="margin-bottom:6px">Teaching breakdown</h3><ol class="timeline">${s.live.map(([a,b,t,d])=>`<li><span class="t">${a}–${b}<span class="len">${len(a,b)} min</span></span><div><b>${esc(t)}</b><span class="muted">${esc(d)}</span></div></li>`).join('')}</ol></div>
       <div class="panel"><h3 style="margin-bottom:12px">Live tools</h3><ul class="tools">${s.liveTools.map(([t,d])=>`<li><b>${esc(t)}</b>${esc(d)}</li>`).join('')}</ul></div>
@@ -1580,7 +1579,7 @@ function renderSession(s){
     </div>
   </section></div>`;
   bindDeck(s);if(cloud.tpass&&!cloud.t.loaded&&!cloud.t.loading&&!cloud.t.error)loadTeacher();
-  {const pl=document.getElementById('pane-live');bindWidgets(pl);const pb=document.getElementById('present-btn');if(pb)pb.addEventListener('click',()=>openSlides(SLIDESETS[s.slides],s.n))}
+  {const pl=document.getElementById('pane-live');bindWidgets(pl);}
   const setProg=()=>{const p=sessionProgress(s);const el=document.getElementById('hubprog');if(el)el.textContent=`${p.done}/${p.total}`;const r=document.getElementById('hubring');if(r)r.style.setProperty('--p',p.pct)};setProg();
   app.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{store.set(TK,b.dataset.tab);
     app.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));
@@ -2329,7 +2328,7 @@ function DeckPanel(s){const url=(cloud.settings||{})['deck:'+s.n];const T=!!clou
       ${url?`<a class="chip" href="${esc(deckOpen(url))}" target="_blank" rel="noopener">Full page ↗</a>`:''}${url&&T&&!editing?'<button class="btn sm" id="deck-change">Change deck</button>':''}</div>
     ${url?`<div class="deckframe"><div class="stripe"></div><iframe src="${esc(url)}" title="Session ${s.n} slides" loading="lazy" allow="fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
       <p class="muted" style="font-size:13.5px">Use the arrows inside the slides. <a href="${esc(deckOpen(url))}" target="_blank" rel="noopener">Open full screen</a>.</p>`
-      :`<p class="muted" style="font-size:14px">Add your own slide deck for this session. Students will see it here.${s.slides?' Until then, the built-in slides below are available.':''}</p>`}
+      :`<p class="muted" style="font-size:14px">Paste your Canva link for this session. Students will see the slides here.${DECK_FILES[s.n]?` Need a starting point? <a href="${DECK_FILES[s.n]}" download>Download the PowerPoint</a> and import it into Canva.`:''}</p>`}
     ${editor}</section>`}
 function bindDeck(s){const on=(id,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener('click',fn)};
   on('deck-change',()=>{deckEdit[s.n]=true;view(true)});on('deck-cancel',()=>{deckEdit[s.n]=false;view(true)});
@@ -2398,7 +2397,7 @@ function TeacherHome(){const t=cloud.t;const ready=t.loaded;const unread=ready?u
   const classes=ready&&t.batches.length?t.batches.map(b=>{const nx=nextForBatch(b);const n=nx.s.n;const cnt=ros.filter(r=>r.batch===b.id).length;
     return `<article class="tclass" style="${skv(nx.s.k)}"><div class="row" style="gap:8px"><span class="chip" style="background:var(--surface);color:var(--ci)">${esc(nx.label)}${nx.date?' · '+esc(fmtDate(nx.date)):''}</span><span class="muted" style="font-size:12.5px">${esc(b.name)} · ${cnt} student${cnt===1?'':'s'}</span></div>
       <h3><span class="sn-mini" style="background:var(--surface)">${n}</span> ${esc(nx.s.title)}</h3><p class="muted" style="font-size:14px">${esc(nx.s.obj)}</p>
-      <div class="row" style="gap:8px"><a class="btn primary sm" href="#session-${n}" data-live>Teaching plan</a>${set['deck:'+n]||SESSIONS[n-1].slides?`<button class="btn sm" data-present="${n}">▶ Present slides</button>`:''}${GUIDES_FOR(n)?`<a class="btn sm" href="#session-${n}" data-live>Teacher guide</a>`:''}</div></article>`}).join('')
+      <div class="row" style="gap:8px"><a class="btn primary sm" href="#session-${n}" data-live>Teaching plan</a>${set['deck:'+n]?`<button class="btn sm" data-present="${n}">▶ Present slides</button>`:''}${GUIDES_FOR(n)?`<a class="btn sm" href="#session-${n}" data-live>Teacher guide</a>`:''}</div></article>`}).join('')
     :`<div class="panel empty">${ready?'Create a batch in <a href="#teacher">Students &amp; Batches</a> to see your upcoming classes here.':'Loading your classes…'}</div>`;
   const T=[['O','Teaching plans','12 sessions','#syllabus','map'],['R','Slide decks',`${Object.keys(set).filter(k=>k.startsWith('deck:')).length} of 12 linked`,'#teacher','flag'],['L','Students & Batches',ready?`${t.students.length} student${t.students.length===1?'':'s'} · ${t.batches.length} batch${t.batches.length===1?'':'es'}`:'Open','#teacher','log'],['S','Inbox',unread?`${unread} new`:'No new messages','#teacher','msg']];
   const PAS=['#D9F7E8','#F3E5FF','#DCEBFF','#FFE0E6'];
@@ -2410,24 +2409,24 @@ function TeacherHome(){const t=cloud.t;const ready=t.loaded;const unread=ready?u
    <section class="stack" style="gap:12px"><div class="secthead"><h2>Your next classes</h2><span class="muted" style="font-size:13px">From each batch's session schedule</span></div><div class="tclasses">${classes}</div></section>
    <section class="qtiles" aria-label="Teaching shortcuts">${T.map(([k,tt,sub,href,ic],i)=>`<a class="qtile" href="${href}" style="${skv(k)};--qbg:${PAS[i]}"><span class="qic">${qicon(ic)}</span><b>${tt}</b><small>${esc(sub)}</small></a>`).join('')}</section>
    <section class="panel stack" style="gap:12px"><div class="row"><h3>Course readiness</h3><span class="spacer"></span><span class="muted" style="font-size:13px">What's ready to teach</span></div>
-     <div class="tablewrap"><table class="log"><thead><tr><th></th><th>Session</th><th>Canva deck</th><th>PowerPoint</th><th>Built-in slides</th><th>Teacher guide</th><th></th></tr></thead><tbody>
-     ${SESSIONS.map(x=>{const ok=v=>v?'<span class="rchip good">✓ Ready</span>':'<span class="muted">–</span>';return `<tr><td><span class="sn-mini" style="${skv(x.k)}">${x.n}</span></td><td style="min-width:200px">${esc(x.title)}</td><td>${ok(set['deck:'+x.n])}</td><td>${ok(DECK_FILES[x.n])}</td><td>${ok(x.slides)}</td><td>${ok(GUIDES_FOR(x.n))}</td><td><a class="chip" href="#session-${x.n}" data-live>Open</a></td></tr>`}).join('')}
+     <div class="tablewrap"><table class="log"><thead><tr><th></th><th>Session</th><th>Canva deck</th><th>PowerPoint</th><th>Teacher guide</th><th></th></tr></thead><tbody>
+     ${SESSIONS.map(x=>{const ok=v=>v?'<span class="rchip good">✓ Ready</span>':'<span class="muted">–</span>';return `<tr><td><span class="sn-mini" style="${skv(x.k)}">${x.n}</span></td><td style="min-width:200px">${esc(x.title)}</td><td>${ok(set['deck:'+x.n])}</td><td>${ok(DECK_FILES[x.n])}</td><td>${ok(GUIDES_FOR(x.n))}</td><td><a class="chip" href="#session-${x.n}" data-live>Open</a></td></tr>`}).join('')}
      </tbody></table></div></section></div>`}
 function GUIDES_FOR(n){const x=SESSIONS[n-1];return !!(x&&x.guide)}
 function bindTeacherHome(){if(cloud.tpass&&!cloud.t.loaded&&!cloud.t.loading&&!cloud.t.error)loadTeacher();
   app.querySelectorAll('[data-live]').forEach(a=>a.addEventListener('click',()=>store.set('ttab','live')));
   app.querySelectorAll('[data-present]').forEach(b=>b.addEventListener('click',()=>{const n=+b.dataset.present;const url=(cloud.settings||{})['deck:'+n];
-    if(url){window.open(deckOpen(url),'_blank','noopener')}else if(SESSIONS[n-1].slides)openSlides(SLIDESETS[SESSIONS[n-1].slides])}))}
+    if(url)window.open(deckOpen(url),'_blank','noopener')}))}
 
 
 /* ---------- student dashboard: this week's class slides ---------- */
 function ClassSlidesCard(){if(!cloud.code)return '';const s=nextSession();const url=(cloud.settings||{})['deck:'+s.n];const p=sessionProgress(s);
-  if(!url&&!s.slides)return `<section class="panel row" style="${skv(s.k)};background:var(--c)"><span class="ic" style="background:var(--surface)">${icon(s.k)}</span><div style="flex:1;min-width:0"><div class="eyebrow" style="color:var(--ci)">This week's class · Session ${s.n}</div><h3>${esc(s.title)}</h3><p class="muted" style="font-size:13.5px">Slides for this session will appear here when your teacher shares them.</p></div><a class="btn primary" href="#session-${s.n}">Open session</a></section>`;
+  if(!url)return `<section class="panel row" style="${skv(s.k)};background:var(--c)"><span class="ic" style="background:var(--surface)">${icon(s.k)}</span><div style="flex:1;min-width:0"><div class="eyebrow" style="color:var(--ci)">This week's class · Session ${s.n}</div><h3>${esc(s.title)}</h3><p class="muted" style="font-size:13.5px">Slides for this session will appear here when your teacher shares them.</p></div><a class="btn primary" href="#session-${s.n}">Open session</a></section>`;
   return `<section class="panel stack" style="gap:14px" id="class-slides"><div class="row"><div style="flex:1;min-width:0"><div class="eyebrow" style="color:var(--sk${s.k}i)">This week's class · Session ${s.n}</div><h2>${esc(s.title)}</h2></div>
      <a class="btn" href="#session-${s.n}">Open session</a></div>
    ${url?`<div class="deckframe"><div class="stripe"></div><iframe src="${esc(url)}" title="Session ${s.n} slides" loading="lazy" allow="fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
      <p class="muted" style="font-size:13.5px">Use the arrows inside the slides to review the class. <a href="${esc(deckOpen(url))}" target="_blank" rel="noopener">Open full screen</a>.</p>`
-     :`<div class="present"><div><b>Class slides</b><span class="muted">${SLIDESETS[s.slides].length} slides · review what we covered in class</span></div><button class="btn primary" id="dash-slides">▶ View slides</button></div>`}
+     :''}
    <div class="row" style="gap:10px"><span class="muted" style="font-size:13.5px">Study Hub for this session: <b>${p.done}/${p.total}</b> tasks done</span><span class="spacer"></span><a class="btn hub sm" href="#session-${s.n}" data-hub>Go to Study Hub</a></div></section>`}
 function bindClassSlides(){const b=document.getElementById('dash-slides');if(b)b.addEventListener('click',()=>{const s=nextSession();openSlides(SLIDESETS[s.slides])});
   app.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',()=>store.set('tab','hub')))}
