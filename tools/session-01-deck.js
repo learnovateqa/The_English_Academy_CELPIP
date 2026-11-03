@@ -165,6 +165,25 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
   await tips(s, 0.75, 5.25, 11.75, 1.5, ['Order: Listening → Reading → Writing → Speaking. Train stamina with full timed practice; Speaking comes last.'], 'Glance tip', 'Test-day tip');
   s.addNotes('Point to each icon as you name the skill. Stress stamina. Confirm current details on the official CELPIP website before class.\nCHECK: "Which skill comes last?" "Which skill is the shortest?"');
 
+  // 4b · How the test is given
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The test' });
+  eyebrow(s, 'Test day', 'O'); title(s, 'How the test is given');
+  const steps = [['O', 'LuCalendarCheck', 'Book and arrive', 'Book on the official CELPIP website. Bring valid ID. Arrive early.'],
+    ['L', 'LuLaptop', 'Computer + headset', 'You sit at a computer with headphones and a microphone. No face-to-face interview.'],
+    ['R', 'LuClock', 'Four parts, one sitting', 'About 3 hours. Every part is timed. After Next, you cannot go back.'],
+    ['W', 'LuAward', 'Results', 'The computer scores Listening and Reading. Trained raters score Writing and Speaking.']];
+  for (let i = 0; i < 4; i++) {
+    const [k, ic, h, t] = steps[i], x = 0.75 + i * 3.0;
+    card(s, x, 1.95, 2.75, 3.45, SK[k][0], h);
+    await chip(s, x + 0.3, 2.25, 0.75, k, ic, h);
+    s.addText(String(i + 1).padStart(2, '0'), { x: x + 1.9, y: 2.3, w: 0.6, h: 0.4, fontSize: 12, bold: true, color: SK[k][1], align: 'right', margin: 0, isTextBox: true });
+    s.addText(h, { x: x + 0.3, y: 3.15, w: 2.2, h: 0.8, fontSize: 18, bold: true, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+    s.addText(t, { x: x + 0.3, y: 4.0, w: 2.2, h: 1.3, fontSize: 14, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+    if (i < 3) s.addText('→', { x: x + 2.72, y: 3.35, w: 0.3, h: 0.5, fontSize: 18, bold: true, color: MUTED, align: 'center', margin: 0, isTextBox: true });
+  }
+  await tips(s, 0.75, 5.65, 11.75, 1.1, ['Practise on a laptop: on test day you type your writing and speak into a microphone. Check ID, break and test-centre rules on the official CELPIP website before you book.'], 'Laptop tip', 'Practise like test day');
+  s.addNotes('Walk through test day step by step. Explain that there is no examiner in the room asking questions: speaking is recorded through the headset microphone. This is why we practise on laptops in this course.\nCHECK: "Who scores your speaking: a computer or a person?" "What do you wear during the test?"');
+
   // 5–6 · Listening & Reading
   pres.addSection({ title: 'The four skills' });
   const skillSlide = async (k, ic, eb, ttl, items, tipList, notes, rowH = 0.52) => {
@@ -404,6 +423,23 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
   await tips(s, 0.75, 5.15, 11.75, 1.15, ['Open the course website on your phone: My Dashboard → Your four skills → Target CLB.'], 'Action', 'On your phone');
   s.addNotes('Give 3 minutes for students to set targets on their phones. Walk around and check.\nCHECK: "What is your target for Speaking, and why?"');
 
+  // 22a · Bring to class
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Wrap-up' });
+  eyebrow(s, 'From next class', 'L'); title(s, 'Bring to every class');
+  const kit = [['L', 'LuLaptop', 'Laptop + charger', 'Mock tests run on a laptop, just like test day.'], ['S', 'LuHeadphones', 'Headphones with a mic', 'For listening and recording your speaking.'], ['R', 'LuGlobe', 'Updated browser', 'Chrome or Edge, up to date.'], ['O', 'LuKey', 'Your access code', 'To open your dashboard and save your work.'], ['W', 'LuSmartphone', 'Your phone', 'To record speaking answers and upload them.']];
+  kit.forEach(([k, ic, h, t], i) => {
+    const x = 0.75 + i * 2.4;
+    card(s, x, 1.95, 2.2, 3.3, SK[k][0], h);
+  });
+  for (const [i, [k, ic, h, t]] of kit.entries()) {
+    const x = 0.75 + i * 2.4;
+    await chip(s, x + 0.3, 2.25, 0.75, k, ic, h);
+    s.addText(h, { x: x + 0.3, y: 3.2, w: 1.7, h: 0.75, fontSize: 16, bold: true, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+    s.addText(t, { x: x + 0.3, y: 3.95, w: 1.7, h: 1.2, fontSize: 13, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+  }
+  await tips(s, 0.75, 5.5, 11.75, 1.15, ['We will sit full mock tests on the course website. A laptop with a headset gives you the closest experience to the real test.'], 'Mock tip', 'Why a laptop?');
+  s.addNotes('Ask everyone to bring a laptop and headset from the next class. If a student has no laptop, plan pairs or a backup device.\nCHECK: "What two things do you need for the mock test besides your access code?"');
+
   // 22b · Ask in English
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Wrap-up' });
   eyebrow(s, 'Classroom English', 'L'); title(s, 'Ask in English. Every question helps.');
@@ -419,7 +455,7 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
   // 15 · Before Session 2
   s = pres.addSlide({ masterName: 'CLOSING', sectionTitle: 'Wrap-up' });
   eyebrow(s, 'Study Hub · Session 1', 'O'); title(s, 'Before Session 2');
-  const todo = ['Listening and reading checks', 'Baseline email · 27 minutes', 'Two baseline speaking answers', 'Save your starting point', 'Tag every error in your Error Log'];
+  const todo = ['Listening and reading checks', 'Baseline email · 27 minutes', 'Two baseline speaking answers', 'Save your starting point', 'Bring a laptop + headphones next class'];
   for (let i = 0; i < todo.length; i++) {
     const y = 1.95 + i * 0.86;
     card(s, 0.75, y, 7.4, 0.7, 'FFFFFF', 'To-do ' + (i + 1), true);
