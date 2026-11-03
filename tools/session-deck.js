@@ -107,33 +107,59 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
   const ebFor = (sl, i) => (i === D.SLIDES.length - 1 ? `Study Hub · Session ${N}` : sl.eyebrow || (sl.k === 'O' ? 'Strategy' : SKILLNAME[SESSION.k]));
   const nobreak = t => String(t).replace(/(\S)–(\S)/g, '$1\u2060–\u2060$2');
 
-  // ---------- layouts ----------
+  // ---------- layouts (same visual language as the Session 1 deck) ----------
+  const ICON_RULES = [[/word|vocab/i, 'LuBookOpenCheck'], [/predict|context/i, 'LuEye'], [/distractor|trap/i, 'LuAlertTriangle'], [/signal|change|mind/i, 'LuRefreshCw'],
+    [/paraphrase/i, 'LuRepeat'], [/condition/i, 'LuFilter'], [/main idea|headline/i, 'LuNewspaper'], [/detail/i, 'LuListChecks'], [/impact/i, 'LuTrendingUp'],
+    [/look back|score/i, 'LuBarChart3'], [/cause/i, 'LuSearch'], [/fix/i, 'LuWrench'], [/goal|focus|target/i, 'LuTarget'], [/contrast/i, 'LuArrowLeftRight'],
+    [/disagree|polite no|negative/i, 'LuThumbsDown'], [/partly/i, 'LuScale'], [/decision|^agree/i, 'LuThumbsUp'], [/reluctant/i, 'LuMeh'], [/surprise/i, 'LuZap'],
+    [/relief|positive|attitude/i, 'LuSmile'], [/hedge/i, 'LuHelpCircle'], [/viewpoint/i, 'LuMessageSquare'], [/imply/i, 'LuMessageCircle'], [/infer/i, 'LuLightbulb'],
+    [/tone/i, 'LuVolume2'], [/^what$/i, 'LuClipboardList'], [/^when$/i, 'LuCalendar'], [/bring/i, 'LuLaptop']];
+  const iconFor = (t, k) => { for (const [r, ic] of ICON_RULES) if (r.test(String(t).replace(/^\d+\s*·\s*/, ''))) return ic; return ICON[k] || 'LuSparkles'; };
+  const oval = (s, x, y, d, k, label, name) => {
+    s.addShape(pres.shapes.OVAL, { x, y, w: d, h: d, fill: { color: SK[k][1] }, line: { color: SK[k][1], width: 0 }, objectName: name });
+    T(s, String(label), { x, y, w: d, h: d, align: 'center', fontSize: 12, bold: true, color: 'FFFFFF' });
+  };
+  const softPill = (s, x, y, w, h, k, label, name) => {
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y, w, h, rectRadius: h / 2, fill: { color: SK[k][0] }, line: { color: SK[k][0] }, objectName: name });
+    T(s, String(label), { x, y, w, h, fontSize: 12, bold: true, color: SK[k][1], align: 'center' });
+  };
+  // a row label: a round number badge for short labels, a soft pill for words
+  const rowLabel = (s, x, y, rowH, k, a, name) => {
+    const short = String(a).length <= 2;
+    if (short) { oval(s, x, y + (rowH - 0.46) / 2, 0.46, k, a, name); return 0.46; }
+    const w = Math.max(0.8, Math.min(1.9, 0.3 + String(a).length * 0.11));
+    softPill(s, x, y + (rowH - 0.4) / 2, w, 0.4, k, a, name); return w;
+  };
+
   async function titleSlide(sl) {
     const s = newSlide('TITLE');
     T(s, 'SESSION ' + String(N).padStart(2, '0'), { x: 0.75, y: 1.75, w: 4, h: 0.4, fontSize: 13, bold: true, color: SK[sl.k][1], charSpacing: 4 });
     s.addText(nobreak(sl.h), { placeholder: 'title' });
     s.addText('CELPIP Prep Course  ·  2-hour live class', { placeholder: 'body' });
-    card(s, 9.05, 2.0, 3.5, 3.9, 'FFFFFF', 'Skill tile', true);
-    await chip(s, 10.15, 2.45, 1.3, sl.k, ICON[sl.k], 'Skill', true);
-    T(s, ({ L: 'Listening', R: 'Reading', W: 'Writing', S: 'Speaking', O: 'Orientation' })[sl.k], { x: 9.05, y: 4.0, w: 3.5, h: 0.5, fontSize: 20, bold: true, align: 'center' });
-    T(s, clean(SESSION.obj), { x: 9.35, y: 4.55, w: 2.9, h: 1.2, fontSize: 11.5, color: MUTED, align: 'center', valign: 'top' });
+    const four = [['L', 'LuHeadphones', 'Listening'], ['R', 'LuBookOpen', 'Reading'], ['W', 'LuPenLine', 'Writing'], ['S', 'LuMic', 'Speaking']];
+    for (let i = 0; i < 4; i++) {
+      const [k, ic, n] = four[i], x = 9.05 + (i % 2) * 1.85, y = 2.0 + Math.floor(i / 2) * 2.05, on = k === SESSION.k;
+      card(s, x, y, 1.65, 1.85, 'FFFFFF', n + ' tile', true, on ? SK[k][1] : null);
+      await chip(s, x + 0.43, y + 0.3, 0.8, k, ic, n, true);
+      T(s, n, { x, y: y + 1.2, w: 1.65, h: 0.4, fontSize: 12, bold: true, align: 'center', color: on ? SK[k][1] : NAVY });
+    }
     const g = D.GUIDE && D.GUIDE[0];
     s.addNotes(notesFor(sl, g ? 'DELIVERY TIPS FOR THIS CLASS\n' + [...g.say, ...g.ask, ...g.watch, g.tip].map(x => '• ' + x).join('\n') : ''));
   }
   function outcomesSlide(sl) {
     const s = newSlide();
-    eyebrow(s, "Today's outcomes", sl.k); title(s, sl.h);
+    eyebrow(s, "Today's outcomes", 'R'); title(s, nobreak(sl.h));
     sl.list.forEach(([a, b], i) => {
-      const y = 1.95 + i * 0.86, k = ROT[i % 5];
-      badge(s, 0.75, y + 0.1, 0.5, k, a, 'Outcome ' + a);
+      const y = 1.95 + i * 0.86, k = ['L', 'R', 'O', 'W', 'S'][i % 5];
+      oval(s, 0.75, y + 0.12, 0.46, k, a, 'Outcome ' + a);
       T(s, b, { x: 1.45, y, w: 6.6, h: 0.7, fontSize: 18 });
     });
     card(s, 8.6, 1.95, 4.0, 4.3, 'F6F7FB', 'Agenda');
     T(s, '2 HOURS', { x: 8.95, y: 2.2, w: 3.3, h: 0.3, fontSize: 11, bold: true, color: MUTED, charSpacing: 3 });
     SESSION.live.forEach(([a, , b], i) => {
       const y = 2.65 + i * 0.68;
-      T(s, a, { x: 8.95, y, w: 0.8, h: 0.5, fontSize: 14, bold: true, color: SK[sl.k][1] });
-      T(s, b, { x: 9.8, y, w: 2.6, h: 0.5, fontSize: 13.5 });
+      T(s, a, { x: 8.95, y, w: 0.8, h: 0.5, fontSize: 14, bold: true, color: '6A2BC4' });
+      T(s, b, { x: 9.8, y, w: 2.6, h: 0.5, fontSize: 14 });
     });
     s.addNotes(notesFor(sl));
   }
@@ -141,24 +167,42 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     const s = newSlide(master);
     eyebrow(s, ebFor(sl, i), sl.k); title(s, nobreak(sl.h));
     const cs = sl.cards, n = cs.length, tips = sl.tips || [];
-    if (n >= 6) { // word cards, 4 per row
+    if (n >= 6) { // word cards, 4 per row (as in Session 1)
       cs.forEach(([a, b], j) => {
         const k = ROT[j % 5], x = 0.75 + (j % 4) * 3.0, y = 1.95 + Math.floor(j / 4) * 2.3;
         card(s, x, y, 2.8, 2.1, SK[k][0], a);
-        T(s, a, { x: x + 0.25, y: y + 0.2, w: 2.35, h: 0.55, fontSize: 17, bold: true, color: SK[k][1], valign: 'top' });
-        T(s, b, { x: x + 0.25, y: y + 0.8, w: 2.35, h: 1.2, fontSize: 13.5, valign: 'top' });
+        T(s, a, { x: x + 0.3, y: y + 0.25, w: 2.3, h: 0.5, fontSize: 19, bold: true, color: SK[k][1], valign: 'top' });
+        T(s, b, { x: x + 0.3, y: y + 0.8, w: 2.3, h: 1.15, fontSize: 14, valign: 'top' });
       });
-    } else {
-      const gap = 0.25, w = (11.8 - gap * (n - 1)) / n, h = tips.length ? 3.15 : 4.3;
+    } else { // icon cards with 01 / 02 numbering (as in Session 1)
+      const gap = 0.25, w = (11.8 - gap * (n - 1)) / n, h = tips.length ? 3.2 : 4.3;
       for (let j = 0; j < n; j++) {
         const [a, b] = cs[j], k = ROT[(j + ROT.indexOf(sl.k)) % 5], x = 0.75 + j * (w + gap);
-        card(s, x, 1.95, w, h, SK[k][0], a);
-        badge(s, x + 0.3, 2.25, 0.5, k, j + 1, 'Card ' + (j + 1));
-        T(s, a, { x: x + 0.3, y: 2.95, w: w - 0.6, h: 0.75, fontSize: n > 3 ? 17 : 19, bold: true, color: SK[k][1], valign: 'top' });
-        T(s, b, { x: x + 0.3, y: 3.7, w: w - 0.6, h: h - 1.95, fontSize: n > 3 ? 14 : 15.5, valign: 'top' });
+        const head = String(a).replace(/^\d+\s*·\s*/, '');
+        card(s, x, 1.95, w, h, SK[k][0], head);
+        await chip(s, x + 0.3, 2.25, 0.75, k, iconFor(head, k), head);
+        T(s, String(j + 1).padStart(2, '0'), { x: x + w - 0.9, y: 2.3, w: 0.6, h: 0.4, fontSize: 12, bold: true, color: SK[k][1], align: 'right' });
+        T(s, head, { x: x + 0.3, y: 3.15, w: w - 0.6, h: 0.6, fontSize: n > 3 ? 17 : 19, bold: true, valign: 'top' });
+        T(s, b, { x: x + 0.3, y: 3.75, w: w - 0.6, h: h - 1.95, fontSize: n > 3 ? 14 : 15, valign: 'top' });
       }
-      if (tips.length) await tipsBox(s, 0.75, 5.35, 11.8, 1.3, tips, 'Tips', 'Remember');
+      if (tips.length) await tipsBox(s, 0.75, 5.4, 11.8, 1.25, tips, 'Tips', 'Remember');
     }
+    s.addNotes(notesFor(sl));
+  }
+  async function closingSlide(sl) {
+    const s = newSlide('CLOSING');
+    eyebrow(s, `Study Hub · Session ${N}`, 'O'); title(s, nobreak(sl.h));
+    const todo = sl.list.map(x => x[1]), rowH = Math.min(0.7, (4.6 - (todo.length - 1) * 0.12) / todo.length);
+    todo.forEach((t, i) => {
+      const y = 1.95 + i * (rowH + 0.12);
+      card(s, 0.75, y, 7.4, rowH, 'FFFFFF', 'To-do ' + (i + 1), true);
+      oval(s, 0.97, y + (rowH - 0.42) / 2, 0.42, 'O', '✓', 'Check ' + (i + 1));
+      T(s, t, { x: 1.6, y, w: 6.4, h: rowH, fontSize: 16 });
+    });
+    card(s, 8.6, 1.95, 3.9, 4.15, 'FFFFFF', 'Next class', true);
+    await chip(s, 8.95, 2.3, 0.85, 'O', 'LuFlag', 'Next class', true);
+    T(s, [{ text: 'Your results open the next class.', options: { bold: true, fontSize: 18, breakLine: true } }, { text: `Finish the Study Hub before Session ${N + 1} so we can work on your real mistakes.`, options: { fontSize: 14, color: MUTED } }],
+      { x: 8.95, y: 3.4, w: 3.25, h: 2.4, valign: 'top', paraSpaceAfter: 10 });
     s.addNotes(notesFor(sl));
   }
   async function listSlide(sl, i, master) {
@@ -170,29 +214,29 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
       for (let j = 0; j < L.length; j += 2) {
         const y = 1.95 + (j / 2) * 1.05;
         card(s, 0.75, y, 6.6, 0.9, 'F6F7FB', 'Said ' + j);
-        T(s, [{ text: 'SAID   ', options: { bold: true, color: MUTED, fontSize: 11 } }, { text: L[j][1] }], { x: 1.0, y, w: 6.2, h: 0.9, fontSize: 16 });
+        await chip(s, 0.95, y + 0.17, 0.56, 'L', 'LuMessageCircle', 'Said', true);
+        T(s, L[j][1], { x: 1.7, y, w: 5.5, h: 0.9, fontSize: 16 });
         T(s, '→', { x: 7.4, y, w: 0.5, h: 0.9, fontSize: 20, bold: true, color: MUTED, align: 'center' });
         card(s, 7.95, y, 4.6, 0.9, SK.O[0], 'Meant ' + j);
-        T(s, [{ text: 'MEANT   ', options: { bold: true, color: SK.O[1], fontSize: 11 } }, { text: L[j + 1][1], options: { bold: true } }], { x: 8.2, y, w: 4.2, h: 0.9, fontSize: 16 });
+        await chip(s, 8.12, y + 0.17, 0.56, 'O', 'LuLightbulb', 'Meant');
+        T(s, L[j + 1][1], { x: 8.85, y, w: 3.55, h: 0.9, fontSize: 16, bold: true });
       }
       if (tips.length) await tipsBox(s, 0.75, 5.35, 11.8, 1.3, tips, 'Tips', 'Remember');
-    } else if (tips.length) { // rows left, tips right
-      const rowH = Math.min(0.78, (4.75 - (L.length - 1) * 0.12) / L.length);
+    } else if (tips.length) { // rows left, tips right (as in Session 1's skill slides)
+      const rowH = Math.min(0.72, (4.75 - (L.length - 1) * 0.1) / L.length);
       L.forEach(([a, b], j) => {
-        const y = 1.95 + j * (rowH + 0.12), k = sl.k;
+        const y = 1.95 + j * (rowH + 0.1);
         card(s, 0.75, y, 7.3, rowH, j % 2 ? 'FFFFFF' : 'F6F7FB', 'Row ' + (j + 1), false, j % 2 ? LINE : null);
-        const lw = Math.max(0.55, Math.min(1.3, 0.2 + String(a).length * 0.12));
-        badge(s, 0.95, y + (rowH - 0.5) / 2, lw, k, a, 'Label ' + (j + 1), String(a).length > 3 ? 11 : 13);
-        T(s, b, { x: 1.2 + lw, y, w: 6.65 - lw, h: rowH, fontSize: 15.5 });
+        const lw = rowLabel(s, 0.95, y, rowH, sl.k, a, 'Label ' + (j + 1));
+        T(s, b, { x: 1.2 + lw, y, w: 6.65 - lw, h: rowH, fontSize: 15 });
       });
-      await tipsBox(s, 8.35, 1.95, 4.2, Math.max(2.6, L.length * (rowH + 0.12) - 0.12), tips, 'Tips', 'How to score higher');
-    } else { // two-column grid
-      const rowsN = Math.ceil(L.length / 2), rowH = Math.min(1.0, (4.7 - (rowsN - 1) * 0.2) / rowsN);
+      await tipsBox(s, 8.35, 1.95, 4.15, Math.max(2.6, L.length * (rowH + 0.1) - 0.1), tips, 'Strategies', 'How to score higher');
+    } else { // two columns of rows
+      const rowsN = Math.ceil(L.length / 2), rowH = Math.min(0.95, (4.7 - (rowsN - 1) * 0.15) / rowsN);
       L.forEach(([a, b], j) => {
-        const col = j % 2, row = Math.floor(j / 2), x = 0.75 + col * 6.0, y = 1.95 + row * (rowH + 0.2), k = ROT[j % 5];
-        card(s, x, y, 5.8, rowH, SK[k][0], 'Item ' + (j + 1));
-        const lw = Math.max(0.55, Math.min(1.3, 0.2 + String(a).length * 0.12));
-        badge(s, x + 0.25, y + (rowH - 0.5) / 2, lw, k, a, 'Label ' + (j + 1));
+        const col = j % 2, row = Math.floor(j / 2), x = 0.75 + col * 6.0, y = 1.95 + row * (rowH + 0.15), k = ROT[j % 5];
+        card(s, x, y, 5.8, rowH, (row + col) % 2 ? 'FFFFFF' : 'F6F7FB', 'Item ' + (j + 1), false, (row + col) % 2 ? LINE : null);
+        const lw = rowLabel(s, x + 0.25, y, rowH, k, a, 'Label ' + (j + 1));
         T(s, b, { x: x + 0.5 + lw, y, w: 5.1 - lw, h: rowH, fontSize: 16 });
       });
     }
@@ -335,6 +379,7 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     if (sl.layout === 'title') await titleSlide(sl);
     else if (i === 1 && sl.list) outcomesSlide(sl);
     else if (sl.widget) { if (!W[sl.widget]) throw new Error('No deck layout for ' + sl.widget); await W[sl.widget](sl); }
+    else if (i === last && sl.list) await closingSlide(sl);
     else if (sl.cards) await cardsSlide(sl, i, master);
     else if (sl.list) await listSlide(sl, i, master);
     else throw new Error('Unknown slide ' + i);
