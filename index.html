@@ -603,6 +603,25 @@ nav.main a[aria-current="page"]{background:#14213D;color:#fff}
 @media(max-width:560px){.dgrid{grid-template-columns:minmax(0,1fr)}}
 .dg{display:flex;gap:10px;align-items:center;background:var(--c);border-radius:14px;padding:12px}
 .dg>div{flex:1;display:flex;flex-direction:column;min-width:0}.dg .ic{background:var(--surface)}
+
+.deckframe{position:relative;border-radius:18px;overflow:hidden;box-shadow:0 12px 32px rgba(20,33,61,.14);background:#14213D;aspect-ratio:16/9;max-width:100%}
+.deckframe .stripe{position:absolute;left:0;right:0;top:0;height:8px;background:var(--band);z-index:1}
+.deckframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.deckp h3{display:flex;gap:8px;align-items:center}
+.deckp a.chip{text-decoration:none;color:var(--fg)}
+.deck-help{font-size:13.5px;background:var(--surface-2);border-radius:12px;padding:8px 12px}
+.deck-help summary{cursor:pointer;font-weight:600}
+.deck-help ol{margin:8px 0 0;padding-left:18px}
+.sl-tips{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.35em}
+.sl-tips li{background:#FFF6D6;border-radius:.7em;padding:.45em .8em;font-size:.88em}
+.slide .sl-list li{padding:.45em .8em}
+
+.schedp summary{cursor:pointer;display:flex;flex-direction:column;gap:2px}
+.schedp summary::marker{content:''}
+.schedp summary b::before{content:'▸ ';color:var(--muted)}.schedp[open] summary b::before{content:'▾ '}
+.sn-mini{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--c);color:var(--ci);font-weight:700;font-size:12.5px}
+.schedp select,.schedp input[type=date],.deckin{padding:6px 8px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);font-size:13.5px;width:100%}
+.srow.locked{opacity:.7}.srow.locked .num{background:var(--surface-2)}
 </style>
 </head>
 <body>
@@ -647,7 +666,7 @@ const ERR={bad_code:'That access code was not found. Check it and try again.',ba
   network:'Cannot reach the course server. Check your internet connection and try again.',
   not_configured:'The course server is not connected yet. Your teacher needs to add the Apps Script link to the site.',
   no_password:'Set TEACHER_PASSWORD in the Apps Script project settings first.',code_taken:'That access code is already used by another student.',
-  bad_code_format:'Codes use 4–20 letters, numbers or dashes.',busy:'The server is busy. Try again in a moment.',
+  bad_code_format:'Codes use 4–20 letters, numbers or dashes.',bad_link:'Use a Canva, Google Slides, PowerPoint Online, Pitch or Gamma link.',busy:'The server is busy. Try again in a moment.',
   too_large:'This progress is too large to save.',server_error:'Something went wrong on the server. Try again.'};
 const errMsg=e=>ERR[e&&e.code]||(e&&e.message)||ERR.server_error;
 
@@ -658,7 +677,7 @@ const readTPass=()=>{try{return sessionStorage.getItem('bcs:tpass')}catch(e){ret
 const writeTPass=v=>{try{v?sessionStorage.setItem('bcs:tpass',v):sessionStorage.removeItem('bcs:tpass')}catch(e){}};
 
 const SYNC_KEYS=['tasks','res','targets','log'];
-const cloud={code:null,student:null,batch:null,feedback:null,state:'local',tpass:null,
+const cloud={code:null,student:null,batch:null,feedback:null,state:'local',tpass:null,settings:{},
   messages:[],t:{loaded:false,loading:false,error:null,at:0,batches:[],students:[],progress:{},feedback:{},messages:[]}};
 const _set=store.set.bind(store);
 store.set=function(k,v){_set(k,v);if(SYNC_KEYS.includes(k)){_set('updatedAt',Date.now());schedulePush()}};
@@ -684,17 +703,17 @@ function refreshIf(rs){if(!rs.includes(curRoute()))return;const a=document.activ
   if(a&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)&&app.contains(a)){pendingRefresh=true;return}view(true)}
 document.addEventListener('focusout',()=>{if(!pendingRefresh)return;setTimeout(()=>{const a=document.activeElement;if(pendingRefresh&&!(a&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName))){pendingRefresh=false;view(true)}},700)});
 
-function applyStudent(j){cloud.code=j.student.code;PREFIX='bcs:'+cloud.code+':';cloud.student=j.student;cloud.batch=j.batch;cloud.feedback=j.feedback;cloud.messages=j.messages||[];
-  writeSession({code:cloud.code,student:j.student,batch:j.batch,feedback:j.feedback});
+function applyStudent(j){cloud.code=j.student.code;PREFIX='bcs:'+cloud.code+':';cloud.student=j.student;cloud.batch=j.batch;cloud.feedback=j.feedback;cloud.messages=j.messages||[];cloud.settings=j.settings||cloud.settings||{};
+  writeSession({code:cloud.code,student:j.student,batch:j.batch,feedback:j.feedback,settings:cloud.settings});
   const r=j.progress;const localT=store.get('updatedAt',0);
   if(r&&(r.updatedAt||0)>localT){SYNC_KEYS.forEach(k=>{if(r[k]!==undefined)_set(k,r[k])});_set('updatedAt',r.updatedAt)}
   else if(localT>((r&&r.updatedAt)||0))schedulePush();
   if(cloud.state!=='saving'||!pushPending)cloud.state='synced';renderNav()}
 async function initCloud(){const s=readSession();cloud.tpass=readTPass();
-  if(s&&s.code){cloud.code=s.code;PREFIX='bcs:'+s.code+':';cloud.student=s.student;cloud.batch=s.batch;cloud.feedback=s.feedback;cloud.state='saving'}
+  if(s&&s.code){cloud.code=s.code;PREFIX='bcs:'+s.code+':';cloud.student=s.student;cloud.batch=s.batch;cloud.feedback=s.feedback;cloud.settings=s.settings||{};cloud.state='saving'}
   else if(cloud.tpass)PREFIX='bcs:teacher:';
   renderNav();view();
-  if(cloud.code){try{applyStudent(await api('student.login',{code:cloud.code}));refreshIf(['home','syllabus','log'])}
+  if(cloud.code){try{const before=JSON.stringify(cloud.settings);applyStudent(await api('student.login',{code:cloud.code}));refreshIf(['home','syllabus','log'].concat(before!==JSON.stringify(cloud.settings)?['session']:[]))}
     catch(e){cloud.state=e.code==='bad_code'?'revoked':'offline';updateSyncBadge()}}}
 async function signOut(){if(pushPending&&cloud.code){clearTimeout(pushTimer);await push()}
   writeSession(null);writeTPass(null);Object.assign(cloud,{code:null,student:null,batch:null,feedback:null,tpass:null,state:'local'});
@@ -1205,7 +1224,7 @@ DS2:{task:'Diagnostic · Task 7 · Expressing Opinions',prep:30,speak:90,prompt:
 const tasksDone=()=>store.get('tasks',{});
 const results=()=>store.get('res',{});
 function sessionProgress(s){const t=tasksDone();const done=s.tasks.filter((_,i)=>t[s.n+':'+i]).length;return {done,total:s.tasks.length,pct:Math.round(done/s.tasks.length*100)}}
-function nextSession(){return SESSIONS.find(s=>sessionProgress(s).pct<100)||SESSIONS[11]}
+function nextSession(){const open=SESSIONS.filter(s=>typeof sessionState!=='function'||sessionState(s.n).open);return open.find(s=>sessionProgress(s).pct<100)||open[open.length-1]||SESSIONS[0]}
 function skillScores(r){r=r||results();const out={L:[],R:[],W:[],S:[]};
   for(const [k,v] of Object.entries(r)){const tool=k.split(':')[1];const q=QUIZ[tool];
     if(q&&q.kind==='listen')out.L.push(v.pct);else if(q&&q.kind==='read')out.R.push(v.pct);
@@ -1324,9 +1343,10 @@ function Syllabus(){
     <p class="lead">Twelve two-hour live sessions, each paired with a Study Hub module. Open a session to see the live teaching plan and its Hub work.</p>
     <div class="legend">${phases.map(([k])=>`<span style="${skv(k)}">${icon(k,15)} ${SKILL[k]}</span>`).join('')}</div></div></section>
   ${phases.map(([k,ns])=>`<section class="phase" style="${skv(k)}"><div class="phase-head"><span class="ic">${icon(k)}</span><div><h2>${SKILL[k]}</h2><div class="muted" style="font-size:13px">Session${ns.length>1?'s':''} ${ns[0]}${ns.length>1?'–'+ns[ns.length-1]:''}</div></div></div>
-   ${ns.map(n=>{const s=SESSIONS[n-1];const p=sessionProgress(s);return `<a class="srow" href="#session-${n}"><span class="num">${p.pct===100?CHECK:String(n).padStart(2,'0')}</span><div style="min-width:0"><h3>${esc(s.title)}</h3><p>${esc(s.obj)}</p></div><div class="prog"><div class="row" style="justify-content:space-between;font-size:12px;margin-bottom:4px"><span class="muted">Hub</span><span>${p.done}/${p.total}</span></div><div class="bar-track"><div class="bar-fill" style="width:${p.pct}%;background:var(--ci)"></div></div></div></a>`}).join('')}</section>`).join('')}</div>`}
+   ${ns.map(n=>{const s=SESSIONS[n-1];const p=sessionProgress(s);const ls=sessionState(n);return `<a class="srow ${ls.open?'':'locked'}" href="#session-${n}"><span class="num">${ls.open?(p.pct===100?CHECK:String(n).padStart(2,'0')):'🔒'}</span><div style="min-width:0"><h3>${esc(s.title)}</h3><p>${ls.open?esc(s.obj):(ls.date?'Opens on '+esc(fmtDate(ls.date)):'Not open yet')}</p></div><div class="prog"><div class="row" style="justify-content:space-between;font-size:12px;margin-bottom:4px"><span class="muted">Hub</span><span>${p.done}/${p.total}</span></div><div class="bar-track"><div class="bar-fill" style="width:${p.pct}%;background:var(--ci)"></div></div></div></a>`}).join('')}</section>`).join('')}</div>`}
 
 function renderSession(s){
+  const lockSt=sessionState(s.n);if(!lockSt.open){app.innerHTML=LockedSession(s,lockSt);return}
   const tab=store.get('tab','live');const prev=SESSIONS[s.n-2];const gated=prev&&sessionProgress(prev).pct<100;
   const len=(a,b)=>{const m=x=>{const [h,mm]=x.split(':');return +h*60+ +mm};return m(b)-m(a)};
   app.innerHTML=`<div class="stack">
@@ -1339,7 +1359,8 @@ function renderSession(s){
   </div>
   <section id="pane-live" ${tab==='live'?'':'hidden'} class="stack">
     <div class="boundary">${icon('S',20)}<p><b>What happens in class.</b> Your instructor teaches and models every strategy live. There are no quizzes and no quiet work during class time.</p></div>
-    ${s.slides?`<div class="present"><div><b>Class slides</b><span class="muted">${SLIDESETS[s.slides].length} slides · ${cloud.tpass?'press N for speaker notes':'follow along with your teacher'}</span></div><button class="btn primary" id="present-btn">▶ Present slides</button></div>`:''}
+    ${DeckPanel(s)}
+    ${s.slides?`<div class="present"><div><b>${(cloud.settings||{})['deck:'+s.n]?'Backup slides (built in)':'Class slides'}</b><span class="muted">${SLIDESETS[s.slides].length} slides · ${cloud.tpass?'press N for speaker notes':'follow along with your teacher'}</span></div><button class="btn primary" id="present-btn">▶ Present slides</button></div>`:''}
     <div class="grid g2" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
       <div class="panel"><h3 style="margin-bottom:6px">Teaching breakdown</h3><ol class="timeline">${s.live.map(([a,b,t,d])=>`<li><span class="t">${a}–${b}<span class="len">${len(a,b)} min</span></span><div><b>${esc(t)}</b><span class="muted">${esc(d)}</span></div></li>`).join('')}</ol></div>
       <div class="panel"><h3 style="margin-bottom:12px">Live tools</h3><ul class="tools">${s.liveTools.map(([t,d])=>`<li><b>${esc(t)}</b>${esc(d)}</li>`).join('')}</ul></div>
@@ -1356,6 +1377,7 @@ function renderSession(s){
       ${s.tools.map(t=>`<div id="tool-${t}"></div>`).join('')}
     </div>
   </section></div>`;
+  bindDeck(s);if(cloud.tpass&&!cloud.t.loaded&&!cloud.t.loading&&!cloud.t.error)loadTeacher();
   {const pl=document.getElementById('pane-live');bindTestMap(pl);bindReq(pl);bindSim(pl);const pb=document.getElementById('present-btn');if(pb)pb.addEventListener('click',()=>openSlides(SLIDESETS[s.slides]))}
   const setProg=()=>{const p=sessionProgress(s);const el=document.getElementById('hubprog');if(el)el.textContent=`${p.done}/${p.total}`;const r=document.getElementById('hubring');if(r)r.style.setProperty('--p',p.pct)};setProg();
   app.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{store.set('tab',b.dataset.tab);
@@ -1557,7 +1579,7 @@ const seenSet=()=>new Set(store.get('seenMsgs',[]));
 function unreadCount(){if(!cloud.code)return 0;const seen=seenSet();return (cloud.messages||[]).filter(m=>m.from==='teacher'&&!seen.has(m.id)).length}
 function updateMsgBadge(){const b=document.getElementById('msg-badge');if(!b)return;const n=unreadCount();b.textContent=n;b.hidden=!n}
 async function refreshMessages(){if(!cloud.code)return;try{const j=await api('student.messages',{code:cloud.code});
-  const before=JSON.stringify([(cloud.messages||[]).length,cloud.feedback&&cloud.feedback.updatedAt]);cloud.messages=j.messages||[];cloud.feedback=j.feedback;
+  const before=JSON.stringify([(cloud.messages||[]).length,cloud.feedback&&cloud.feedback.updatedAt]);cloud.messages=j.messages||[];cloud.feedback=j.feedback;if(j.settings)cloud.settings=j.settings;
   updateMsgBadge();if(before!==JSON.stringify([cloud.messages.length,cloud.feedback&&cloud.feedback.updatedAt]))refreshIf(['home','messages'])}catch(e){}}
 setInterval(()=>{if(cloud.code&&document.visibilityState==='visible')refreshMessages()},90000);
 const KIND={message:'Message',task:'Email-writing task',invite:'Welcome','task-reply':'Task reply'};
@@ -1675,30 +1697,37 @@ const LIVE_WIDGETS={TESTMAP:['Test Map','Click a skill to see every part, questi
 /* ---------- slides ---------- */
 const S1_SLIDES=[
  {k:'O',layout:'title',h:'Decode the Test Engine and Set Your CLB Target',sub:'Session 1 · CELPIP Prep Course · Learnovate Qatar',
-  notes:'Welcome everyone. Introduce yourself in one sentence. Say: "Today there are no quizzes. By the end you will know exactly how the test works and what level you need."'},
- {k:'O',h:'Today in 2 hours',list:[['0:00','Map the test'],['0:20','How scoring works'],['0:45','What the test screen does'],['1:15','The four causes of errors'],['1:45','Set your targets']],
-  notes:'Keep this on screen while people settle. Point to each block. Mention the Study Hub opens after class.'},
- {k:'O',h:'Why CELPIP?',cards:[['Permanent residence','Accepted for Express Entry and other economic programs.'],['Citizenship','Proof of listening and speaking skills.'],['One sitting','All four skills on a computer, about 3 hours.']],
-  notes:'Ask: "Who is taking CELPIP for PR? For citizenship?" Note it on the board. Citizenship candidates usually take the CELPIP-General LS (listening and speaking only).'},
- {k:'O',h:'The test at a glance',widget:'TESTMAP',notes:'Use the Test Map live. Click each skill. Stress the order: Listening, Reading, Writing, Speaking. No breaks between most components, so stamina matters.'},
- {k:'L',h:'Listening · 6 parts, 38 questions',list:[['Part 1','Problem Solving · 8 Qs'],['Part 2','Daily Life Conversation · 5 Qs'],['Part 3','Listening for Information · 6 Qs'],['Part 4','News Item · 5 Qs'],['Part 5','Discussion (video) · 8 Qs'],['Part 6','Viewpoints · 6 Qs']],tip:'Audio plays once. Predict before you listen.',
-  notes:'Model one prediction: read a context screen aloud and guess the questions. Ask students what they find hardest when listening in English.'},
- {k:'R',h:'Reading · 4 parts, 38 questions',list:[['Part 1','Correspondence · 11 Qs'],['Part 2','Apply a Diagram · 8 Qs'],['Part 3','Reading for Information · 9 Qs'],['Part 4','Reading for Viewpoints · 10 Qs']],tip:'The answer is usually a paraphrase, not the same words.',
-  notes:'Show a paraphrase pair: "postponed" vs "moved to a later date". Ask who reads every word first. Plant the idea of question-first scanning (Session 4).'},
- {k:'W',h:'Writing · 2 tasks',cards:[['Task 1 · Email','27 minutes · 150–200 words · cover all 3 bullets'],['Task 2 · Survey','26 minutes · 150–200 words · choose one option and defend it']],tip:'Leave 3 minutes to proofread.',
-  notes:'Ask: "What happens if you skip a bullet?" (Task fulfillment drops.) Mention four scoring areas: content and coherence, vocabulary, readability, task fulfillment.'},
- {k:'S',h:'Speaking · 8 tasks, 15–20 minutes',list:[['1','Giving Advice · 90 s'],['2','Personal Experience · 60 s'],['3','Describing a Scene · 60 s'],['4','Making Predictions · 60 s'],['5','Comparing and Persuading · 60 s'],['6','Difficult Situation · 60 s'],['7','Expressing Opinions · 90 s'],['8','Unusual Situation · 60 s']],tip:'Recording starts by itself. Fill the time.',
-  notes:'Most students lose points by stopping early. Ask a volunteer to speak for 60 seconds on "your favourite place" to feel the time.'},
- {k:'O',h:'How scoring works',cards:[['A level for each skill','You receive a CELPIP level for Listening, Reading, Writing and Speaking.'],['Levels match CLB','CELPIP 7 = CLB 7. Programs ask for CLB levels.'],['No penalty for wrong answers','Never leave a question blank.']],
-  notes:'Listening and Reading are machine-scored; Writing and Speaking are rated by trained raters. Avoid promising raw-score conversions; the official site publishes the score comparison.'},
- {k:'O',h:'What level do you need?',widget:'REQS',notes:'Use the Requirements Checker. Enter a sample student profile (e.g. 8/7/6/7) and show which programs it meets. Remind them to confirm current rules on the IRCC website.'},
- {k:'O',h:'What the test screen does',widget:'SIM',notes:'Click through the four screens. Key messages: no replay in Listening, Next is final, Speaking records automatically.'},
+  notes:'Welcome everyone. Say: "Today you learn exactly how the test works, how it is scored, and what level you need. Every slide is something you will use on test day."'},
+ {k:'O',h:'By the end of today you can…',list:[['1','Name every part of the test and its timing'],['2','Explain how your level is scored'],['3','Find the CLB level your program needs'],['4','Avoid the 10 mistakes that cost the most points'],['5','Set a target for each skill']],
+  notes:'Read the outcomes aloud. Return to this slide at the end and ask students to tick each one.'},
+ {k:'O',h:'Pick the right test',cards:[['CELPIP-General','All four skills. For permanent residence (Express Entry and other economic programs).'],['CELPIP-General LS','Listening and Speaking only. For Canadian citizenship.'],['Before you book','Check which test and which levels your program asks for.']],
+  notes:'Booking the wrong version costs money and time. Ask who is applying for PR and who for citizenship.'},
+ {k:'O',h:'The test at a glance',widget:'TESTMAP',tips:['Order: Listening → Reading → Writing → Speaking, about 3 hours.','Train your stamina: do full timed practice before test day.'],notes:'Use the Test Map live. Click each skill. Stress stamina: Speaking comes last, when people are tired.'},
+ {k:'L',h:'Listening · 6 parts, 38 questions',list:[['Part 1','Problem Solving · 8 Qs'],['Part 2','Daily Life Conversation · 5 Qs'],['Part 3','Listening for Information · 6 Qs'],['Part 4','News Item · 5 Qs'],['Part 5','Discussion (video) · 8 Qs'],['Part 6','Viewpoints · 6 Qs']],
+  tips:['Audio plays once: read the context screen and predict before it starts.','The first answer you hear is often corrected later. Wait for the final decision.','Take short notes: who, what, when, change of plan.'],
+  notes:'Model one prediction from a context screen. Then give a quick example of a "corrected" detail (Thursday → tomorrow).'},
+ {k:'R',h:'Reading · 4 parts, 38 questions',list:[['Part 1','Correspondence · 11 Qs'],['Part 2','Apply a Diagram · 8 Qs'],['Part 3','Reading for Information · 9 Qs'],['Part 4','Reading for Viewpoints · 10 Qs']],
+  tips:['Read the questions first, then scan for the answer.','Answers are paraphrased: "postponed" = "moved to a later date".','About one minute per question. Never get stuck.'],
+  notes:'Show one paraphrase pair. Ask who reads every word first; explain why question-first scanning saves time.'},
+ {k:'W',h:'Writing · 2 tasks, what raters score',cards:[['Task 1 · Email','27 min · 150–200 words · cover all 3 bullets'],['Task 2 · Survey','26 min · 150–200 words · choose one option and defend it'],['Raters score','Content & coherence · Vocabulary · Readability · Task fulfillment']],
+  tips:['Plan 3 minutes, write 20, proofread 3.','Match the tone: formal for a manager, friendly for a friend.'],
+  notes:'Ask: "What happens if you skip a bullet?" Task fulfillment drops. Show a one-line plan per bullet.'},
+ {k:'S',h:'Speaking · 8 tasks, what raters score',list:[['1','Giving Advice · 90 s'],['2','Personal Experience · 60 s'],['3','Describing a Scene · 60 s'],['4','Making Predictions · 60 s'],['5','Comparing and Persuading · 60 s'],['6','Difficult Situation · 60 s'],['7','Expressing Opinions · 90 s'],['8','Unusual Situation · 60 s']],
+  tips:['Raters score content & coherence, vocabulary, listenability and task fulfillment.','Use the prep time to plan 2–3 points, not full sentences.','Keep talking until the time ends: add an example or a summary.'],
+  notes:'Ask a volunteer to speak for 60 seconds about a favourite place, so everyone feels how long 60 seconds is.'},
+ {k:'O',h:'How scoring works',cards:[['A level for each skill','You receive a CELPIP level for Listening, Reading, Writing and Speaking.'],['Levels match CLB','CELPIP 7 = CLB 7. Programs ask for CLB levels per skill.'],['No penalty for wrong answers','Never leave a question blank. Always make your best guess.']],
+  notes:'Listening and Reading are scored by the computer; Writing and Speaking by trained raters. Do not promise raw-score conversions; the official site publishes them.'},
+ {k:'O',h:'What level do you need?',widget:'REQS',tips:['Aim one level above the minimum: it protects you and can add Express Entry points.'],notes:'Enter a sample profile (e.g. 8/7/6/7) and show which programs it meets. Remind students to confirm current rules on the IRCC website.'},
+ {k:'O',h:'What the test screen does',widget:'SIM',tips:['Once you press Next, you cannot go back.','Speaking records automatically when preparation ends.'],notes:'Click through all four screens. Run the speaking demo so everyone hears the beep timing.'},
+ {k:'W',h:'10 mistakes that cost points',list:[['1','Leaving a question blank'],['2','Missing a bullet in the email'],['3','Writing under 150 words'],['4','Wrong tone (too casual or too stiff)'],['5','Picking an answer you only heard first'],['6','Spending 3 minutes on one question'],['7','Stopping your speaking answer early'],['8','Going off topic to "sound smart"'],['9','Memorized answers that do not fit the task'],['10','Skipping the proofreading pass']],
+  notes:'Ask students which mistakes they have made before. These become the checklist for every Study Hub task.'},
  {k:'R',h:'The four causes of errors',cards:[['Distractor','You chose a detail that was mentioned but later corrected.'],['Vocabulary','You missed a paraphrase or a word.'],['Timing','You ran out of time or rushed.'],['Inference','You missed what was implied.']],
-  notes:'Give one example of each from the diagnostic. From today, every wrong answer in the Study Hub lands in the Error Log, and students tag it with one of these four.'},
- {k:'O',h:'Set your targets',list:[['1','Find the level your program needs.'],['2','Add a safety margin of +1 if you can.'],['3','Set each skill on your dashboard.'],['4','Write your weakest skill on a sticky note.']],
-  notes:'Give students 3 minutes on their phones to open the dashboard and set targets. Walk around and check. This is the only hands-on moment, and it is part of the teaching.'},
- {k:'O',h:'Before Session 2',list:[['✓','Listening and reading checks'],['✓','Baseline email (27 minutes)'],['✓','Two baseline speaking answers'],['✓','Save your starting point'],['✓','Tag every error']],tip:'Your results open the next class.',
-  notes:'Show the Study Hub tab for Session 1. Remind them the next class starts with their data, so finishing matters.'}];
+  tips:['Tag every mistake in your Error Log. Your top cause tells you what to practise.'],
+  notes:'Give one example of each from the diagnostic. Model tagging two errors live in the Error Log.'},
+ {k:'O',h:'Set your targets now',list:[['1','Find the level your program needs.'],['2','Add +1 as a safety margin if you can.'],['3','Set each skill on your dashboard.'],['4','Write down your weakest skill.']],
+  notes:'Give 3 minutes for students to open the dashboard on their phones and set targets. Walk around and check.'},
+ {k:'O',h:'Before Session 2',list:[['✓','Listening and reading checks'],['✓','Baseline email (27 minutes)'],['✓','Two baseline speaking answers'],['✓','Save your starting point'],['✓','Tag every error']],tips:['Your results open the next class, so finish before Session 2.'],
+  notes:'Open the Study Hub tab for Session 1 and show the diagnostic. Return to slide 2 and tick the outcomes together.'}];
 
 function slideHTML(sl,i,n){const top=`<div class="sl-top"><span class="sl-brand">CELPIP Prep Course · Session 1</span><span>${i+1} / ${n}</span></div>`;
   if(sl.layout==='title')return `<div class="slide sl-title" style="${skv(sl.k)}">${top}<div class="sl-center"><div class="eyebrow">◆ Learnovate Qatar</div><h1>${sl.h}</h1><p>${sl.sub}</p></div><div class="sl-band"></div></div>`;
@@ -1706,7 +1735,7 @@ function slideHTML(sl,i,n){const top=`<div class="sl-top"><span class="sl-brand"
   if(sl.list)body=`<ol class="sl-list">${sl.list.map(([a,b])=>`<li><span class="sl-num">${a}</span><span>${b}</span></li>`).join('')}</ol>`;
   if(sl.cards)body=`<div class="sl-cards">${sl.cards.map(([a,b],j)=>`<div class="sl-card" style="${skv('LRWSO'[j%5])}"><b>${a}</b><span>${b}</span></div>`).join('')}</div>`;
   if(sl.widget)body=`<div class="sl-widget">${LIVE_WIDGETS[sl.widget][2]()}</div>`;
-  return `<div class="slide" style="${skv(sl.k)}">${top}<h2>${sl.h}</h2>${body}${sl.tip?`<div class="sl-tip">💡 ${sl.tip}</div>`:''}<div class="sl-band"></div></div>`}
+  return `<div class="slide" style="${skv(sl.k)}">${top}<h2>${sl.h}</h2>${body}${(sl.tips||[]).length?`<ul class="sl-tips">${sl.tips.map(t=>`<li>💡 ${t}</li>`).join('')}</ul>`:''}<div class="sl-band"></div></div>`}
 function openSlides(slides){let i=0;const ov=document.createElement('div');ov.className='deck';ov.setAttribute('role','dialog');ov.setAttribute('aria-label','Session slides');document.body.appendChild(ov);
   let notesOn=!!cloud.tpass;const prevFocus=document.activeElement;
   const draw=()=>{ov.innerHTML=`<div class="deck-stage">${slideHTML(slides[i],i,slides.length)}</div>
@@ -1726,7 +1755,7 @@ const S1_GUIDE=[
  {t:'0:00–0:20 · Map the test',say:['"Today you learn how the test works. No quizzes."','Walk through the Test Map, skill by skill.'],ask:['Who is taking CELPIP for PR? For citizenship?','Which skill worries you most?'],watch:['Students mixing up CELPIP-General and CELPIP-General LS.'],tip:'Keep it brisk. Students will see the details again in each skill session.'},
  {t:'0:20–0:45 · How scoring works',say:['One CELPIP level per skill. CELPIP 7 = CLB 7.','No penalty for wrong answers: never leave blanks.'],ask:['What level does your program need?','Why might CLB 9 matter more than CLB 8 for Express Entry?'],watch:['Students expecting an overall score. Requirements are per skill.'],tip:'Use the Requirements Checker with a volunteer’s profile.'},
  {t:'0:45–1:15 · The test screen',say:['Audio plays once. Next is final. Speaking records by itself.'],ask:['What will you do if you miss a listening detail?'],watch:['Students who plan to "come back later". There is no going back after Next.'],tip:'Run the Speaking demo twice so everyone hears the beep timing.'},
- {t:'1:15–1:45 · Four causes of errors',say:['Distractor, vocabulary, timing, inference.','Every Study Hub mistake goes to the Error Log.'],ask:['Think of a recent English mistake. Which cause was it?'],watch:['"Careless" is not a cause. Push for one of the four.'],tip:'Model tagging two errors live in the Error Log.'},
+ {t:'1:15–1:45 · Mistakes and error causes',say:['Go through the 10 mistakes that cost points.','Then the four causes: distractor, vocabulary, timing, inference.'],ask:['Think of a recent English mistake. Which cause was it?'],watch:['"Careless" is not a cause. Push for one of the four.'],tip:'Model tagging two errors live in the Error Log.'},
  {t:'1:45–2:00 · Set targets',say:['Target = program minimum, +1 if possible.'],ask:['Which skill is furthest from your target?'],watch:['Targets set too low "to be safe". Aim for the requirement or higher.'],tip:'End by opening the Study Hub tab and showing the diagnostic.'}];
 function TeacherGuide(g){return `<section class="panel stack guide" style="gap:12px"><div class="row"><h3>Teacher guide</h3><span class="chip">Only you see this</span></div>
   ${g.map(b=>`<details class="gblock"><summary><b>${b.t}</b></summary><div class="gcols">
@@ -1747,6 +1776,89 @@ function Diag(host){const r=results();const g=k=>r['1:'+k];
    ${base?`<div class="notice" style="background:var(--hub-soft)">Baseline saved on ${esc(base.date)}. You will compare it in Session 12.</div>`:''}
    <div class="row"><button class="btn primary" id="dg-save" ${done<4?'disabled':''}>${base?'Update my baseline':'Save as my baseline'}</button><span class="muted" style="font-size:13px">${done<4?'Finish all four checks above first.':'Your teacher sees this in your progress.'}</span></div></div></div>`;
   const b=host.querySelector('#dg-save');if(b)b.addEventListener('click',()=>{store.set('baseline',{date:new Date().toISOString().slice(0,10),L,R,W,S});const rr=results();rr['1:DIAG']={at:Date.now(),baseline:{L,R,W,S}};store.set('res',rr);Diag(host)})}
+
+
+/* ---------- embedded slide decks (Canva, Google Slides, ...) ---------- */
+function normDeck(raw){let v=String(raw||'').trim();const m=v.match(/src\s*=\s*["']([^"']+)["']/i);if(m)v=m[1];v=v.replace(/&amp;/g,'&');
+  if(!/^https:\/\//.test(v))return {err:'Paste a link that starts with https:// or the full embed code.'};
+  let u;try{u=new URL(v)}catch(e){return {err:'That link does not look right. Copy it again from Canva or Google Slides.'}}
+  if(/(^|\.)canva\.com$/.test(u.hostname)){const seg=u.pathname.split('/').filter(Boolean);const i=seg.indexOf('design');
+    if(i<0||!seg[i+1])return {err:'Use the Canva share link for the design (it contains /design/).'};
+    const rest=seg.slice(i+2).filter(x=>!/^(view|edit|watch)$/.test(x));
+    if(seg.includes('edit')&&!rest.length)return {err:'That is an editing link. In Canva, use Share → More → Embed, or Share → Public view link.'};
+    const base='https://www.canva.com/design/'+seg[i+1]+(rest[0]?'/'+rest[0]:'')+'/view';return {embed:base+'?embed',open:base}}
+  if(u.hostname==='docs.google.com'&&/\/presentation\//.test(u.pathname)){const pub=u.pathname.match(/\/presentation\/d\/e\/([^/]+)/);
+    if(pub)return {embed:'https://docs.google.com/presentation/d/e/'+pub[1]+'/embed?start=false&loop=false',open:'https://docs.google.com/presentation/d/e/'+pub[1]+'/pub'};
+    const id=u.pathname.match(/\/presentation\/d\/([^/]+)/);if(id)return {embed:'https://docs.google.com/presentation/d/'+id[1]+'/embed?start=false&loop=false',open:'https://docs.google.com/presentation/d/'+id[1]+'/present'}}
+  if(/^(canva\.link|onedrive\.live\.com|view\.officeapps\.live\.com|pitch\.com|gamma\.app)$/.test(u.hostname))return {embed:v,open:v.replace(/[?&]embed\b.*/,'')};
+  return {err:'Use a Canva, Google Slides, PowerPoint Online, Pitch or Gamma link.'}}
+function deckOpen(url){if(/canva\.com/.test(url))return url.replace('?embed','');if(/docs\.google\.com/.test(url))return url.replace(/\/embed.*$/,/\/d\/e\//.test(url)?'/pub':'/present');return url}
+let deckEdit={};
+function DeckPanel(s){const url=(cloud.settings||{})['deck:'+s.n];const T=!!cloud.tpass;const editing=T&&(deckEdit[s.n]||!url);
+  if(!url&&!T)return '';
+  const editor=editing?`<div class="deck-edit stack" style="gap:10px">
+      <label class="field" for="deck-in">Paste your Canva link or embed code<input id="deck-in" placeholder="https://www.canva.com/design/…/view" value="${esc(url?deckOpen(url):'')}"></label>
+      <details class="deck-help"><summary>Where do I find it?</summary><ol><li><b>Canva:</b> open the deck → <b>Share</b> → <b>More</b> → <b>Embed</b> → <b>Embed</b> → copy the code. (Or Share → Public view link.)</li><li><b>Google Slides:</b> File → Share → <b>Publish to web</b> → <b>Embed</b> → copy.</li></ol></details>
+      <div class="row"><button class="btn primary" id="deck-save">Save deck</button>${url?'<button class="btn" id="deck-cancel">Cancel</button><button class="btn" id="deck-remove">Remove deck</button>':''}<span class="err" id="deck-msg" style="min-height:0"></span></div></div>`:'';
+  return `<section class="panel stack deckp" style="gap:12px"><div class="row"><h3>${icon('O',18)} Slides</h3><span class="spacer"></span>
+      ${url?`<a class="chip" href="${esc(deckOpen(url))}" target="_blank" rel="noopener">Full page ↗</a>`:''}${url&&T&&!editing?'<button class="btn sm" id="deck-change">Change deck</button>':''}</div>
+    ${url?`<div class="deckframe"><div class="stripe"></div><iframe src="${esc(url)}" title="Session ${s.n} slides" loading="lazy" allow="fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+      <p class="muted" style="font-size:13.5px">Use the arrows inside the slides. <a href="${esc(deckOpen(url))}" target="_blank" rel="noopener">Open full screen</a>.</p>`
+      :`<p class="muted" style="font-size:14px">Add your own slide deck for this session. Students will see it here.${s.slides?' Until then, the built-in slides below are available.':''}</p>`}
+    ${editor}</section>`}
+function bindDeck(s){const on=(id,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener('click',fn)};
+  on('deck-change',()=>{deckEdit[s.n]=true;view(true)});on('deck-cancel',()=>{deckEdit[s.n]=false;view(true)});
+  const save=async v=>{const msg=document.getElementById('deck-msg');msg.textContent='Saving…';
+    try{const j=await tcall('teacher.setting.save',{key:'deck:'+s.n,value:v});cloud.settings=j.settings||{};deckEdit[s.n]=false;view(true)}
+    catch(e){msg.textContent=e.code==='bad_request'&&/Unknown action/.test(e.message||'')?'Update Code.gs in Apps Script and deploy a new version first.':errMsg(e)}};
+  on('deck-save',()=>{const r=normDeck(document.getElementById('deck-in').value);if(r.err){document.getElementById('deck-msg').textContent=r.err;return}save(r.embed)});
+  on('deck-remove',()=>save(''));}
+
+
+/* ---------- session schedule per batch + slide-deck library ---------- */
+const DECK_FILES={1:'decks/session-01.pptx'};
+const todayISO=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function batchSchedule(batchId){try{return JSON.parse((cloud.settings||{})['open:'+batchId]||'{}')||{}}catch(e){return {}}}
+function sessionState(n){if(cloud.tpass||!cloud.code)return {open:true};const b=cloud.student&&cloud.student.batch;if(!b)return {open:true};
+  const v=batchSchedule(b)[n];if(!v||v==='open')return {open:true};if(v==='locked')return {open:false};
+  return /^\d{4}-\d{2}-\d{2}$/.test(v)&&todayISO()<v?{open:false,date:v}:{open:true}}
+function LockedSession(s,st){return `<div class="stack"><div class="row"><a href="#syllabus" class="muted" style="font-size:14px">← Syllabus</a></div>
+  <section class="sband" style="${skv(s.k)}"><span class="bignum">${String(s.n).padStart(2,'0')}</span><div class="stack" style="gap:10px;min-width:0"><span class="chip">🔒 Not open yet</span><h1>${esc(s.title)}</h1>
+  <p style="font-size:16px">${st.date?`This session opens on <b>${esc(fmtDate(st.date))}</b>.`:'Your teacher will open this session soon.'} Keep working on the sessions that are open.</p></div></section>
+  <div class="row"><a class="btn primary" href="#session-${nextSession().n}">Go to my next open session</a><a class="btn" href="#home">My dashboard</a></div></div>`}
+
+function SchedulePanel(b){const sc=batchSchedule(b.id);
+  const row=x=>{const v=sc[x.n]||'open';const mode=v==='open'||v==='locked'?v:'date';
+    return `<tr><td><span class="sn-mini" style="${skv(x.k)}">${x.n}</span></td><td>${esc(x.title)}</td>
+      <td><select data-sch="${x.n}" aria-label="Session ${x.n} status"><option value="open" ${mode==='open'?'selected':''}>Open</option><option value="locked" ${mode==='locked'?'selected':''}>Locked</option><option value="date" ${mode==='date'?'selected':''}>Opens on…</option></select></td>
+      <td><input type="date" data-schd="${x.n}" value="${mode==='date'?esc(v):''}" ${mode==='date'?'':'hidden'} aria-label="Session ${x.n} opening date"></td></tr>`};
+  return `<details class="panel schedp" id="sched"><summary><b>Session schedule for ${esc(b.name||'this batch')}</b><span class="muted" style="font-size:13px">Choose when each session opens for these students</span></summary>
+    <div class="row" style="margin:12px 0"><button class="btn sm" data-schall="open">Open all</button><button class="btn sm" data-schall="locked">Lock all</button><button class="btn sm" data-schweekly>Fill weekly dates from start date</button></div>
+    <div class="tablewrap"><table class="log"><thead><tr><th></th><th>Session</th><th>Status</th><th>Date</th></tr></thead><tbody>${SESSIONS.map(row).join('')}</tbody></table></div>
+    <div class="row" style="margin-top:12px"><button class="btn primary" id="sch-save">Save schedule</button><span class="muted" id="sch-msg" style="font-size:13px">Students see a locked session until it opens. You always see every session.</span></div></details>`}
+function bindSchedule(b){const box=document.getElementById('sched');if(!box)return;
+  box.querySelectorAll('[data-sch]').forEach(sel=>sel.addEventListener('change',()=>{const d=box.querySelector(`[data-schd="${sel.dataset.sch}"]`);d.hidden=sel.value!=='date';if(sel.value==='date'&&!d.value)d.value=todayISO()}));
+  box.querySelectorAll('[data-schall]').forEach(bt=>bt.addEventListener('click',()=>box.querySelectorAll('[data-sch]').forEach(sel=>{sel.value=bt.dataset.schall;sel.dispatchEvent(new Event('change'))})));
+  const wk=box.querySelector('[data-schweekly]');if(wk)wk.addEventListener('click',()=>{const st=b.start&&/^\d{4}-\d{2}-\d{2}$/.test(b.start)?new Date(b.start+'T12:00:00'):new Date();
+    box.querySelectorAll('[data-sch]').forEach((sel,i)=>{const d=new Date(st);d.setDate(d.getDate()+7*Math.floor(i/2)+(i%2?3:0));sel.value=i===0?'open':'date';sel.dispatchEvent(new Event('change'));
+      box.querySelector(`[data-schd="${sel.dataset.sch}"]`).value=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')})});
+  document.getElementById('sch-save').addEventListener('click',async e=>{const out={};box.querySelectorAll('[data-sch]').forEach(sel=>{const n=sel.dataset.sch;const v=sel.value==='date'?box.querySelector(`[data-schd="${n}"]`).value:sel.value;if(v&&v!=='open')out[n]=v});
+    const msg=document.getElementById('sch-msg');e.target.disabled=true;msg.textContent='Saving…';
+    try{const j=await tcall('teacher.setting.save',{key:'open:'+b.id,value:Object.keys(out).length?JSON.stringify(out):''});cloud.settings=j.settings||{};msg.textContent='Saved. Students in this batch see the new schedule next time they open the site.'}
+    catch(err){msg.textContent=/Unknown/.test(err.message||'')?'Update Code.gs in Apps Script and deploy a new version first.':errMsg(err)}e.target.disabled=false})}
+
+function DecksPanel(){return `<details class="panel schedp" id="decks"><summary><b>Slide decks</b><span class="muted" style="font-size:13px">Download the PowerPoint, upload it to Canva, then paste the Canva link</span></summary>
+  <ol class="howlist" style="margin:12px 0"><li><b>1 ·</b> Click <b>Download PowerPoint</b>.</li><li><b>2 ·</b> In Canva: <b>Create a design → Import file</b>, choose the file, and make it yours.</li><li><b>3 ·</b> In Canva: <b>Share → More → Embed</b> (or Public view link), copy it, paste it here and click <b>Save</b>.</li></ol>
+  <div class="tablewrap"><table class="log"><thead><tr><th></th><th>Session</th><th>PowerPoint</th><th>Canva link</th><th></th></tr></thead><tbody>
+  ${SESSIONS.map(x=>{const url=(cloud.settings||{})['deck:'+x.n]||'';return `<tr><td><span class="sn-mini" style="${skv(x.k)}">${x.n}</span></td><td style="min-width:180px">${esc(x.title)}</td>
+    <td>${DECK_FILES[x.n]?`<a class="btn sm" href="${DECK_FILES[x.n]}" download>⬇ Download PowerPoint</a>`:'<span class="muted" style="font-size:12.5px">Coming soon</span>'}</td>
+    <td style="min-width:240px"><input class="deckin" data-deckn="${x.n}" placeholder="Paste Canva link or embed code" value="${esc(url?deckOpen(url):'')}" aria-label="Canva link for session ${x.n}"></td>
+    <td><button class="btn sm" data-decksave="${x.n}">Save</button> ${url?`<a class="chip" href="#session-${x.n}">View</a>`:''}<div class="err" data-deckmsg="${x.n}" style="min-height:0;font-size:12px"></div></td></tr>`}).join('')}
+  </tbody></table></div></details>`}
+function bindDecks(){document.querySelectorAll('[data-decksave]').forEach(bt=>bt.addEventListener('click',async()=>{const n=bt.dataset.decksave;const inp=document.querySelector(`[data-deckn="${n}"]`);const msg=document.querySelector(`[data-deckmsg="${n}"]`);
+  let v='';if(inp.value.trim()){const r=normDeck(inp.value);if(r.err){msg.textContent=r.err;return}v=r.embed}
+  bt.disabled=true;msg.textContent='';try{const j=await tcall('teacher.setting.save',{key:'deck:'+n,value:v});cloud.settings=j.settings||{};msg.style.color='var(--hub)';msg.textContent=v?'Saved ✓':'Removed'}
+  catch(e){msg.style.color='';msg.textContent=/Unknown/.test(e.message||'')?'Update Code.gs and deploy a new version first.':errMsg(e)}bt.disabled=false}))}
 
 /* ---------- Teacher portal ---------- */
 let tSel=null,tStudent=null,tNewOpen=false,tConfirmDel=false,tLogFilter='',tForm=null,tConfirmStuDel=false,tShare=null,tBatchMsg=false,tFlash='';const fbDraft={};
@@ -1778,9 +1890,9 @@ const siteURL=()=>location.href.split('#')[0];
 const inviteText=st=>`Hi ${st.name}, welcome to the Learnovate Qatar CELPIP Prep Course!\n\nOpen: ${siteURL()}\nYour access code: ${st.code}\n\nKeep this code private. It opens your dashboard and saves your practice.`;
 const tcall=(action,payload)=>api(action,Object.assign({pass:cloud.tpass},payload||{}));
 async function loadTeacher(){if(cloud.t.loading)return;cloud.t.loading=true;cloud.t.error=null;refreshIf(['teacher']);
-  try{const j=await tcall('teacher.data');Object.assign(cloud.t,{batches:j.batches||[],students:j.students||[],progress:j.progress||{},feedback:j.feedback||{},messages:j.messages||[],loaded:true,at:Date.now()})}
+  try{const j=await tcall('teacher.data');Object.assign(cloud.t,{batches:j.batches||[],students:j.students||[],progress:j.progress||{},feedback:j.feedback||{},messages:j.messages||[],loaded:true,at:Date.now()});cloud.settings=j.settings||{}}
   catch(e){if(e.code==='bad_password'){writeTPass(null);cloud.tpass=null;renderNav()}cloud.t.error=errMsg(e)}
-  finally{cloud.t.loading=false;refreshIf(['teacher'])}}
+  finally{cloud.t.loading=false;refreshIf(['teacher','session'])}}
 function tRoster(){return cloud.t.students.map(st=>Object.assign({},cloud.t.progress[st.code]||{},{id:st.code,code:st.code,profile:{name:st.name,email:st.email,phone:st.phone},batch:st.batch}))}
 function stuStats(r){const tasks=r.tasks||{};const done=Object.values(tasks).filter(Boolean).length;
   const cur=SESSIONS.find(s=>s.tasks.some((_,i)=>!tasks[s.n+':'+i]))||SESSIONS[11];
@@ -1845,7 +1957,7 @@ function TeacherView(){
     ${inboxList.length?`<ul class="recent">${inboxList.slice(0,6).map(m=>{const st=t.students.find(x=>x.code===m.code);return `<li class="pickmsg" data-open="${esc(m.code)}"><div><b>${esc(st?st.name:m.code)}</b><span class="muted">${esc(m.subject||KIND[m.kind]||'Message')} · ${ago(m.createdAt)}</span><span style="font-size:13.5px">${esc(m.body.length>120?m.body.slice(0,120)+'…':m.body)}</span></div><button class="btn sm">Open</button></li>`}).join('')}</ul>`:'<p class="muted" style="font-size:14px">No new messages from students.</p>'}</section>`;
   const flash=tFlash?`<div class="notice" style="background:var(--hub-soft)">${esc(tFlash)} <button class="btn sm" id="t-flash-x">OK</button></div>`:'';
   const bmsg=tBatchMsg&&g.b?`<section class="panel">${Composer('bm','Message everyone in '+esc(g.name),list.some(r=>r.profile.email),'Emails go to every student in this batch who has an email address.')}<div class="row" style="margin-top:8px"><button class="btn" id="bm-cancel">Close</button></div></section>`:'';
-  return `<div class="stack" style="gap:24px">${head}${flash}${errNote}${inbox}${pills}${form}<section class="stack" style="gap:16px">${binfo}${bmsg}${StudentForm()}${share}${tiles}${roster}</section>${tStudent?StudentDetail():''}</div>`}
+  return `<div class="stack" style="gap:24px">${head}${flash}${errNote}${inbox}${DecksPanel()}${pills}${form}<section class="stack" style="gap:16px">${binfo}${bmsg}${g.b?SchedulePanel(g.b):''}${StudentForm()}${share}${tiles}${roster}</section>${tStudent?StudentDetail():''}</div>`}
 
 function StudentForm(){if(!tForm)return '';const d=tForm.data;const bopts=cloud.t.batches.map(b=>`<option value="${esc(b.id)}" ${b.id===d.batch?'selected':''}>${esc(b.name)}</option>`).join('');
   return `<section class="panel stack" style="gap:12px" id="t-form"><h3>${tForm.mode==='new'?'Add a student':'Edit student details'}</h3>
@@ -1887,7 +1999,8 @@ function StudentDetail(){const r=tRoster().find(x=>x.id===tStudent);if(!r)return
       <div class="row"><button class="btn primary" id="t-fb-send">${fb&&fb.text?'Update feedback':'Send feedback'}</button><span class="muted" id="t-fb-msg" style="font-size:13px">${fb&&fb.updatedAt?'Last sent '+ago(fb.updatedAt):''}</span></div></div>
   </section>`}
 
-function bindTeacher(){
+let openDetails={};document.addEventListener('toggle',e=>{if(e.target.id==='sched'||e.target.id==='decks')openDetails[e.target.id]=e.target.open},true);
+function bindTeacher(){document.querySelectorAll('#sched,#decks').forEach(d=>{if(openDetails[d.id])d.open=true});
   const on=(id,ev,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn);return el};
   on('tlogin-form','submit',async e=>{e.preventDefault();const pass=document.getElementById('tlogin-pass').value;const msg=document.getElementById('tlogin-msg');const btn=document.getElementById('tlogin-btn');
     if(!pass){msg.textContent='Enter your password.';return}btn.disabled=true;btn.textContent='Checking…';
@@ -1895,6 +2008,7 @@ function bindTeacher(){
     catch(err){msg.textContent=errMsg(err);btn.disabled=false;btn.textContent='Sign in'}});
   if(document.getElementById('tlogin-pass')){document.getElementById('tlogin-pass').focus();return}
   if(cloud.tpass&&!cloud.t.loaded&&!cloud.t.loading&&!cloud.t.error)loadTeacher();
+  bindDecks();{const gb=cloud.t.batches.find(b=>b.id===tSel);if(gb)bindSchedule(gb)}
   on('t-refresh','click',loadTeacher);every(()=>{if(document.visibilityState==='visible'&&!cloud.t.loading)loadTeacher()},120000);
   on('t-flash-x','click',()=>{tFlash='';view(true)});
   app.querySelectorAll('[data-open]').forEach(li=>li.addEventListener('click',()=>{const st=cloud.t.students.find(x=>x.code===li.dataset.open);if(!st)return;tStudent=st.code;tSel=st.batch&&cloud.t.batches.some(b=>b.id===st.batch)?st.batch:'__none';view(true);const d=document.getElementById('t-msgs');if(d)d.scrollIntoView({behavior:'smooth',block:'start'})}));
