@@ -1,5 +1,5 @@
 /**
- * CELPIP Prep Course — backend
+ * Learnovate Qatar · CELPIP Prep Course — backend
  * Google Apps Script bound to a Google Sheet. The Sheet is the database:
  *   Batches  · one row per class batch
  *   Students · one row per student, with the access code you assign
@@ -22,7 +22,7 @@ const CHUNK = 45000;          // a Sheets cell holds at most 50,000 characters
 const CODE_RE = /^[A-Z0-9-]{4,20}$/;
 
 function doGet() {
-  return out_({ ok: true, service: 'CELPIP Prep Course API' });
+  return out_({ ok: true, service: 'Learnovate Qatar CELPIP Prep Course API' });
 }
 
 function doPost(e) {
@@ -45,7 +45,7 @@ function setup() {
 /** Run once from the editor: sends you a test email and grants email permission. */
 function testEmail() {
   const me = Session.getEffectiveUser().getEmail();
-  MailApp.sendEmail(me, 'CELPIP Prep Course: email is working', 'Your course can now email students. Daily quota left: ' + MailApp.getRemainingDailyQuota());
+  MailApp.sendEmail(me, 'Learnovate Qatar CELPIP: email is working', 'Your course can now email students. Daily quota left: ' + MailApp.getRemainingDailyQuota());
 }
 
 function route_(q) {
@@ -166,7 +166,7 @@ function route_(q) {
           recipients.forEach(function (st) {
             if (!st.email) { result.skipped++; return; }
             try {
-              MailApp.sendEmail({ to: String(st.email), name: 'CELPIP Prep Course',
+              MailApp.sendEmail({ to: String(st.email), name: 'Learnovate Qatar · CELPIP Prep Course',
                 subject: row.subject || (kind === 'task' ? 'New CELPIP email-writing task' : 'Message from your CELPIP teacher'),
                 body: emailBody_(row, st, clean_(q.siteUrl, 300)) });
               result.sent++;
@@ -261,7 +261,7 @@ function emailBody_(row, st, siteUrl) {
   else t += 'You can reply on your course dashboard, under Messages.\n';
   if (siteUrl) t += siteUrl + '\n';
   if (row.kind === 'invite') t += 'Your access code: ' + st.code + '\n';
-  return t + '\nCELPIP Prep Course';
+  return t + '\nLearnovate Qatar · CELPIP Prep Course';
 }
 function notifyTeacher_(st, row) {
   if (PropertiesService.getScriptProperties().getProperty('NOTIFY_ME') !== 'yes') return;

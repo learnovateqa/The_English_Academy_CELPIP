@@ -1,6 +1,6 @@
-# CELPIP Prep Course
+# Learnovate Qatar · CELPIP Prep Course
 
-A 12-session CELPIP-General prep course website for Ms. Maria's classes.
+A 12-session CELPIP-General prep course website by Learnovate Qatar.
 
 - **Students** sign in with an access code you give them. No account needed.
 - **The Teacher Portal** (`#teacher`, password protected) is where you create batches, add students, assign their codes, see their progress, writing and error logs, and send feedback.
