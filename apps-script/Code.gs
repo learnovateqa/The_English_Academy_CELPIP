@@ -8,8 +8,8 @@
  *
  *   Messages · messages and email-writing tasks between you and students
  *
- * Setup: see README.md. Set the script property TEACHER_PASSWORD before use.
- * Run testEmail once from the editor so Google asks for permission to send email.
+ * Setup: see README.md. After pasting, reload the Sheet and use the
+ * "CELPIP Course" menu: Set teacher password, Set up sheets, Send me a test email.
  */
 const SHEET_HEADERS = {
   Batches:  ['id', 'name', 'start', 'schedule', 'createdAt'],
@@ -35,6 +35,54 @@ function doPost(e) {
   try { return out_(Object.assign({ ok: true }, route_(req))); }
   catch (err) { return out_({ ok: false, error: err.code || 'server_error', message: String((err && err.message) || err) }); }
   finally { lock.releaseLock(); }
+}
+
+/* ---------- Sheet menu: CELPIP Course ---------- */
+/** Adds the "CELPIP Course" menu each time the Sheet opens. */
+function onOpen() {
+  SpreadsheetApp.getUi().createMenu('CELPIP Course')
+    .addItem('1. Set teacher password', 'setTeacherPassword')
+    .addItem('2. Set up sheets', 'setup')
+    .addItem('3. Send me a test email', 'testEmail')
+    .addSeparator()
+    .addItem('Email me when students write: on/off', 'toggleNotify')
+    .addItem('Check setup', 'checkSetup')
+    .addToUi();
+}
+
+/** Asks for the Teacher Portal password and saves it (no settings page needed). */
+function setTeacherPassword() {
+  const ui = SpreadsheetApp.getUi();
+  const r = ui.prompt('Teacher password',
+    'Type the password you will use to sign in to the Teacher Portal (at least 6 characters).',
+    ui.ButtonSet.OK_CANCEL);
+  if (r.getSelectedButton() !== ui.Button.OK) return;
+  const p = r.getResponseText().trim();
+  if (p.length < 6) { ui.alert('Please use at least 6 characters. Nothing was saved.'); return; }
+  PropertiesService.getScriptProperties().setProperty('TEACHER_PASSWORD', p);
+  ui.alert('Saved. Sign in to the Teacher Portal with this password. You do not need to redeploy.');
+}
+
+/** Turns email alerts for new student messages on or off. */
+function toggleNotify() {
+  const props = PropertiesService.getScriptProperties();
+  const on = props.getProperty('NOTIFY_ME') === 'yes';
+  props.setProperty('NOTIFY_ME', on ? 'no' : 'yes');
+  SpreadsheetApp.getUi().alert(on ? 'Email alerts are now OFF.' : 'Email alerts are now ON. You will get an email when a student writes to you.');
+}
+
+/** Shows what is set up and what is missing. */
+function checkSetup() {
+  const props = PropertiesService.getScriptProperties();
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const lines = [
+    (props.getProperty('TEACHER_PASSWORD') ? '✅' : '❌') + ' Teacher password ' + (props.getProperty('TEACHER_PASSWORD') ? 'is set' : 'is missing: use CELPIP Course > Set teacher password'),
+    (Object.keys(SHEET_HEADERS).every(function (n) { return ss.getSheetByName(n); }) ? '✅ All sheets exist' : '❌ Some sheets are missing: use CELPIP Course > Set up sheets'),
+    (props.getProperty('NOTIFY_ME') === 'yes' ? '✅ Email alerts are on' : 'ℹ️ Email alerts are off (optional)'),
+    '',
+    'Remember: after pasting new code, use Deploy > Manage deployments > Edit > New version > Deploy.'
+  ];
+  SpreadsheetApp.getUi().alert('CELPIP Course setup', lines.join('\n'), SpreadsheetApp.getUi().ButtonSet.OK);
 }
 
 /** Run once from the editor to create the sheets. */
