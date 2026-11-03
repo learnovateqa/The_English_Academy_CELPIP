@@ -369,6 +369,25 @@ table.sess td{vertical-align:middle}
 .chk{display:inline-flex;gap:8px;align-items:center;font-size:14px;font-weight:600;cursor:pointer}
 .chk input{width:18px;height:18px;accent-color:var(--hub)}
 .composer textarea{min-height:140px}
+
+.login{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:28px;align-items:stretch;place-items:stretch;padding-block:8px}
+@media(max-width:900px){.login{grid-template-columns:minmax(0,1fr)}}
+.logincard{max-width:none;align-self:center}
+.showcase{border-radius:28px;padding:36px;background:linear-gradient(140deg,var(--skR) 0%,var(--skS) 52%,var(--skL) 100%);display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+.showcase h1{font-size:clamp(30px,4.4vw,46px)}
+.showcase .lead{color:var(--fg);opacity:.78;max-width:46ch;font-size:16px}
+.sk4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media(max-width:480px){.sk4{grid-template-columns:minmax(0,1fr)}.showcase{padding:24px}}
+.sk4>div{background:color-mix(in srgb,var(--surface) 82%,transparent);border-radius:18px;padding:12px;display:flex;gap:12px;align-items:center;min-width:0}
+.sk4 .ic{width:40px;height:40px;border-radius:12px}
+.sk4 b{display:block;font-size:14.5px}.sk4 small{display:block;color:var(--muted);font-size:12.5px;line-height:1.35}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stats span{background:var(--surface);border-radius:999px;padding:6px 13px;font-size:12.5px;font-weight:600}
+.miniladder{margin-top:auto;display:flex;flex-direction:column;gap:6px}
+.miniladder small{font-size:12px;font-weight:600;color:var(--muted)}
+.minirungs{display:flex;align-items:flex-end;gap:6px;height:90px}
+.minirungs i{flex:1;border-radius:8px 8px 3px 3px;box-shadow:0 2px 8px rgba(27,42,74,.08);display:flex;justify-content:center;padding-top:4px}
+.minirungs i span{font-size:10.5px;font-weight:700;color:var(--surface);font-style:normal}
 </style>
 </head>
 <body>
@@ -467,7 +486,20 @@ async function signOut(){if(pushPending&&cloud.code){clearTimeout(pushTimer);awa
   renderNav();if(location.hash&&location.hash!=='#home')location.hash='#home';else view()}
 document.getElementById('signout').addEventListener('click',signOut);
 
-function LoginView(){return `<div class="login"><section class="logincard">
+
+function Showcase(kind){
+  const items=kind==='teacher'
+    ?[['O','Batches & codes','Create classes and give each student a code'],['R','Progress & errors','See every score, task and error log'],['S','Messages & email','Write to one student or a whole batch'],['W','Email tasks','Send CELPIP Writing Task 1 prompts']]
+    :[['L','Listening','Single-play audio, auto-graded'],['R','Reading','Timed passages, split screen'],['W','Writing','Email and survey tasks, word counter'],['S','Speaking','All 8 task types, real timings']];
+  return `<section class="showcase" aria-label="About the course">
+    <div class="eyebrow" style="color:var(--skRi)">Learnovate Qatar</div>
+    <h1>${kind==='teacher'?'Run every batch from one place.':'Reach your CLB target on CELPIP.'}</h1>
+    <p class="lead">${kind==='teacher'?'Add students, track their practice, and coach them with messages and CELPIP-style email tasks.':'Twelve live, teacher-led sessions plus a personal Study Hub for listening, reading, writing and speaking practice.'}</p>
+    <div class="sk4">${items.map(([k,t,d])=>`<div style="${skv(k)}"><span class="ic">${icon(k)}</span><span><b>${t}</b><small>${d}</small></span></div>`).join('')}</div>
+    <div class="stats">${(kind==='teacher'?['Google Sheets backend','Email from your account','Works on any phone']:['12 live sessions','2 hours each','Teacher feedback','Progress you can see']).map(x=>`<span>${x}</span>`).join('')}</div>
+    <div class="miniladder" aria-hidden="true"><div class="minirungs">${[4,5,6,7,8,9,10,11,12].map((v,i)=>`<i style="height:${22+i*9.5}%;background:var(--sk${'LRWSLRWSL'[i]});${i===5?'outline:2px solid var(--live);outline-offset:-2px;':''}"><span style="color:var(--sk${'LRWSLRWSL'[i]}i)">${v}</span></i>`).join('')}</div><small>CLB 4 → 12</small></div>
+  </section>`}
+function LoginView(){return `<div class="login">${Showcase('student')}<section class="logincard">
   <span class="mark big">CLB</span>
   <div class="eyebrow">Learnovate Qatar · CELPIP Prep Course</div>
   <h1>Welcome. Enter your access code.</h1>
@@ -1156,7 +1188,7 @@ function stuStats(r){const tasks=r.tasks||{};const done=Object.values(tasks).fil
   const sc=skillScores(r.res||{});const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
   const log=r.log||[];return {done,cur,L:avg(sc.L),R:avg(sc.R),W:avg(sc.W),S:avg(sc.S),log,untagged:log.filter(e=>!e.cause).length}}
 
-function TeacherLogin(){return `<div class="login"><section class="logincard">
+function TeacherLogin(){return `<div class="login">${Showcase('teacher')}<section class="logincard">
   <span class="mark big" style="background:var(--lav);color:var(--skRi)">${icon('O',24)}</span>
   <div class="eyebrow" style="color:var(--skRi)">Teacher Portal</div><h1>Teacher sign in</h1>
   <p class="lead">Use the teacher password you set in your Apps Script project.</p>
