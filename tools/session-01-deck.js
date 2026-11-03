@@ -99,7 +99,7 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     await chip(s, x + 0.43, y + 0.3, 0.8, k, ic, n, true);
     s.addText(n, { x, y: y + 1.2, w: 1.65, h: 0.4, fontSize: 12, bold: true, color: NAVY, align: 'center', margin: 0, isTextBox: true });
   }
-  s.addNotes('Welcome everyone. Say: "Today you learn exactly how the test works, how it is scored, and what level you need. Every slide is something you will use on test day."');
+  s.addNotes('Welcome everyone. Say: "Today you learn exactly how the test works, how it is scored, and what level you need. Every slide is something you will use on test day."\n\nDELIVERY TIPS FOR THIS CLASS\n• Pace: speak about 15% slower than normal conversation. Pause after every acronym (CLB, IRCC, TEER) and write it on the board.\n• Check understanding with questions, not "Do you understand?" Students often nod even when confused. Use the CHECK question in each slide\'s notes.\n• Point to the icons every time: headphones = Listening, book = Reading, pen = Writing, microphone = Speaking.');
 
   // 2 · Outcomes
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Welcome' });
@@ -117,7 +117,20 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     s.addText(a, { x: 8.95, y, w: 0.8, h: 0.5, fontSize: 14, bold: true, color: '6A2BC4', valign: 'middle', margin: 0, isTextBox: true });
     s.addText(b, { x: 9.8, y, w: 2.6, h: 0.5, fontSize: 14, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
   });
-  s.addNotes('Read the outcomes aloud. Return to this slide at the end and ask students to tick each one.');
+  s.addNotes('Read the outcomes aloud. Return to this slide at the end and ask students to tick each one.\nCHECK: "Which outcome is most important for you?"');
+
+  // 2b · Key words
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Welcome' });
+  eyebrow(s, 'Key words for today', 'O'); title(s, '8 words you will hear today');
+  const words = [['L', 'CLB', 'Canada’s ruler for English level, from 1 to 12.'], ['R', 'IRCC', 'Canada’s immigration department.'], ['W', 'Paraphrase', 'The same idea in different words.'], ['S', 'Distractor', 'A wrong answer that sounds right. Often said first, then changed.'],
+    ['O', 'Inference', 'What someone means but does not say directly.'], ['L', 'Rater', 'A trained person who scores your writing and speaking.'], ['R', 'Task fulfillment', 'Doing everything the task asks.'], ['W', 'Prep time', 'Planning time before you speak or write.']];
+  words.forEach(([k, w, d], i) => {
+    const x = 0.75 + (i % 4) * 3.0, y = 1.95 + Math.floor(i / 4) * 2.3;
+    card(s, x, y, 2.8, 2.1, SK[k][0], w);
+    s.addText(w, { x: x + 0.3, y: y + 0.25, w: 2.3, h: 0.5, fontSize: 19, bold: true, color: SK[k][1], margin: 0, isTextBox: true });
+    s.addText(d, { x: x + 0.3, y: y + 0.8, w: 2.3, h: 1.15, fontSize: 14, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+  });
+  s.addNotes('Say each word slowly and have students repeat it. Pause after CLB and IRCC.\nCHECK: "What is a distractor?" "Which word means the same idea in different words?"');
 
   // 3 · Right test
   pres.addSection({ title: 'The test' });
@@ -134,7 +147,7 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     s.addText(tag, { x: x + 0.35, y: 3.95, w: 3.0, h: 0.4, fontSize: 13, bold: true, color: SK[k][1], margin: 0, isTextBox: true });
     s.addText(b, { x: x + 0.35, y: 4.5, w: 3.0, h: 1.5, fontSize: 15, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
   }
-  s.addNotes('Booking the wrong version costs money and time. Ask who is applying for PR and who for citizenship.');
+  s.addNotes('Booking the wrong version costs money and time. Ask who is applying for PR and who for citizenship.\nCHECK: "You are applying for citizenship. Which test do you book?"');
 
   // 4 · Glance
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The test' });
@@ -150,7 +163,7 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     s.addText(sub, { x: x + 0.3, y: 4.3, w: 2.3, h: 0.45, fontSize: 13, color: MUTED, margin: 0, isTextBox: true });
   }
   await tips(s, 0.75, 5.25, 11.75, 1.5, ['Order: Listening → Reading → Writing → Speaking. Train stamina with full timed practice; Speaking comes last.'], 'Glance tip', 'Test-day tip');
-  s.addNotes('Walk through each skill. Stress stamina. Confirm current details on the official CELPIP website before class.');
+  s.addNotes('Point to each icon as you name the skill. Stress stamina. Confirm current details on the official CELPIP website before class.\nCHECK: "Which skill comes last?" "Which skill is the shortest?"');
 
   // 5–6 · Listening & Reading
   pres.addSection({ title: 'The four skills' });
@@ -164,15 +177,47 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
   await skillSlide('L', 'LuHeadphones', 'Listening · 6 parts · 38 questions', 'Hear it once. Answer with confidence.',
     [['Part 1 · Problem Solving', '8 Qs'], ['Part 2 · Daily Life Conversation', '5 Qs'], ['Part 3 · Listening for Information', '6 Qs'], ['Part 4 · Listening to a News Item', '5 Qs'], ['Part 5 · Listening to a Discussion (video)', '8 Qs'], ['Part 6 · Listening to Viewpoints', '6 Qs']],
     ['Audio plays once: read the context screen and predict first.', 'The first answer you hear is often corrected. Wait for the final decision.', 'Note who, what, when, and any change of plan.'],
-    'Model one prediction from a context screen. Give a quick example of a corrected detail (Thursday → tomorrow).');
+    'Point to the headphones icon. Model one prediction from a context screen.\nCHECK: "How many times can you hear the audio?"');
+  // 6b · Distractor example
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The four skills' });
+  eyebrow(s, 'Listening · example', 'L'); title(s, 'Spot the corrected answer');
+  card(s, 0.75, 1.95, 6.6, 3.0, 'F6F7FB', 'Transcript');
+  await chip(s, 1.05, 2.25, 0.7, 'L', 'LuHeadphones', 'Audio', true);
+  s.addText('You hear:', { x: 1.95, y: 2.25, w: 4, h: 0.7, fontSize: 15, bold: true, color: MUTED, valign: 'middle', margin: 0, isTextBox: true });
+  s.addText([{ text: '“Let’s meet on ', options: {} }, { text: 'Tuesday', options: { bold: true, color: SK.W[1] } }, { text: '… oh wait, Tuesday is busy. ', options: {} }, { text: 'Let’s do ', options: {} }, { text: 'Wednesday', options: { bold: true, color: SK.O[1] } }, { text: '.”', options: {} }],
+    { x: 1.05, y: 3.1, w: 6.0, h: 1.6, fontSize: 22, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+  card(s, 7.65, 1.95, 4.85, 3.0, 'FFFFFF', 'Question', true);
+  s.addText('When will they meet?', { x: 7.95, y: 2.2, w: 4.3, h: 0.5, fontSize: 17, bold: true, color: NAVY, margin: 0, isTextBox: true });
+  [['W', 'A', 'Tuesday', 'Trap: said first, then changed'], ['O', 'B', 'Wednesday', 'Correct: the final decision']].forEach(([k, l, a, why], i) => {
+    const y = 2.85 + i * 0.95;
+    card(s, 7.95, y, 4.3, 0.8, SK[k][0], 'Option ' + l);
+    badge(s, 8.12, y + 0.17, 0.46, k, l, 'Letter ' + l);
+    s.addText([{ text: a, options: { bold: true, fontSize: 15, breakLine: true } }, { text: why, options: { fontSize: 12, color: MUTED } }], { x: 8.75, y, w: 3.4, h: 0.8, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+  });
+  await tips(s, 0.75, 5.2, 11.75, 1.55, ['Do not grab the first detail you hear. Listen for words that change the answer: but, oh wait, actually, instead, on second thought.'], 'Signal words', 'Listen for the change');
+  s.addNotes('Read the line aloud with natural self-correction. Ask students to raise a hand when they hear the change.\nCHECK: "Why is Tuesday wrong?" "Which words told you the plan changed?"');
+
   await skillSlide('R', 'LuBookOpen', 'Reading · 4 parts · 38 questions', 'Scan fast. Match the paraphrase.',
     [['Part 1 · Reading Correspondence', '11 Qs'], ['Part 2 · Reading to Apply a Diagram', '8 Qs'], ['Part 3 · Reading for Information', '9 Qs'], ['Part 4 · Reading for Viewpoints', '10 Qs']],
     ['Read the questions first, then scan for the answer.', 'Answers are paraphrased: "postponed" = "moved to a later date".', 'About one minute per question. Never get stuck.'],
-    'Show one paraphrase pair. Ask who reads every word first; explain why question-first scanning saves time.', 0.72);
+    'Point to the book icon. Explain question-first scanning.\nCHECK: "What do you read first: the passage or the questions?"', 0.72);
+
+  // 8b · Paraphrase pairs
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The four skills' });
+  eyebrow(s, 'Reading · example', 'R'); title(s, 'Paraphrase pairs to know');
+  [['postponed', 'moved to a later date'], ['mandatory', 'you must'], ['complimentary', 'free'], ['refreshments', 'drinks and snacks'], ['seating is limited', 'not everyone gets a seat'], ['commute', 'travel to and from work']].forEach(([a, b], i) => {
+    const col = i % 2, row = Math.floor(i / 2), x = 0.75 + col * 5.95, y = 1.95 + row * 1.15;
+    card(s, x, y, 5.8, 0.95, i % 4 === 0 || i % 4 === 3 ? 'F6F7FB' : 'FFFFFF', 'Pair ' + (i + 1));
+    s.addText('“' + a + '”', { x: x + 0.3, y, w: 2.3, h: 0.95, fontSize: 16, bold: true, color: SK.R[1], valign: 'middle', margin: 0, isTextBox: true });
+    s.addText('=', { x: x + 2.6, y, w: 0.4, h: 0.95, fontSize: 18, bold: true, color: MUTED, align: 'center', valign: 'middle', margin: 0, isTextBox: true });
+    s.addText(b, { x: x + 3.05, y, w: 2.6, h: 0.95, fontSize: 16, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+  });
+  await tips(s, 0.75, 5.5, 11.75, 1.2, ['The question and the text rarely use the same words. Look for the same meaning, not the same word.'], 'Paraphrase tip', 'Same idea, new words');
+  s.addNotes('Cover the right column and ask students to guess the paraphrase.\nCHECK: "If a notice says attendance is mandatory, do you have to go?"');
 
   // 7 · Writing
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The four skills' });
-  eyebrow(s, 'Writing · 2 tasks', 'W'); title(s, 'Write to the task, not around it');
+  eyebrow(s, 'Writing · 2 tasks', 'W'); title(s, 'Answer every part of the task');
   [['Task 1 · Email', '27', 'Cover all three bullets in 150–200 words.'], ['Task 2 · Survey', '26', 'Choose one option and defend it in 150–200 words.']].forEach(([h, m, b], i) => {
     const x = 0.75 + i * 3.95;
     card(s, x, 1.95, 3.7, 2.55, SK.W[0], h);
@@ -187,7 +232,22 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     s.addText(t, { x: 9.45, y: 2.6 + i * 0.44, w: 2.9, h: 0.4, fontSize: 14, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
   });
   await tips(s, 0.75, 4.7, 11.75, 2.1, ['Plan 3 minutes, write 20, proofread 3.', 'Give each bullet its own paragraph so the rater can find it.', 'Match the tone: formal for a manager, friendly for a friend.'], 'Writing tips', 'How to score higher');
-  s.addNotes('Ask: "What happens if you skip a bullet?" Task fulfillment drops. Show a one-line plan per bullet.');
+  s.addNotes('Point to the pen icon. A missed bullet lowers task fulfillment.\nCHECK: "How many minutes for the email?" "What happens if you skip one bullet?"');
+
+  // 10b · Plan an email
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The four skills' });
+  eyebrow(s, 'Writing · example', 'W'); title(s, 'Plan your email in 3 minutes');
+  card(s, 0.75, 1.95, 4.2, 4.75, SK.W[0], 'Prompt');
+  s.addText('THE TASK', { x: 1.05, y: 2.2, w: 3.6, h: 0.3, fontSize: 11, bold: true, color: SK.W[1], charSpacing: 3, margin: 0, isTextBox: true });
+  s.addText([{ text: 'Your neighbour’s dog barks every night. Write to your neighbour:', options: { breakLine: true } }, { text: 'introduce yourself', options: { bullet: true, breakLine: true } }, { text: 'describe the problem', options: { bullet: true, breakLine: true } }, { text: 'suggest a solution', options: { bullet: true } }],
+    { x: 1.05, y: 2.6, w: 3.6, h: 3.8, fontSize: 15, color: NAVY, valign: 'top', margin: 0, paraSpaceAfter: 6, isTextBox: true });
+  [['1', 'Hello + who I am', 'Hi Sam, I’m Ana from unit 4B, next door.'], ['2', 'Problem + how it affects me', 'Your dog barks at night, so I cannot sleep before work.'], ['3', 'Solution + polite close', 'Would it be possible to keep him inside after 10 p.m.? Thank you for understanding.']].forEach(([n, h, ex], i) => {
+    const y = 1.95 + i * 1.6;
+    card(s, 5.2, y, 7.3, 1.45, 'FFFFFF', 'Paragraph ' + n, true);
+    badge(s, 5.45, y + 0.25, 0.5, 'W', n, 'Paragraph number ' + n);
+    s.addText([{ text: h, options: { bold: true, fontSize: 15, breakLine: true } }, { text: ex, options: { fontSize: 13.5, color: MUTED, italic: true } }], { x: 6.15, y: y + 0.12, w: 6.1, h: 1.2, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+  });
+  s.addNotes('One bullet = one paragraph. Useful phrases: "I’m writing to…", "I’m afraid that…", "Would it be possible to…?", "Thank you for understanding."\nCHECK: "How many paragraphs for three bullets?" "Is this email formal or friendly?"');
 
   // 8 · Speaking
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The four skills' });
@@ -200,10 +260,40 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     s.addText([{ text: t, options: { bold: true, fontSize: 14, breakLine: true } }, { text: 'prep / speak  ' + v, options: { fontSize: 11, color: MUTED } }], { x: x + 0.8, y, w: 2.65, h: 0.95, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
   });
   await tips(s, 8.35, 1.95, 4.15, 4.4, ['Raters score content & coherence, vocabulary, listenability and task fulfillment.', 'Plan 2–3 points in prep time, not full sentences.', 'Keep talking until time ends: add an example or a summary.'], 'Speaking tips', 'How to score higher');
-  s.addNotes('Ask a volunteer to speak for 60 seconds about a favourite place. Task 5 has 60 seconds to choose, then 60 seconds to prepare.');
+  s.addNotes('Point to the microphone icon. Ask a volunteer to speak for 60 seconds about a favourite place. Task 5 has 60 seconds to choose, then 60 seconds to prepare.\nCHECK: "Which tasks are 90 seconds long?"');
+
+  // 12b · Speaking phrases
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'The four skills' });
+  eyebrow(s, 'Speaking · useful phrases', 'S'); title(s, 'Phrases to fill your speaking time');
+  [['L', 'Start', ['In my opinion, …', 'I would suggest …', 'The best option is …']], ['S', 'Add & explain', ['This is because …', 'For example, …', 'Another reason is …']], ['O', 'Finish', ['To sum up, …', 'That’s why I think …', 'So my advice is …']]].forEach(([k, h, list], i) => {
+    const x = 0.75 + i * 4.0;
+    card(s, x, 1.95, 3.7, 3.4, SK[k][0], h);
+    s.addText(h.toUpperCase(), { x: x + 0.35, y: 2.2, w: 3.0, h: 0.35, fontSize: 12, bold: true, color: SK[k][1], charSpacing: 3, margin: 0, isTextBox: true });
+    s.addText(list.map((t, j) => ({ text: t, options: { breakLine: j < list.length - 1 } })), { x: x + 0.35, y: 2.75, w: 3.0, h: 2.4, fontSize: 18, color: NAVY, valign: 'top', margin: 0, paraSpaceAfter: 14, isTextBox: true });
+  });
+  await tips(s, 0.75, 5.6, 11.75, 1.15, ['Survival rule: if you run out of ideas, keep talking until the clock stops. Summarize your main point or add a quick example.'], 'Survival rule', 'Never stop early');
+  s.addNotes('Drill the phrases chorally, then ask volunteers to answer "Coffee or tea?" for 30 seconds using one phrase from each column.\nCHECK: "What do you say if you run out of ideas with 15 seconds left?"');
+
+  // 13b · CELPIP vs CLB
+  pres.addSection({ title: 'Scores and targets' });
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Scores and targets' });
+  eyebrow(s, 'CELPIP and CLB', 'L'); title(s, 'The test and the ruler');
+  card(s, 0.75, 1.95, 5.6, 2.6, SK.R[0], 'CELPIP');
+  await chip(s, 1.05, 2.25, 0.75, 'R', 'LuPenLine', 'Test');
+  s.addText([{ text: 'CELPIP is the test', options: { bold: true, fontSize: 22, breakLine: true } }, { text: 'The exam you sit on the computer.', options: { fontSize: 15 } }], { x: 2.0, y: 2.2, w: 4.1, h: 2.1, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+  card(s, 6.6, 1.95, 5.9, 2.6, SK.L[0], 'CLB');
+  await chip(s, 6.9, 2.25, 0.75, 'L', 'LuScale', 'Ruler');
+  s.addText([{ text: 'CLB is the ruler', options: { bold: true, fontSize: 22, breakLine: true } }, { text: 'Canada uses the Canadian Language Benchmarks (1–12) to measure English. Immigration asks for CLB levels.', options: { fontSize: 15 } }], { x: 7.85, y: 2.2, w: 4.45, h: 2.1, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
+  s.addText('CLB RULER', { x: 0.75, y: 4.8, w: 3, h: 0.3, fontSize: 11, bold: true, color: MUTED, charSpacing: 3, margin: 0, isTextBox: true });
+  for (let i = 1; i <= 12; i++) {
+    const x = 0.75 + (i - 1) * 0.98, hl = i === 7;
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 5.2, w: 0.88, h: 0.75, rectRadius: 0.12, fill: { color: hl ? SK.L[1] : (i < 7 ? 'F6F7FB' : SK.L[0]) }, line: { color: hl ? SK.L[1] : (i < 7 ? 'F6F7FB' : SK.L[0]) }, objectName: 'CLB ' + i });
+    s.addText(String(i), { x, y: 5.2, w: 0.88, h: 0.75, fontSize: 18, bold: true, color: hl ? 'FFFFFF' : NAVY, align: 'center', valign: 'middle', margin: 0, isTextBox: true });
+  }
+  s.addText('Your CELPIP result converts straight onto the ruler: CELPIP 7 = CLB 7.', { x: 0.75, y: 6.1, w: 11.75, h: 0.45, fontSize: 15, color: NAVY, margin: 0, isTextBox: true });
+  s.addNotes('Analogy: CELPIP is like a bathroom scale; CLB is the kilogram. Different tests (scales), one unit Canada understands. Pause after "CLB" and write it on the board.\nCHECK: "Which one do you take: CELPIP or CLB?" "If you score CELPIP 8, what is your CLB?"');
 
   // 9 · Scoring
-  pres.addSection({ title: 'Scores and targets' });
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Scores and targets' });
   eyebrow(s, 'How scoring works', 'R'); title(s, 'One level per skill. No penalty for guessing.');
   [['L', '4', 'levels', 'One CELPIP level each for Listening, Reading, Writing and Speaking.'], ['R', '7=7', 'CELPIP = CLB', 'A CELPIP level matches the same CLB level. Programs ask for CLB per skill.'], ['O', '0', 'penalty', 'A wrong answer costs nothing. Never leave a question blank.']].forEach(([k, big, lab, txt], i) => {
@@ -213,7 +303,27 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     s.addText(lab.toUpperCase(), { x: x + 0.35, y: 3.85, w: 3.0, h: 0.35, fontSize: 12, bold: true, color: NAVY, charSpacing: 3, margin: 0, isTextBox: true });
     s.addText(txt, { x: x + 0.35, y: 4.35, w: 3.0, h: 1.8, fontSize: 15, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
   });
-  s.addNotes('Listening and Reading are scored by the computer; Writing and Speaking by trained raters. Do not promise raw-score conversions; the official site publishes the score comparison.');
+  s.addNotes('Listening and Reading are scored by the computer; Writing and Speaking by trained raters. Do not promise raw-score conversions; the official site publishes the score comparison.\nCHECK: "Do you get one score or four?" "What happens if you guess and get it wrong?"');
+
+  // 15b · Immigration words
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Scores and targets' });
+  eyebrow(s, 'Immigration words in plain English', 'O'); title(s, '3 words you will see on the next slide');
+  [['L', 'LuMonitor', 'Express Entry', 'Canada’s online application system for permanent residence.', 'You create a profile and receive points. Higher English levels = more points.'],
+   ['R', 'LuGraduationCap', 'TEER 0 / 1', 'Management and professional jobs.', 'e.g. restaurant manager, registered nurse, software engineer, accountant'],
+   ['W', 'LuCompass', 'TEER 2 / 3', 'Skilled technical and trade jobs.', 'e.g. electrician, cook, dental assistant, heavy-equipment operator']].forEach(([k, ic, h, d, ex], i) => {
+    const x = 0.75 + i * 4.0;
+    card(s, x, 1.95, 3.7, 4.0, SK[k][0], h);
+  });
+  for (const [i, [k, ic, h, d, ex]] of [['L', 'LuMonitor', 'Express Entry', 'Canada’s online application system for permanent residence.', 'You create a profile and receive points. Higher English levels = more points.'],
+   ['R', 'LuGraduationCap', 'TEER 0 / 1', 'Management and professional jobs.', 'e.g. restaurant manager, registered nurse, software engineer, accountant'],
+   ['W', 'LuCompass', 'TEER 2 / 3', 'Skilled technical and trade jobs.', 'e.g. electrician, cook, dental assistant, heavy-equipment operator']].entries()) {
+    const x = 0.75 + i * 4.0;
+    await chip(s, x + 0.35, 2.25, 0.75, k, ic, h);
+    s.addText(h, { x: x + 0.35, y: 3.2, w: 3.0, h: 0.5, fontSize: 21, bold: true, color: NAVY, margin: 0, isTextBox: true });
+    s.addText([{ text: d, options: { bold: true, breakLine: true } }, { text: ex, options: { color: MUTED } }], { x: x + 0.35, y: 3.75, w: 3.0, h: 2.05, fontSize: 14, color: NAVY, valign: 'top', margin: 0, paraSpaceAfter: 8, isTextBox: true });
+  }
+  await tips(s, 0.75, 6.1, 11.75, 0.75, ['IRCC = Immigration, Refugees and Citizenship Canada, the department that checks your application.'], 'IRCC', 'One more');
+  s.addNotes('Use workplace examples from your students’ own jobs: ask two students their job and decide together if it is TEER 0/1 or 2/3. Pause after each acronym.\nCHECK: "Is a cook TEER 1 or TEER 3?" "What is Express Entry in one sentence?"');
 
   // 10 · Requirements
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Scores and targets' });
@@ -226,13 +336,13 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     s.addText(p, { x: 1.05, y, w: 5.4, h: 0.56, fontSize: 15, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
     v.forEach((n, j) => s.addText(String(n), { x: 6.6 + j * 1.5, y, w: 1.4, h: 0.56, fontSize: 17, bold: true, color: n === '–' ? MUTED : SK.L[1], align: 'center', valign: 'middle', margin: 0, isTextBox: true }));
   });
-  await tips(s, 0.75, 5.8, 11.75, 1.0, ['Aim one level above the minimum: it protects you and CLB 9+ adds Express Entry points. Always confirm current rules on the official IRCC website.'], 'Target tip', 'Aim higher');
-  s.addNotes('Enter a sample profile (e.g. 8/7/6/7) in the website’s Requirements Checker and show which programs it meets.');
+  await tips(s, 0.75, 5.8, 11.75, 1.0, ['If immigration asks for CLB 7, aim for 8, so one small mistake on test day will not ruin your application. CLB 9+ also adds Express Entry points.'], 'Insurance tip', 'Your insurance policy');
+  s.addNotes('Present the +1 rule as an insurance policy. Enter a sample profile (e.g. 8/7/6/7) in the website’s Requirements Checker. Remind students to confirm current rules on the IRCC website.\nCHECK: "Your program needs CLB 7. What level should you aim for, and why?"');
 
   // 11 · Test screen
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Scores and targets' });
   eyebrow(s, 'The test screen', 'S'); title(s, 'Know the rules before test day');
-  const scr = [['L', 'LuHeadphones', 'Listening', 'Audio plays once. No pause, no replay. Questions appear after the audio.'], ['R', 'LuBookOpen', 'Reading', 'Change answers until you press Next. After Next, there is no going back.'], ['W', 'LuTimer', 'Writing', 'A timer runs for each task. Plan, write, then proofread.'], ['S', 'LuMic', 'Speaking', 'Recording starts by itself after prep time. Silence is recorded too.']];
+  const scr = [['L', 'LuHeadphones', 'Listening', 'Audio plays once. No pause, no replay. Questions appear after the audio.'], ['R', 'LuBookOpen', 'Reading', 'Like a moving train: once you click Next, you leave the station and cannot jump back.'], ['W', 'LuTimer', 'Writing', 'A timer runs for each task. Plan, write, then proofread.'], ['S', 'LuMic', 'Speaking', 'The microphone starts by itself after prep time. Silence is recorded too, so keep talking.']];
   for (let i = 0; i < 4; i++) {
     const [k, ic, n, t] = scr[i], x = 0.75 + (i % 2) * 5.95, y = 1.95 + Math.floor(i / 2) * 2.4;
     card(s, x, y, 5.8, 2.15, SK[k][0], n + ' rule');
@@ -240,7 +350,20 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     s.addText(n, { x: x + 1.35, y: y + 0.35, w: 4.2, h: 0.5, fontSize: 18, bold: true, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
     s.addText(t, { x: x + 1.35, y: y + 0.9, w: 4.2, h: 1.05, fontSize: 15, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
   }
-  s.addNotes('Demo the Test Screen Simulator on the website. Key messages: no replay, Next is final, speaking records automatically.');
+  s.addNotes('Demo the Test Screen Simulator on the website. Use the moving-train image for Reading. Reassure students about the microphone: it is automatic; their only job is to keep talking.\nCHECK: "What happens if you click Next in Reading?" "When does the microphone start?"');
+
+  // 18b · Check your understanding
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Scores and targets' });
+  eyebrow(s, 'Quick check', 'G'); title(s, 'True or false?');
+  ['You get one overall CELPIP score.', 'A wrong answer loses you points.', 'CELPIP 8 = CLB 8.', 'You can replay the listening audio once.', 'The speaking microphone starts by itself.'].forEach((t, i) => {
+    const y = 1.95 + i * 0.92;
+    card(s, 0.75, y, 11.75, 0.78, i % 2 ? 'FFFFFF' : 'F6F7FB', 'Statement ' + (i + 1));
+    badge(s, 0.97, y + 0.15, 0.48, 'R', i + 1, 'Statement number ' + (i + 1));
+    s.addText(t, { x: 1.7, y, w: 7.8, h: 0.78, fontSize: 18, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 10.0, y: y + 0.17, w: 2.25, h: 0.44, rectRadius: 0.22, fill: { color: 'FFFFFF' }, line: { color: LINE, width: 1 }, objectName: 'Answer box ' + (i + 1) });
+    s.addText('True  /  False', { x: 10.0, y: y + 0.17, w: 2.25, h: 0.44, fontSize: 12, bold: true, color: MUTED, align: 'center', valign: 'middle', margin: 0, isTextBox: true });
+  });
+  s.addNotes('Students answer with fingers (1 = true, 2 = false) or on mini whiteboards.\nANSWERS: 1 False (one level per skill) · 2 False (no penalty) · 3 True · 4 False (plays once) · 5 True.');
 
   // 12 · Mistakes
   pres.addSection({ title: 'Mistakes' });
@@ -252,11 +375,11 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     badge(s, x + 0.25, y + 0.17, 0.46, 'W', i + 1, 'Mistake number ' + (i + 1), false);
     s.addText(t, { x: x + 0.95, y, w: 4.7, h: 0.8, fontSize: 16, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
   });
-  s.addNotes('Ask which of these students have made before. These become the checklist for every Study Hub task.');
+  s.addNotes('Normalize mistakes: everyone makes them. Ask which ones students have made before.\nCHECK: "Which mistake is easiest to fix today?"');
 
   // 13 · Error causes
   s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Mistakes' });
-  eyebrow(s, 'Your error log', 'R'); title(s, 'Every mistake has one of four causes');
+  eyebrow(s, 'Your detective notebook', 'R'); title(s, 'Find out why you lost the point');
   const causes = [['W', 'LuTarget', 'Distractor', 'You chose a detail that was mentioned, then corrected.'], ['L', 'LuBookOpen', 'Vocabulary', 'You missed a paraphrase or a word.'], ['S', 'LuClock', 'Timing', 'You ran out of time or rushed.'], ['R', 'LuBrain', 'Inference', 'You missed what was implied, not said.']];
   for (let i = 0; i < 4; i++) {
     const [k, ic, n, t] = causes[i], x = 0.75 + i * 3.0;
@@ -265,8 +388,8 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     s.addText(n, { x: x + 0.3, y: 3.2, w: 2.2, h: 0.5, fontSize: 19, bold: true, color: NAVY, margin: 0, isTextBox: true });
     s.addText(t, { x: x + 0.3, y: 3.75, w: 2.2, h: 1.6, fontSize: 14, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
   }
-  await tips(s, 0.75, 5.8, 11.75, 0.95, ['Tag every Study Hub mistake in your Error Log. Your top cause tells you what to practise next.'], 'Error log tip', 'Make it a habit');
-  s.addNotes('Give one example of each from the diagnostic. Model tagging two errors live in the Error Log.');
+  await tips(s, 0.75, 5.8, 11.75, 0.95, ['Your Error Log is a detective notebook, not a punishment. Tag each mistake with its cause; the clue tells you what to practise next.'], 'Error log tip', 'Be a detective');
+  s.addNotes('Frame mistakes as normal and useful. Give one example of each cause from the diagnostic, then model tagging two errors live in the Error Log.\nCHECK: "You chose Tuesday, but the answer was Wednesday. Which cause is that?" (Distractor)');
 
   // 14 · Targets
   pres.addSection({ title: 'Wrap-up' });
@@ -279,7 +402,19 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
     s.addText(t, { x: x + 0.3, y: 3.15, w: 2.2, h: 1.5, fontSize: 17, bold: true, color: NAVY, valign: 'top', margin: 0, isTextBox: true });
   });
   await tips(s, 0.75, 5.15, 11.75, 1.15, ['Open the course website on your phone: My Dashboard → Your four skills → Target CLB.'], 'Action', 'On your phone');
-  s.addNotes('Give 3 minutes for students to set targets on their phones. Walk around and check.');
+  s.addNotes('Give 3 minutes for students to set targets on their phones. Walk around and check.\nCHECK: "What is your target for Speaking, and why?"');
+
+  // 22b · Ask in English
+  s = pres.addSlide({ masterName: 'CONTENT', sectionTitle: 'Wrap-up' });
+  eyebrow(s, 'Classroom English', 'L'); title(s, 'Ask in English. Every question helps.');
+  ['Could you repeat that, please?', 'Could you speak more slowly, please?', 'What does “___” mean?', 'How do you spell “___”?', 'Can you give an example?', 'Is this correct: “___”?'].forEach((t, i) => {
+    const col = i % 2, row = Math.floor(i / 2), x = 0.75 + col * 5.95, y = 1.95 + row * 1.25, k = ['L', 'R', 'W', 'S', 'O', 'L'][i];
+    card(s, x, y, 5.8, 1.05, SK[k][0], 'Phrase ' + (i + 1));
+    s.addText('“', { x: x + 0.25, y, w: 0.5, h: 1.05, fontSize: 36, bold: true, color: SK[k][1], valign: 'middle', margin: 0, isTextBox: true });
+    s.addText(t, { x: x + 0.8, y, w: 4.8, h: 1.05, fontSize: 18, color: NAVY, valign: 'middle', margin: 0, isTextBox: true });
+  });
+  await tips(s, 0.75, 5.85, 11.75, 0.9, ['Asking questions in English is speaking practice too.'], 'Ask', 'Remember');
+  s.addNotes('Practise each phrase chorally. Tell students you expect these questions in every class.\nCHECK: "How do you ask me to say something again?"');
 
   // 15 · Before Session 2
   s = pres.addSlide({ masterName: 'CLOSING', sectionTitle: 'Wrap-up' });
@@ -295,7 +430,7 @@ const shadow = () => ({ type: 'outer', color: '14213D', opacity: 0.08, blur: 14,
   await chip(s, 8.95, 2.3, 0.85, 'O', 'LuFlag', 'Next class', true);
   s.addText([{ text: 'Your results open the next class.', options: { bold: true, fontSize: 18, breakLine: true } }, { text: 'Finish the Study Hub before Session 2 so we can work on your real mistakes.', options: { fontSize: 14, color: MUTED } }],
     { x: 8.95, y: 3.4, w: 3.25, h: 2.4, color: NAVY, valign: 'top', margin: 0, paraSpaceAfter: 10, isTextBox: true });
-  s.addNotes('Open the Study Hub tab for Session 1 and show the diagnostic. Return to slide 2 and tick the outcomes together.');
+  s.addNotes('Open the Study Hub tab for Session 1 and show the diagnostic. Return to slide 2 and tick the outcomes together.\nCHECK: "What do you need to finish before Session 2?"');
 
   const out = process.argv[2] || 'session-01.pptx';
   await pres.writeFile({ fileName: out });
