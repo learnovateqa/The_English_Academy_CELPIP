@@ -1,0 +1,1153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CELPIP Prep Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: matches Ms. Maria's course family (Lora + Poppins, navy ink, pastel panels).
+   Sticky navy app bar, one 1080px column; session pages split into Live (pink pen) and Study Hub (green) tabs. */
+:root{
+  --bg:#F5F6FA; --surface:#FFFFFF; --surface-2:#EEF1F7; --fg:#1B2A4A; --muted:#6B7590; --line:#DCE1EB;
+  --navy:#1B2A4A; --navy-fg:#FFFFFF;
+  --live:#C2255C; --live-soft:#F7E1E5; --hub:#17803D; --hub-soft:#DDF3E4; --good:#17803D; --warn:#A14A0B; --bad:#B42318;
+  --blue:#DCEBFA; --peach:#FDE5D2; --lav:#E8E0F7;
+  --display:'Lora',Georgia,'Times New Roman',serif; --body:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif; --mono:'Poppins','Segoe UI',system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10172A; --surface:#172036; --surface-2:#1E2942; --fg:#EEF1F8; --muted:#9AA4BD; --line:#2C3754;
+  --navy:#EEF1F8; --navy-fg:#10172A;
+  --live:#FF7FA8; --live-soft:#3A2534; --hub:#7BD69B; --hub-soft:#1D3A2B; --good:#7BD69B; --warn:#F2B27E; --bad:#FF8A7A;
+  --blue:#1F3150; --peach:#3D2C22; --lav:#2C2647; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10172A; --surface:#172036; --surface-2:#1E2942; --fg:#EEF1F8; --muted:#9AA4BD; --line:#2C3754;
+  --navy:#EEF1F8; --navy-fg:#10172A;
+  --live:#FF7FA8; --live-soft:#3A2534; --hub:#7BD69B; --hub-soft:#1D3A2B; --good:#7BD69B; --warn:#F2B27E; --bad:#FF8A7A;
+  --blue:#1F3150; --peach:#3D2C22; --lav:#2C2647; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15.5px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+h1,h2,h3{font-family:var(--display);line-height:1.2;text-wrap:balance;margin:0}
+h1{font-size:clamp(26px,5vw,38px);font-weight:700}
+h2{font-size:22px;font-weight:700}
+h3{font-size:18px;font-weight:700}
+p{margin:0}
+a{color:inherit}
+button,select,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--hub);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--navy);color:var(--navy-fg)}
+header.bar .wrap{display:flex;align-items:center;gap:20px;padding-block:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--display);font-weight:700;font-size:19px}
+.brand small{font-family:var(--body);font-weight:500;font-size:12px;opacity:.75;display:block;line-height:1}
+.brand .mark{width:34px;height:34px;border-radius:10px;background:var(--live);color:#fff;display:grid;place-items:center;font-family:var(--body);font-size:12px;font-weight:700}
+nav.main{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+nav.main a{text-decoration:none;padding:7px 14px;border-radius:999px;color:var(--navy-fg);opacity:.8;font-weight:600;font-size:14px}
+nav.main a[aria-current="page"]{background:var(--navy-fg);color:var(--navy);opacity:1}
+main{padding-block:28px 64px}
+.stack{display:flex;flex-direction:column;gap:20px}
+.eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--live)}
+.muted{color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.grid>*{min-width:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1.5px solid var(--navy);background:transparent;padding:8px 16px;border-radius:10px;cursor:pointer;font-weight:600;font-size:14px;min-height:42px;text-decoration:none}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--navy);color:var(--navy-fg);border-color:var(--navy)}
+.btn.hub{background:var(--hub);border-color:var(--hub);color:var(--surface)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.chip.live{background:var(--live-soft);color:var(--live)}
+.chip.hub{background:var(--hub-soft);color:var(--hub)}
+.chip.good{color:var(--good)}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.bar-track{height:6px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;background:var(--hub);border-radius:99px}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:end}
+@media (max-width:760px){.hero{grid-template-columns:1fr}}
+.hero p.lead{font-size:17px;max-width:58ch;margin-top:10px;color:var(--muted)}
+.split-key{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.target-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:460px){.target-grid{grid-template-columns:repeat(2,1fr)}}
+.target{background:var(--blue);border-radius:12px;padding:12px}
+.target label{display:block;font-size:12px;font-weight:700;color:var(--muted)}
+.target select{width:100%;margin-top:4px;padding:4px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.target .score{font-size:12px;margin-top:6px}
+
+/* session strip */
+.strip{display:grid;grid-template-columns:repeat(12,1fr);gap:6px}
+@media (max-width:640px){.strip{grid-template-columns:repeat(6,1fr)}}
+.strip a{display:flex;flex-direction:column;gap:6px;text-decoration:none;padding:8px;border-radius:10px;background:var(--surface-2)}
+.strip a.next{outline:2px solid var(--live)}
+.strip .n{font-family:var(--mono);font-weight:600;font-size:13px}
+
+/* syllabus */
+.phase{display:flex;flex-direction:column;gap:10px}
+.srow{display:grid;grid-template-columns:56px 1fr 150px;gap:16px;align-items:center;padding:14px 18px;background:var(--surface);border:1px solid var(--line);border-radius:14px;text-decoration:none}
+.srow:hover{border-color:var(--muted)}
+.srow .num{font-family:var(--display);font-weight:700;font-size:28px;color:var(--live);font-variant-numeric:tabular-nums}
+.srow p{color:var(--muted);font-size:14px}
+@media (max-width:600px){.srow{grid-template-columns:44px 1fr}.srow .prog{grid-column:2}}
+
+/* session page */
+.shead{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:end}
+.bignum{font-family:var(--display);font-weight:700;font-size:clamp(52px,9vw,84px);line-height:.9;color:var(--live)}
+.tabs{display:flex;gap:0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{border:0;background:none;padding:12px 16px;font-weight:700;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px;display:flex;gap:8px;align-items:center}
+.tab[aria-selected="true"].t-live{color:var(--live);border-color:var(--live)}
+.tab[aria-selected="true"].t-hub{color:var(--hub);border-color:var(--hub)}
+.boundary{border-left:4px solid var(--live);background:var(--live-soft);padding:12px 16px;border-radius:0 8px 8px 0;font-size:14px}
+.boundary.hubb{border-color:var(--hub);background:var(--hub-soft)}
+.timeline{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.timeline li{display:grid;grid-template-columns:110px 1fr;gap:16px;padding:14px 0;border-top:1px solid var(--line)}
+.timeline li:first-child{border-top:0}
+.timeline .t{font-family:var(--mono);font-size:13px;color:var(--live);font-variant-numeric:tabular-nums;padding-top:2px}
+.timeline .len{display:block;color:var(--muted);font-size:12px}
+.timeline b{display:block}
+@media (max-width:520px){.timeline li{grid-template-columns:1fr;gap:4px}}
+.tools{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+.tools li b{display:block}
+.tools li{font-size:14px;color:var(--muted)}
+.tools li b{color:var(--fg)}
+.tasks{list-style:none;padding:0;margin:0}
+.tasks li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.tasks li:first-child{border-top:0}
+.tasks input{margin-top:4px;width:18px;height:18px;accent-color:var(--hub)}
+.tasks label{cursor:pointer}
+.tasks label span{display:block;color:var(--muted);font-size:14px}
+
+/* tool shells */
+.tool{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.tool-head{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 18px;background:var(--hub-soft);border-bottom:1px solid var(--line)}
+.tool-head h3{font-size:16px}
+.tool-body{padding:18px;display:flex;flex-direction:column;gap:16px}
+.timer{font-family:var(--mono);font-weight:600;font-size:15px;padding:4px 10px;border-radius:6px;background:var(--surface);border:1px solid var(--line);font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad);border-color:var(--bad)}
+.q{display:flex;flex-direction:column;gap:8px;padding-top:14px;border-top:1px solid var(--line)}
+.q:first-of-type{border-top:0;padding-top:0}
+.q .qt{font-weight:600}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer}
+.opt:has(input:checked){background:var(--lav);border-color:var(--fg)}
+.opt input{margin-top:4px;accent-color:var(--hub)}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 12%,transparent)}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,transparent)}
+.why{font-size:14px;color:var(--muted);padding-left:4px}
+.result{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-radius:14px;background:var(--hub-soft)}
+.result .big{font-family:var(--display);font-size:30px;font-weight:700}
+.splitread{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:760px){.splitread{grid-template-columns:1fr}}
+.passage{background:var(--surface-2);border-radius:12px;padding:16px;font-size:14.5px;max-height:520px;overflow:auto}
+.passage p+p{margin-top:10px}
+.transcript{background:var(--surface-2);border-radius:8px;padding:14px;font-size:14px}
+.transcript p+p{margin-top:6px}
+.player{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:14px;border:1px dashed var(--line);border-radius:8px}
+.wave{display:flex;gap:3px;align-items:center;height:24px}
+.wave i{display:block;width:3px;height:6px;background:var(--hub);border-radius:2px}
+.playing .wave i{animation:w 0.9s ease-in-out infinite}
+.wave i:nth-child(2n){animation-delay:.15s}.wave i:nth-child(3n){animation-delay:.3s}
+@keyframes w{50%{height:22px}}
+@media (prefers-reduced-motion:reduce){.playing .wave i{animation:none;height:14px}}
+textarea.write{width:100%;min-height:300px;resize:vertical;padding:14px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);line-height:1.6}
+.wc{font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums}
+.wc.ok{color:var(--good)}.wc.bad{color:var(--bad)}
+.prompt{background:var(--blue);border-radius:12px;padding:14px 16px;font-size:14.5px;font-weight:500}
+.prompt ul{margin:8px 0 0;padding-left:20px}
+.rubric{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.rubric label{font-size:13px;font-weight:600;display:flex;flex-direction:column;gap:4px}
+.rubric select{padding:6px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.feedback{white-space:pre-wrap;background:var(--surface-2);border-radius:8px;padding:14px;font-size:14px}
+.stage{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;padding:16px;border-radius:14px;background:var(--surface-2)}
+.stage .clock{font-family:var(--body);font-size:44px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+.stage.speak{background:var(--live-soft)}
+.stage.speak .clock{color:var(--live)}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--live);margin-right:6px}
+.stage.speak .dot{animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.stage.speak .dot{animation:none}}
+.scene{max-width:440px;width:100%;border-radius:8px;display:block}
+.opts2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.opts2{grid-template-columns:1fr}}
+.opts2 div{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;font-size:14px}
+.notice{font-size:14px;padding:12px 14px;border-radius:12px;background:var(--peach)}
+table.log{width:100%;border-collapse:collapse;font-size:14px}
+table.log th,table.log td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+table.log th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+table.log select{padding:4px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.tablewrap{overflow-x:auto}
+.cause-bars{display:grid;gap:8px}
+.cause-bars div{display:grid;grid-template-columns:110px 1fr 30px;gap:10px;align-items:center;font-size:14px}
+footer{padding-block:24px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+
+/* ---- skill colour system + richer layout ---- */
+:root{--skO:#DDF3E4;--skL:#DCEBFA;--skR:#E8E0F7;--skW:#FDE5D2;--skS:#F7E1E5;--skT:#DDF3E4;
+  --skOi:#17803D;--skLi:#2F6FA8;--skRi:#6A4FB3;--skWi:#A14A0B;--skSi:#C2255C;--skTi:#17803D;--shadow:0 8px 24px rgba(27,42,74,.08)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--skO:#1D3A2B;--skL:#1F3150;--skR:#2C2647;--skW:#3D2C22;--skS:#3A2534;--skT:#1D3A2B;
+  --skOi:#7BD69B;--skLi:#8DB8E8;--skRi:#B8A6EC;--skWi:#F2B27E;--skSi:#FF7FA8;--skTi:#7BD69B;--shadow:0 8px 24px rgba(0,0,0,.3)}}
+:root[data-theme="dark"]{--skO:#1D3A2B;--skL:#1F3150;--skR:#2C2647;--skW:#3D2C22;--skS:#3A2534;--skT:#1D3A2B;
+  --skOi:#7BD69B;--skLi:#8DB8E8;--skRi:#B8A6EC;--skWi:#F2B27E;--skSi:#FF7FA8;--skTi:#7BD69B;--shadow:0 8px 24px rgba(0,0,0,.3)}
+.hero2{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:28px;align-items:center;background:var(--live-soft);border-radius:24px;padding:34px}
+.hero2.slim{grid-template-columns:minmax(0,1fr);padding:28px 30px}
+@media(max-width:820px){.hero2{grid-template-columns:minmax(0,1fr);padding:22px}}
+.hero2 .lead{font-size:16.5px;color:var(--muted);max-width:56ch}
+.hero2 h1{font-size:clamp(28px,5vw,42px)}
+.ic{flex:none;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:var(--c);color:var(--ci)}
+.upnext{display:flex;gap:14px;align-items:center;background:var(--surface);border-radius:18px;padding:14px 16px;box-shadow:var(--shadow)}
+.upnext b{font-family:var(--display);font-size:17px;display:block;line-height:1.25}
+.ladder{margin:0;background:var(--surface);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:var(--shadow)}
+.ladder figcaption{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:13.5px}
+.ladder figcaption b{font-family:var(--display);font-size:20px;color:var(--live)}
+.rungs{display:flex;align-items:flex-end;gap:6px;height:170px}
+.rung{flex:1;min-width:0;background:var(--surface-2);border-radius:9px 9px 4px 4px;display:flex;align-items:flex-start;justify-content:center;padding-top:6px;font-size:12px;font-weight:600;color:var(--muted)}
+.rung.below{background:var(--blue);color:var(--fg)}
+.rung.on{background:var(--live);color:var(--surface)}
+.ladder .note{font-size:12.5px;color:var(--muted)}
+.skills4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+@media(max-width:900px){.skills4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.skills4{grid-template-columns:minmax(0,1fr)}}
+.skcard{background:var(--c);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.skcard .ic{background:var(--surface)}
+.skcard h3{font-size:19px}
+.tsel{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:13px;font-weight:600;background:var(--surface);border-radius:12px;padding:8px 10px}
+.tsel select{border:1.5px solid var(--line);border-radius:8px;padding:3px 6px;background:var(--surface);font-weight:700}
+.skcard .score{font-size:12.5px}
+.secthead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.strip a{background:var(--c)!important;position:relative}
+.strip a .n{color:var(--ci)}
+.strip a .ck{position:absolute;top:6px;right:6px;color:var(--ci)}
+.strip a .bar-fill{background:var(--ci)}
+.strip a .bar-track{background:var(--surface)}
+.steps{display:grid;gap:14px}
+.step{display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;align-items:start}
+.step i{width:34px;height:34px;border-radius:50%;background:var(--navy);color:var(--navy-fg);display:grid;place-items:center;font-style:normal;font-weight:700}
+.step.live i{background:var(--live);color:var(--surface)}
+.step.hub i{background:var(--hub);color:var(--surface)}
+.phase-head{display:flex;gap:14px;align-items:center}
+.srow .num{width:48px;height:48px;border-radius:50%;background:var(--c);color:var(--ci);display:grid;place-items:center;font-size:19px}
+.srow:hover{border-color:var(--ci);box-shadow:var(--shadow)}
+.legend{display:flex;gap:8px;flex-wrap:wrap}
+.legend span{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;font-weight:600;padding:5px 12px;border-radius:999px;background:var(--c);color:var(--ci)}
+.sband{display:grid;grid-template-columns:auto minmax(0,1fr);gap:26px;align-items:center;background:var(--c);border-radius:24px;padding:30px}
+.sband .bignum{color:var(--ci)}
+.sband .chip{background:var(--surface);color:var(--ci)}
+@media(max-width:600px){.sband{grid-template-columns:minmax(0,1fr);gap:10px;padding:22px}}
+.timeline li{position:relative}
+.timeline .t{font-weight:600}
+.tool{box-shadow:var(--shadow)}
+
+/* ---- modern pastel pass ---- */
+body{background:radial-gradient(900px 520px at 0% -8%,var(--skL),transparent 62%),radial-gradient(800px 480px at 100% -4%,var(--skS),transparent 58%),radial-gradient(700px 500px at 50% 110%,var(--skR),transparent 60%),var(--bg);background-attachment:fixed}
+body::before{background:var(--surface)}
+header.bar{background:color-mix(in srgb,var(--surface) 82%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);color:var(--fg);border-bottom:1px solid var(--line)}
+.brand .mark{background:var(--live-soft);color:var(--live)}
+nav.main{background:var(--surface-2);padding:4px;border-radius:999px}
+nav.main a{color:var(--muted);opacity:1}
+nav.main a[aria-current="page"]{background:var(--surface);color:var(--fg);box-shadow:var(--shadow)}
+.panel{border-color:transparent;box-shadow:var(--shadow);border-radius:20px}
+.srow{border-color:transparent;box-shadow:var(--shadow);border-radius:18px}
+.tabs{display:flex;width:max-content;max-width:100%;background:var(--surface);border:0;border-radius:999px;padding:5px;gap:4px;box-shadow:var(--shadow);flex-wrap:wrap}
+.tab{border:0!important;margin:0;border-radius:999px;padding:10px 18px}
+.tab[aria-selected="true"].t-live{background:var(--live-soft)}
+.tab[aria-selected="true"].t-hub{background:var(--hub-soft)}
+.tab .dot{display:none}
+.boundary{border-left:0;border-radius:16px;display:flex;gap:12px;align-items:flex-start}
+.tool{border-color:transparent;border-radius:20px}
+.tool-head{cursor:pointer;user-select:none;border-bottom:0;padding:14px 18px}
+.tool.closed .tool-body{display:none}
+.tool-head .chev{transition:transform .2s;color:var(--muted)}
+.tool.closed .chev{transform:rotate(-90deg)}
+.stepno{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 10px;border-radius:999px;background:var(--surface);color:var(--hub);font-weight:700;font-size:13px}
+.ring{--p:0;width:58px;height:58px;border-radius:50%;background:conic-gradient(var(--hub) calc(var(--p)*1%),var(--surface-2) 0);display:grid;place-items:center;flex:none}
+.ring span{width:44px;height:44px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-size:12.5px;font-weight:700}
+.tasks li{border-top:0;padding:10px 12px;border-radius:12px}
+.tasks li:has(input:checked){background:var(--hub-soft)}
+.tasks li:has(input:checked) b{text-decoration:line-through;text-decoration-color:var(--hub)}
+.strip{grid-template-columns:repeat(12,minmax(0,1fr))}
+.strip a{min-width:0;overflow:hidden}
+.strip a .muted{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:640px){.strip{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.btn{border-radius:999px}
+.btn.primary:hover{background:var(--navy);opacity:.9}
+@media (prefers-reduced-motion:reduce){.tool-head .chev{transition:none}}
+
+/* ---- class + teacher portal ---- */
+.sync{font-size:12px;font-weight:600;padding:5px 11px;border-radius:999px;background:var(--surface-2);color:var(--muted);display:inline-flex;gap:6px;align-items:center}
+.sync::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.sync.ok{background:var(--hub-soft);color:var(--hub)}
+.sync.warn{background:var(--peach);color:var(--warn)}
+.classcard{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:16px}
+@media(max-width:760px){.classcard{grid-template-columns:minmax(0,1fr)}}
+.fbnote{background:var(--lav);border-radius:16px;padding:16px;white-space:pre-wrap}
+.field{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}
+.field input,.field select,.field textarea{padding:9px 12px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);font-weight:400;font-size:14.5px}
+.field textarea{min-height:110px;resize:vertical}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{border:0;background:var(--surface);box-shadow:var(--shadow);padding:9px 16px;border-radius:999px;cursor:pointer;font-weight:600;font-size:14px;display:inline-flex;gap:8px;align-items:center}
+.pill .cnt{background:var(--surface-2);border-radius:999px;padding:1px 8px;font-size:12px}
+.pill[aria-pressed="true"]{background:var(--navy);color:var(--navy-fg)}
+.pill[aria-pressed="true"] .cnt{background:color-mix(in srgb,var(--navy-fg) 20%,transparent)}
+.pill.add{background:var(--hub-soft);color:var(--hub);box-shadow:none}
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@media(max-width:860px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{background:var(--c,var(--surface));border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.tile b{font-family:var(--display);font-size:26px;line-height:1.1;color:var(--ci,var(--fg))}
+.tile span{font-size:12.5px;color:var(--muted)}
+table.roster{width:100%;border-collapse:separate;border-spacing:0 6px;font-size:14px}
+table.roster th{text-align:left;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:4px 10px;font-weight:600}
+table.roster td{background:var(--surface);padding:10px;vertical-align:middle;font-variant-numeric:tabular-nums}
+table.roster td:first-child{border-radius:14px 0 0 14px}
+table.roster td:last-child{border-radius:0 14px 14px 0}
+table.roster tr.pick td{cursor:pointer}
+table.roster tr.pick:hover td{background:var(--surface-2)}
+table.roster tr.on td{background:var(--lav)}
+.who{display:flex;gap:10px;align-items:center;min-width:170px}
+.who img{width:30px;height:30px;border-radius:50%;flex:none}
+.mini12{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:4px}
+.mini12 div{height:34px;border-radius:8px;background:var(--surface-2);position:relative;overflow:hidden;font-size:10.5px;display:grid;place-items:center;font-weight:600;color:var(--muted)}
+.mini12 div i{position:absolute;left:0;bottom:0;right:0;background:var(--ci);opacity:.35}
+.subm{background:var(--surface-2);border-radius:14px;padding:12px 14px}
+.subm summary{cursor:pointer;font-weight:600}
+.subm pre{white-space:pre-wrap;font-family:var(--body);font-size:14px;margin:10px 0 0}
+.empty{text-align:center;padding:28px;color:var(--muted)}
+
+.classcard3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+@media(max-width:900px){.classcard3{grid-template-columns:minmax(0,1fr)}}
+.btn.sm{min-height:30px;padding:3px 10px;font-size:12px}
+.copyable{user-select:all}
+
+.login{display:grid;place-items:center;padding-block:24px}
+.logincard{max-width:480px;width:100%;background:var(--surface);border-radius:28px;padding:34px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:14px;
+  background-image:radial-gradient(420px 200px at 100% 0%,var(--skS),transparent 70%),radial-gradient(420px 220px at 0% 100%,var(--skL),transparent 70%)}
+.logincard h1{font-size:clamp(26px,5vw,34px)}
+.logincard .lead{color:var(--muted)}
+.mark.big{width:52px;height:52px;border-radius:16px;background:var(--live-soft);color:var(--live);display:grid;place-items:center;font-weight:700;font-size:15px}
+.codein{font-size:20px!important;letter-spacing:.12em;text-transform:uppercase;font-weight:600!important;text-align:center}
+.err{color:var(--bad);font-size:14px;font-weight:600;min-height:1.2em}
+.sharebox{background:var(--hub-soft);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.sharebox pre{white-space:pre-wrap;font-family:var(--body);font-size:14px;margin:0;background:var(--surface);border-radius:12px;padding:12px}
+.codechip{font-weight:700;letter-spacing:.06em;background:var(--surface-2);border-radius:8px;padding:2px 8px;font-size:13px;white-space:nowrap}
+</style>
+</head>
+<body>
+<header class="bar"><div class="wrap">
+  <a class="brand" href="#home"><span class="mark">CLB</span><span>CELPIP Prep Course<small>with Ms. Maria</small></span></a>
+  <nav class="main" aria-label="Main" hidden>
+    <a href="#home" data-nav="home">My Dashboard</a>
+    <a href="#syllabus" data-nav="syllabus">Syllabus</a>
+    <a href="#log" data-nav="log">Error Log</a>
+    <a href="#teacher" data-nav="teacher" id="nav-teacher" hidden>Teacher Portal</a>
+  </nav>
+  <span id="sync" class="sync" hidden></span>
+  <button class="btn sm" id="signout" hidden>Sign out</button>
+</div></header>
+<main><div class="wrap" id="app"></div></main>
+<footer><div class="wrap">Independent prep course for the CELPIP-General test. Not affiliated with or endorsed by the test publisher. All practice items are original. Your practice saves to your class with your personal access code.</div></footer>
+
+<script>
+/* ---------- settings ---------- */
+const CONFIG={
+  /* Paste your Apps Script web app URL here (Deploy > Manage deployments > Web app URL). */
+  API_URL:'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'
+};
+
+/* ---------- storage (each student's data is kept under their own code) ---------- */
+let PREFIX='bcs:guest:';
+const store={get(k,d){try{const v=localStorage.getItem(PREFIX+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(PREFIX+k,JSON.stringify(v))}catch(e){}}};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let samplePromise=Promise.resolve(null);
+
+/* ---------- backend (Google Apps Script) ---------- */
+const apiReady=()=>/^https:\/\/script\.google(usercontent)?\.com\//.test(CONFIG.API_URL);
+async function api(action,payload){
+  if(!apiReady())throw {code:'not_configured'};
+  let r;try{r=await fetch(CONFIG.API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action},payload||{}))})}catch(e){throw {code:'network'}}
+  let j;try{j=await r.json()}catch(e){throw {code:'server_error'}}
+  if(!j.ok)throw {code:j.error||'server_error',message:j.message};return j}
+const ERR={bad_code:'That access code was not found. Check it and try again.',bad_password:'That password is not right.',
+  network:'Cannot reach the course server. Check your internet connection and try again.',
+  not_configured:'The course server is not connected yet. Your teacher needs to add the Apps Script link to the site.',
+  no_password:'Set TEACHER_PASSWORD in the Apps Script project settings first.',code_taken:'That access code is already used by another student.',
+  bad_code_format:'Codes use 4–20 letters, numbers or dashes.',busy:'The server is busy. Try again in a moment.',
+  too_large:'This progress is too large to save.',server_error:'Something went wrong on the server. Try again.'};
+const errMsg=e=>ERR[e&&e.code]||(e&&e.message)||ERR.server_error;
+
+/* ---------- session ---------- */
+const readSession=()=>{try{return JSON.parse(localStorage.getItem('bcs:session')||'null')}catch(e){return null}};
+const writeSession=v=>{try{v?localStorage.setItem('bcs:session',JSON.stringify(v)):localStorage.removeItem('bcs:session')}catch(e){}};
+const readTPass=()=>{try{return sessionStorage.getItem('bcs:tpass')}catch(e){return null}};
+const writeTPass=v=>{try{v?sessionStorage.setItem('bcs:tpass',v):sessionStorage.removeItem('bcs:tpass')}catch(e){}};
+
+const SYNC_KEYS=['tasks','res','targets','log'];
+const cloud={code:null,student:null,batch:null,feedback:null,state:'local',tpass:null,
+  t:{loaded:false,loading:false,error:null,at:0,batches:[],students:[],progress:{},feedback:{}}};
+const _set=store.set.bind(store);
+store.set=function(k,v){_set(k,v);if(SYNC_KEYS.includes(k)){_set('updatedAt',Date.now());schedulePush()}};
+let pushTimer=null,pushPending=false,pushing=false,pushAgain=false;
+function progressBody(){return {tasks:store.get('tasks',{}),res:store.get('res',{}),targets:store.get('targets',{L:9,R:9,W:9,S:9}),log:store.get('log',[]).slice(0,200),updatedAt:store.get('updatedAt',Date.now())}}
+function schedulePush(){if(!cloud.code)return;pushPending=true;clearTimeout(pushTimer);pushTimer=setTimeout(push,2000)}
+async function push(){if(!cloud.code)return;if(pushing){pushAgain=true;return}pushing=true;pushPending=false;cloud.state='saving';updateSyncBadge();
+  try{await api('student.save',{code:cloud.code,progress:progressBody()});cloud.state='synced'}
+  catch(e){if(e.code==='bad_code')cloud.state='revoked';else{cloud.state='offline';pushPending=true;clearTimeout(pushTimer);pushTimer=setTimeout(push,30000)}}
+  finally{pushing=false;updateSyncBadge();if(pushAgain){pushAgain=false;push()}}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&pushPending&&cloud.code&&apiReady()&&navigator.sendBeacon){
+  try{navigator.sendBeacon(CONFIG.API_URL,new Blob([JSON.stringify({action:'student.save',code:cloud.code,progress:progressBody()})],{type:'text/plain;charset=utf-8'}));pushPending=false;clearTimeout(pushTimer)}catch(e){}}});
+function updateSyncBadge(){const el=document.getElementById('sync');if(!el)return;
+  const M={local:['Not signed in',''],saving:['Saving…',''],synced:['Saved to your class','ok'],teacher:['Teacher','ok'],
+    offline:['Offline · saved on this device','warn'],revoked:['Access code no longer active','warn']};
+  const [t,c]=M[cloud.code?cloud.state:(cloud.tpass?'teacher':'local')]||M.local;el.textContent=t;el.className='sync '+c}
+function renderNav(){const signed=!!(cloud.code||cloud.tpass);
+  document.querySelector('nav.main').hidden=!signed;document.getElementById('nav-teacher').hidden=!cloud.tpass;
+  document.getElementById('signout').hidden=!signed;document.getElementById('sync').hidden=!signed;updateSyncBadge()}
+function curRoute(){const h=(location.hash||'#home').slice(1);return h.startsWith('session-')?'session':(['syllabus','log','teacher'].includes(h)?h:'home')}
+let pendingRefresh=false;
+function refreshIf(rs){if(!rs.includes(curRoute()))return;const a=document.activeElement;
+  if(a&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)&&app.contains(a)){pendingRefresh=true;return}view(true)}
+document.addEventListener('focusout',()=>{if(!pendingRefresh)return;setTimeout(()=>{const a=document.activeElement;if(pendingRefresh&&!(a&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName))){pendingRefresh=false;view(true)}},700)});
+
+function applyStudent(j){cloud.code=j.student.code;PREFIX='bcs:'+cloud.code+':';cloud.student=j.student;cloud.batch=j.batch;cloud.feedback=j.feedback;
+  writeSession({code:cloud.code,student:j.student,batch:j.batch,feedback:j.feedback});
+  const r=j.progress;const localT=store.get('updatedAt',0);
+  if(r&&(r.updatedAt||0)>localT){SYNC_KEYS.forEach(k=>{if(r[k]!==undefined)_set(k,r[k])});_set('updatedAt',r.updatedAt)}
+  else if(localT>((r&&r.updatedAt)||0))schedulePush();
+  if(cloud.state!=='saving'||!pushPending)cloud.state='synced';renderNav()}
+async function initCloud(){const s=readSession();cloud.tpass=readTPass();
+  if(s&&s.code){cloud.code=s.code;PREFIX='bcs:'+s.code+':';cloud.student=s.student;cloud.batch=s.batch;cloud.feedback=s.feedback;cloud.state='saving'}
+  else if(cloud.tpass)PREFIX='bcs:teacher:';
+  renderNav();view();
+  if(cloud.code){try{applyStudent(await api('student.login',{code:cloud.code}));refreshIf(['home','syllabus','log'])}
+    catch(e){cloud.state=e.code==='bad_code'?'revoked':'offline';updateSyncBadge()}}}
+async function signOut(){if(pushPending&&cloud.code){clearTimeout(pushTimer);await push()}
+  writeSession(null);writeTPass(null);Object.assign(cloud,{code:null,student:null,batch:null,feedback:null,tpass:null,state:'local'});
+  cloud.t=Object.assign(cloud.t,{loaded:false,error:null,batches:[],students:[],progress:{},feedback:{}});PREFIX='bcs:guest:';
+  renderNav();if(location.hash&&location.hash!=='#home')location.hash='#home';else view()}
+document.getElementById('signout').addEventListener('click',signOut);
+
+function LoginView(){return `<div class="login"><section class="logincard">
+  <span class="mark big">CLB</span>
+  <div class="eyebrow">CELPIP Prep Course · with Ms. Maria</div>
+  <h1>Welcome. Enter your access code.</h1>
+  <p class="lead">Your teacher gave you a personal code. It opens your dashboard and saves your practice to your class.</p>
+  <form id="login-form" class="stack" style="gap:12px" novalidate>
+    <label class="field" for="login-code">Access code<input id="login-code" class="codein" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="CEL-AB12CD" maxlength="20"></label>
+    <button class="btn primary" type="submit" id="login-btn">Open my dashboard</button>
+    <p class="err" id="login-msg" role="alert"></p>
+  </form>
+  <p class="muted" style="font-size:13px">No code yet? Ask your teacher. · <a href="#teacher">Teacher sign in</a></p></section></div>`}
+function bindLogin(){const f=document.getElementById('login-form');if(!f)return;const inp=document.getElementById('login-code');inp.focus();
+  f.addEventListener('submit',async e=>{e.preventDefault();const code=inp.value.trim().toUpperCase();const msg=document.getElementById('login-msg');const btn=document.getElementById('login-btn');
+    if(code.length<4){msg.textContent='Enter the code your teacher gave you.';return}
+    btn.disabled=true;btn.textContent='Checking…';msg.textContent='';
+    try{const j=await api('student.login',{code});PREFIX='bcs:'+j.student.code+':';applyStudent(j);location.hash='#home';view()}
+    catch(err){msg.textContent=errMsg(err);btn.disabled=false;btn.textContent='Open my dashboard'}})}
+
+const ago=t=>{t=Number(t);if(!t)return '–';const m=Math.round((Date.now()-t)/60000);if(m<2)return 'just now';if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<24)return h+' h ago';const d=Math.round(h/24);return d+' day'+(d>1?'s':'')+' ago'};
+const fmtDate=d=>{if(!d)return '';try{const x=new Date(d+'T12:00:00');return isNaN(x)?d:x.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'})}catch(e){return d}};
+
+/* ---------- course data ---------- */
+const SKILL={O:'Orientation',L:'Listening',R:'Reading',W:'Writing',S:'Speaking',T:'Test Day'};
+const SESSIONS=[
+{n:1,k:'O',title:'Decode the Test Engine and Set Your CLB Target',
+ obj:'Students understand the four components, the scoring logic and the computer interface. Each student sets a CLB target per skill.',
+ live:[['0:00','0:20','Map the Test','Walk through all four components, part counts, timings and test order.'],
+  ['0:20','0:45','Explain Scoring','Show how raw scores convert to CELPIP levels and how those levels map to CLB requirements.'],
+  ['0:45','1:15','Model the Interface','Demo the timers, the Next button, no going back, and how speaking recording starts and stops.'],
+  ['1:15','1:45','Teach the Error Taxonomy','Introduce the four error causes students log all course: distractor, vocabulary, timing, inference.'],
+  ['1:45','2:00','Set Targets','Guide each student to set a CLB target per skill. Preview the Study Hub.']],
+ liveTools:[['Test Map Infographic','Clickable diagram of every component and part.'],['Score Converter Widget','Instructor enters a raw score and shows the CLB result.'],['Interface Simulator','Replica test screen for live demos.']],
+ tasks:[['Set Your CLB Targets','Choose a target per skill on the Dashboard.'],['Complete the Diagnostic Listening Set','Audio plays once. No rewind.'],['Complete the Diagnostic Reading Set','Timed. Auto-submits at zero.'],['Submit the Baseline Email','27 minutes. 150–200 words.'],['Record Two Baseline Speaking Answers','Keep these files. You will compare them in Session 12.'],['Tag Every Diagnostic Error','Open the Error Log and give each miss a cause.']],
+ tools:['L1','R1','W1','S1','S2']},
+{n:2,k:'L',title:'Master Listening Parts 1–3',
+ obj:'Students track speaker intent and details across conversations heard only once.',
+ live:[['0:00','0:15','Debrief the Diagnostic','Show class-wide listening error patterns from Hub data.'],
+  ['0:15','0:45','Teach Prediction','Model reading the context screen to predict topic, speakers and likely questions.'],
+  ['0:45','1:15','Model Note-Taking','Think aloud through a Part 1 clip using two-column notes (Speaker A / Speaker B).'],
+  ['1:15','1:40','Break Down Distractors','Annotate a transcript. Show how a first-mentioned answer gets corrected later.'],
+  ['1:40','2:00','Run Prediction Polls','Students commit to an answer. The instructor explains each option.']],
+ liveTools:[['Think-Aloud Audio Stage','Paused playback with a live notes overlay.'],['Transcript Annotation Canvas','Colour-codes distractors and correct cues.'],['Prediction Poll','Shows the class answer split instantly.']],
+ tasks:[['Drill the Problem-Solving Set','Use two-column notes while you listen.'],['Run the Transcript Audit','After grading, find the line that proves each answer.'],['Log Every Error','Tag each miss by cause.']],
+ tools:['L1']},
+{n:3,k:'L',title:'Decode Listening Parts 4–6',
+ obj:'Students identify main ideas, attitudes and opinions in longer, denser audio.',
+ live:[['0:00','0:15','Review Hub Data','Show error trends from Parts 1–3.'],
+  ['0:15','0:45','Teach News Structure','Model the headline → details → impact pattern in news items.'],
+  ['0:45','1:15','Model Multi-Speaker Tracking','Use the discussion video. Track who holds which position.'],
+  ['1:15','1:45','Decode Attitude Language','Teach hedges, contrast markers and tone signals.'],
+  ['1:45','2:00','Analyze Inference Questions','Separate what is said from what is implied.']],
+ liveTools:[['Video Discussion Player','Speaker-tracking overlay grid.'],['Attitude Marker Highlighter','Tags tone words in the transcript.']],
+ tasks:[['Drill the News Item Set','Listen for the headline first, then the details.'],['Complete the Attitude Marker Sort','Classify each phrase.'],['Take Full Listening Mock #1','Scheduled by your instructor. One sitting.'],['Update the Error Log','Focus on inference errors.']],
+ tools:['L2','T1']},
+{n:4,k:'R',title:'Attack Reading Parts 1–2',
+ obj:'Students scan efficiently and match text details to visual information.',
+ live:[['0:00','0:15','Debrief Listening Mock #1','Class trends and fixes for the top three errors.'],
+  ['0:15','0:45','Teach Question-First Scanning','Model reading the questions before the passage.'],
+  ['0:45','1:15','Model Correspondence Logic','Show how the reply email connects to the first message.'],
+  ['1:15','1:45','Break Down Diagram Matching','Think aloud through a diagram-to-email task.'],
+  ['1:45','2:00','Teach Time Allocation','Set a minutes-per-part budget for the reading test.']],
+ liveTools:[['Split-Screen Annotation Canvas','Passage and diagram marked up side by side.'],['Paraphrase Matcher','Links question wording to passage wording.']],
+ tasks:[['Drill the Correspondence Set','Read the questions first.'],['Review Your Slowest Question','Write one sentence on why it took long.'],['Log Paraphrase Misses','Tag them as vocabulary errors.']],
+ tools:['R1']},
+{n:5,k:'R',title:'Conquer Reading Parts 3–4',
+ obj:'Students locate paragraph-level information and judge the positions of a writer and a commenter.',
+ live:[['0:00','0:15','Review Hub Data','Timing and paraphrase trends.'],
+  ['0:15','0:50','Teach Paragraph Mapping','Model a 3–5 word summary per paragraph. Teach the "not given" option.'],
+  ['0:50','1:25','Decode Argument Structure','Annotate an article. Mark claims, evidence and concessions.'],
+  ['1:25','1:50','Model the Comment Response','Judge whether a reader comment agrees with the article.'],
+  ['1:50','2:00','Preview the Mock','Set the strategy for Reading Mock #1.']],
+ liveTools:[['Paragraph Labeler','Instructor tags each paragraph with a summary live.'],['Argument Structure Overlay','Colour codes claim, evidence and concession.']],
+ tasks:[['Drill the Viewpoints Set','Write a 3–5 word summary per paragraph first.'],['Take Full Reading Mock #1','Scheduled by your instructor.'],['Update the Error Log','Tag inference misses.']],
+ tools:['R2']},
+{n:6,k:'W',title:'Build the High-Scoring Email',
+ obj:'Students write a complete 150–200 word email in 27 minutes that covers every bullet in the prompt.',
+ live:[['0:00','0:15','Debrief Reading Mock #1','Class trends.'],
+  ['0:15','0:40','Teach the Scoring Criteria','Content and coherence, vocabulary, readability, task fulfillment.'],
+  ['0:40','1:10','Model Prompt Deconstruction','Turn each bullet into a paragraph. Pick the tone.'],
+  ['1:10','1:40','Write a Model Email Live','The instructor writes from blank to finish and explains each choice.'],
+  ['1:40','2:00','Analyze Anonymized Samples','Mark up baseline emails from Session 1.']],
+ liveTools:[['Live Writing Pad','Students watch the instructor compose in real time.'],['Prompt Deconstruction Template','Maps each bullet to a paragraph.'],['Sample Wall','Anonymized student emails with annotation.']],
+ tasks:[['Write the Timed Complaint Email','27 minutes. Cover all three bullets.'],['Self-Score With the Rubric','Before you ask for feedback.'],['Build a Phrase Bank','Save 15 openers, transitions and closers.'],['Rewrite Your Baseline Email','Apply the paragraph template.']],
+ tools:['W1']},
+{n:7,k:'W',title:'Argue Clearly in the Survey Response',
+ obj:'Students choose an option, defend it with developed reasons and handle the other side in 26 minutes.',
+ live:[['0:00','0:15','Review Email Feedback','Top issues from Hub submissions.'],
+  ['0:15','0:45','Teach Fast Option Selection','Pick the option you can support best, not the one you prefer.'],
+  ['0:45','1:15','Model the Structure','Position → two reasons with examples → concession → restatement.'],
+  ['1:15','1:45','Write a Model Response Live','Think aloud through a full response.'],
+  ['1:45','2:00','Teach Idea Expansion','Grow a thin reason into a paragraph with example, result and contrast.']],
+ liveTools:[['Structure Scaffold Template','Colour-coded paragraph blocks.'],['Idea Expansion Ladder','Visual tool that grows a reason into a paragraph.']],
+ tasks:[['Write the Timed Survey Response','26 minutes.'],['Run a Two-Minute Idea Sprint','List reasons for both options before you choose.'],['Revise One Response','Use your feedback.']],
+ tools:['W2']},
+{n:8,k:'W',title:'Raise Writing Precision',
+ obj:'Students fix the language errors that cap their writing level and add range.',
+ live:[['0:00','0:20','Present the Error Frequency Report','The class’s most common grammar and vocabulary errors.'],
+  ['0:20','0:50','Teach Sentence Variety','Complex and compound sentences, relative clauses.'],
+  ['0:50','1:20','Upgrade Vocabulary','Swap basic words for precise ones on student samples.'],
+  ['1:20','1:45','Teach Cohesion','Transitions, pronoun reference, paragraph links.'],
+  ['1:45','2:00','Teach the Proofreading Pass','A three-minute end-of-task checklist.']],
+ liveTools:[['Error Frequency Dashboard','Class-wide error chart.'],['Before/After Sentence Editor','Live upgrade demonstrations.']],
+ tasks:[['Complete the Grammar Repair Quiz','Pick the correct sentence.'],['Take Writing Mock #1: Task 1','Email, 27 minutes.'],['Take Writing Mock #1: Task 2','Survey, 26 minutes.'],['Proofread Before Submitting','Use the three-minute checklist.']],
+ tools:['G1','W1','W2']},
+{n:9,k:'S',title:'Structure Speaking Tasks 1–3',
+ obj:'Students use prep time well and deliver organized answers that fill the speaking time.',
+ live:[['0:00','0:15','Debrief Writing Mock #1','Class trends.'],
+  ['0:15','0:35','Teach the Speaking Criteria','Content and coherence, vocabulary, listenability, task fulfillment.'],
+  ['0:35','1:00','Model Task 1: Giving Advice','Two or three options, a reason for each. Fill 90 seconds.'],
+  ['1:00','1:25','Model Task 2: Personal Experience','When, where, what happened, how you felt, what you learned.'],
+  ['1:25','1:50','Model Task 3: Describing a Scene','Sweep the picture: foreground to background, people and actions.'],
+  ['1:50','2:00','Analyze Baseline Recordings','Play anonymized Session 1 answers and diagnose them.']],
+ liveTools:[['Framework Cards','One visual frame per task.'],['Image Annotation Canvas','Spatial sweep demo for Task 3.'],['Recording Playback Panel','Anonymized student audio.']],
+ tasks:[['Answer Task 1: Giving Advice','Use the option + reason frame.'],['Answer Task 2: Personal Experience','Use the five-step story frame.'],['Answer Task 3: Describing a Scene','Sweep the picture in order.'],['Re-record Your Weakest Answer','Compare it to your first try.']],
+ tools:['S1','S2','S3']},
+{n:10,k:'S',title:'Command Speaking Tasks 4–6',
+ obj:'Students reason, persuade and handle social tension under tight time limits.',
+ live:[['0:00','0:15','Review Hub Recordings','Pacing and timing trends.'],
+  ['0:15','0:40','Model Task 4: Predictions','Link future and probability language to picture details.'],
+  ['0:40','1:15','Model Task 5: Compare and Persuade','Choose fast. Name the weakness of the other option.'],
+  ['1:15','1:45','Model Task 6: Difficult Situation','Choose, address the person, explain, soften.'],
+  ['1:45','2:00','Teach Polite Persuasion','Softeners, conditionals, empathy phrases.']],
+ liveTools:[['Comparison Matrix Builder','Live two-option breakdown.'],['Register Slider Demo','One message from casual to formal.']],
+ tasks:[['Answer Task 4: Making Predictions','Use the same park picture.'],['Answer Task 5: Comparing and Persuading','Choose within 60 seconds.'],['Answer Task 6: Difficult Situation','Pick one person to talk to.']],
+ tools:['S4','S5','S6']},
+{n:11,k:'S',title:'Polish Speaking Tasks 7–8 and Delivery',
+ obj:'Students give a structured opinion and a precise description with clear pronunciation and natural pacing.',
+ live:[['0:00','0:15','Review Feedback on Tasks 4–6',''],
+  ['0:15','0:45','Model Task 7: Expressing Opinions','Position, two reasons with examples, conclusion. Fill 90 seconds.'],
+  ['0:45','1:10','Model Task 8: Unusual Situation','Shape, size, colour, parts, comparison.'],
+  ['1:10','1:45','Coach Delivery','Word stress, chunking, intonation, recovering from a mistake.'],
+  ['1:45','2:00','Brief the Full Mock','Test-day conditions for Mock #2.']],
+ liveTools:[['Stress and Intonation Visualizer','Pitch contour on instructor audio.'],['Description Frame Card','Task 8 order checklist.']],
+ tasks:[['Answer Task 7: Expressing Opinions','90 seconds. Use the full time.'],['Answer Task 8: Unusual Situation','Describe it so your listener can picture it.'],['Take Full Mock Test #2','All four parts, one sitting, before Session 12.']],
+ tools:['S7','S8']},
+{n:12,k:'T',title:'Execute the Test-Day Game Plan',
+ obj:'Students turn mock results into a personal plan for the final weeks and for test day.',
+ live:[['0:00','0:25','Debrief Full Mock #2','Compare results to baseline by skill.'],
+  ['0:25','1:00','Re-Teach the Weakest Areas','Target the two lowest-scoring parts across the class.'],
+  ['1:00','1:30','Teach Pacing and Recovery','What to do after a bad section or a lost question.'],
+  ['1:30','1:50','Brief Test-Day Logistics','ID, check-in, headset check, breaks, reset routines.'],
+  ['1:50','2:00','Build the Final Study Plan','Walk through each student’s plan.']],
+ liveTools:[['Progress Comparison Chart','Baseline vs Mock #2 by skill.'],['Test-Day Checklist','Shown on screen and saved to the Strategy Library.']],
+ tasks:[['Review Your Readiness Report','Compare scores to your targets.'],['Record the Final Speaking Sample','Compare it to your Session 1 baseline.'],['Clear Your Top Error Cause','Redo every logged miss with that tag.']],
+ tools:['READY','S9']}
+];
+
+/* ---------- practice content (original) ---------- */
+const QUIZ={
+L1:{kind:'listen',title:'Listening Part 1 · Problem Solving',minutes:6,
+ context:'You will hear a conversation between Dana, a tenant, and Mr. Okafor, the building manager. You will hear it once.',
+ audio:[['Dana','Hi, Mr. Okafor. Sorry to bother you. The heater in my unit stopped working last night.'],
+  ['Okafor','Oh no. Is it the heater in the living room, or the one in the bedroom?'],
+  ['Dana','The bedroom. I thought it was the fuse at first, so I checked the panel, but everything looked fine.'],
+  ['Okafor','Okay. Our repair technician usually comes on Thursdays, but with temperatures this low, I will ask him to come tomorrow morning instead.'],
+  ['Dana','Tomorrow morning is tricky. I start work at eight. Could he come after five?'],
+  ['Okafor','He finishes at four, unfortunately. But if you leave a key with me at the front desk, I can let him in.'],
+  ['Dana','That works. I will drop the key off tonight. In the meantime, is there anything I can do?'],
+  ['Okafor','There is a portable heater in the storage room. I will bring it up after lunch. Just do not leave it running when you are out.']],
+ qs:[{q:'What is the problem?',o:['The living room heater is broken.','The bedroom heater is broken.','The fuse panel is damaged.','The front desk is closed.'],a:1,why:'Dana says "The bedroom." The living room is mentioned only in the question.'},
+  {q:'When will the technician come?',o:['On Thursday','Tomorrow after five','Tomorrow morning','After lunch today'],a:2,why:'Thursday is the usual day, but the manager changes it to tomorrow morning. A classic early distractor.'},
+  {q:'What will Dana do tonight?',o:['Check the fuse panel again','Call the technician','Pick up a portable heater','Leave her key with the manager'],a:3,why:'"I will drop the key off tonight."'},
+  {q:'What does the manager warn Dana about?',o:['Leaving the portable heater on when she is out','Touching the fuse panel','Missing work in the morning','Using the storage room'],a:0,why:'"Just do not leave it running when you are out."'}]},
+L2:{kind:'listen',title:'Listening Part 4 · News Item',minutes:5,
+ context:'You will hear a local news report. You will hear it once.',
+ audio:[['Reporter','Riverside City Council has approved a plan to extend public library hours starting in January. Three branches, Elm Street, Harbour, and Northgate, will stay open until nine p.m. on weekdays, two hours later than now.'],
+  ['Reporter','Council member Lisa Tran said the change responds to a survey in which more than sixty percent of residents asked for evening access, mainly students and shift workers.'],
+  ['Reporter','The extension will cost about four hundred thousand dollars a year, funded by a provincial grant rather than property taxes.'],
+  ['Reporter','However, the Westview branch will not be included, because it is scheduled to close for renovations in the spring.']],
+ qs:[{q:'What is the news report mainly about?',o:['A new library opening','Longer library hours','A survey of shift workers','Library renovations'],a:1,why:'The headline sentence: "extend public library hours."'},
+  {q:'How much later will the branches stay open?',o:['One hour','Two hours','Three hours','Until midnight'],a:1,why:'"Two hours later than now."'},
+  {q:'How will the plan be paid for?',o:['Property taxes','Library fees','A provincial grant','Council savings'],a:2,why:'"Funded by a provincial grant rather than property taxes." The "rather than" signals the distractor.'},
+  {q:'Why is Westview not included?',o:['Few residents use it','It already opens late','It will close for renovations','The survey excluded it'],a:2,why:'"Scheduled to close for renovations in the spring."'}]},
+R1:{kind:'read',title:'Reading Part 1 · Correspondence',minutes:8,
+ passage:`<p><b>From:</b> Helen Marsh<br><b>To:</b> Ravi Sandhu<br><b>Subject:</b> Community garden plots</p>
+<p>Hi Ravi,</p>
+<p>Thanks for signing up for a plot at the Linden Street community garden. I wanted to give you a few details before the season starts.</p>
+<p>Plots are assigned by the date we receive the registration fee, not the date you sign up. Your form arrived on March 2, but we have not received the $35 fee yet. If it reaches us by March 20, you should still get one of the sunny plots near the fence. After that, only the shaded plots by the shed will be left.</p>
+<p>Our first work day is Saturday, April 6. We will clear the paths and repair the water barrels. Gloves are provided, but please bring your own tools, since we only have a few shovels to share.</p>
+<p>One more thing: the city has asked us not to plant anything taller than two metres this year, because of complaints about blocked views from the apartments next door. Sunflowers will need to go somewhere else!</p>
+<p>See you in April,<br>Helen</p>`,
+ qs:[{q:'Why has Ravi not been assigned a plot yet?',o:['His form arrived late.','He has not paid the fee.','All sunny plots are taken.','He missed the work day.'],a:1,why:'Plots go by fee date, and "we have not received the $35 fee yet."'},
+  {q:'What happens if Ravi pays after March 20?',o:['He loses his registration.','He gets a plot near the fence.','He will probably get a shaded plot.','He must pay a higher fee.'],a:2,why:'"After that, only the shaded plots by the shed will be left."'},
+  {q:'What should Ravi bring on April 6?',o:['Gloves','Water barrels','His own tools','Sunflower seeds'],a:2,why:'Gloves are provided. "Please bring your own tools."'},
+  {q:'Why is there a height limit this year?',o:['Tall plants use too much water.','Neighbours complained about their views.','Sunflowers attract pests.','The shed blocks the sun.'],a:1,why:'"Complaints about blocked views from the apartments next door." This is a paraphrase match.'}]},
+R2:{kind:'read',title:'Reading Part 4 · Viewpoints',minutes:10,
+ passage:`<p><b>Is the Four-Day Week Ready for Everyone?</b></p>
+<p>Over the past two years, more than forty Canadian companies have tested a four-day work week with no cut in pay. Most report that productivity stayed the same or rose slightly, and staff turnover dropped sharply. Supporters say the extra day off reduces burnout and makes hiring easier.</p>
+<p>Critics are less convinced. Economist Paul Leclerc points out that nearly all the companies in the trials were office-based. "It is easy to compress a week of emails and meetings," he says. "It is much harder to do that in a hospital or a grocery store, where someone has to be physically present." He worries that a four-day week could become a perk for professionals while service workers are left behind.</p>
+<p>Even supporters admit the results are not universal. In one trial, a customer-service team returned to five days after clients complained about slower response times. The team leader said the shorter week worked well internally but “did not suit a job that depends on being available.”</p>
+<p>Still, many observers believe the question is not whether the four-day week will spread, but how. Some suggest rotating schedules, so that a business stays open five days while each employee works four.</p>
+<hr>
+<p><b>Reader comment, from Mona K.:</b> I manage a small pharmacy. We cannot close on Fridays, but last year we tried staggered four-day schedules. It took careful planning, and we had to hire one more part-time pharmacist, but sick days fell and nobody has quit since. It is not free, but it is possible.</p>`,
+ qs:[{q:'According to the article, what did most trials find?',o:['Productivity fell sharply.','Productivity held steady or improved.','Pay had to be reduced.','Turnover increased.'],a:1,why:'"Productivity stayed the same or rose slightly."'},
+  {q:'What is Paul Leclerc’s main concern?',o:['Office workers will become less productive.','The trials were too short.','Workers who must be on site may not benefit.','Companies will cut wages.'],a:2,why:'He worries it becomes "a perk for professionals while service workers are left behind."'},
+  {q:'Why did the customer-service team go back to five days?',o:['Staff burned out.','Clients were unhappy with response times.','Pay was reduced.','The trial ended early.'],a:1,why:'"After clients complained about slower response times."'},
+  {q:'How does Mona K.’s comment relate to the article?',o:['It disproves the critics completely.','It supports the rotating-schedule idea with a real example.','It agrees that service businesses cannot change.','It argues the four-day week costs nothing.'],a:1,why:'She used staggered schedules (the article’s "rotating schedules") but says "it is not free." That rules out options A and D.'}]},
+T1:{kind:'mc',title:'Attitude Marker Sort',minutes:0,
+ context:'Decide what each phrase signals about the speaker’s position.',
+ qs:[{q:'"I see where you’re coming from, but…"',o:['Agree','Disagree','Hedge'],a:1,why:'Polite acknowledgement, then "but" introduces disagreement.'},
+  {q:'"That’s exactly what I was thinking."',o:['Agree','Disagree','Hedge'],a:0,why:'Full agreement.'},
+  {q:'"It might work, depending on the budget."',o:['Agree','Disagree','Hedge'],a:2,why:'"Might" and "depending on" make the position conditional.'},
+  {q:'"I’m not entirely convinced."',o:['Agree','Disagree','Hedge'],a:1,why:'Softened, but still disagreement.'},
+  {q:'"To some extent, yes."',o:['Agree','Disagree','Hedge'],a:2,why:'Partial agreement only.'}]},
+G1:{kind:'mc',title:'Grammar Repair Quiz',minutes:0,
+ context:'Choose the sentence with no errors. Each one comes from a real type of student error.',
+ qs:[{q:'Subject–verb agreement',o:['Each of the rooms have a window.','Each of the rooms has a window.','Each of the room has a window.'],a:1,why:'"Each" is singular, so the verb is "has".'},
+  {q:'Tense consistency',o:['Last week I call the manager and she said no.','Last week I called the manager and she says no.','Last week I called the manager and she said no.'],a:2,why:'Both verbs describe the past.'},
+  {q:'Articles',o:['I would like to request refund.','I would like to request a refund.','I would like to request the refund for.'],a:1,why:'"Refund" is countable here, so it needs "a".'},
+  {q:'Run-on sentence',o:['The room was cold, the heater did not work.','The room was cold because the heater did not work.','The room was cold the heater did not work.'],a:1,why:'Join two clauses with a connector, not a comma.'},
+  {q:'Formal register',o:['I wanna know when you can fix it.','I would appreciate knowing when it can be repaired.','Tell me when you fix it.'],a:1,why:'A complaint email to a manager needs a formal tone.'}]}
+};
+const WRITE={
+W1:{title:'Writing Task 1 · Email',minutes:27,
+ prompt:`<p>You recently stayed at a hotel for a family wedding. Several things went wrong during your stay.</p><p>Write an email to the hotel manager in about 150–200 words. In your email:</p><ul><li>say when you stayed and why</li><li>describe the problems</li><li>explain what you want the hotel to do</li></ul>`,
+ plain:'You recently stayed at a hotel for a family wedding. Several things went wrong. Write an email to the hotel manager (150–200 words): say when you stayed and why; describe the problems; explain what you want the hotel to do.'},
+W2:{title:'Writing Task 2 · Survey Response',minutes:26,
+ prompt:`<p>Your city has money for one new project and is asking residents to choose.</p><div class="opts2" style="margin-top:10px"><div><b>Option A</b><br>Build a new indoor sports and recreation centre.</div><div><b>Option B</b><br>Add more bus routes and run buses more often.</div></div><p style="margin-top:10px">Choose one option. Explain your choice in about 150–200 words.</p>`,
+ plain:'City survey: choose between Option A (build a new indoor sports and recreation centre) and Option B (add more bus routes and run buses more often). Choose one and explain why, 150–200 words.'}
+};
+const SVG_PARK=`<svg class="scene" viewBox="0 0 400 240" role="img" aria-label="A city park on a summer afternoon with dark clouds coming in">
+<rect width="400" height="240" fill="#bfe1f5"/><circle cx="48" cy="40" r="18" fill="#ffd166"/>
+<ellipse cx="320" cy="38" rx="62" ry="22" fill="#6b7787"/><ellipse cx="368" cy="56" rx="44" ry="18" fill="#56627a"/><ellipse cx="280" cy="52" rx="34" ry="14" fill="#7d899a"/>
+<rect y="150" width="400" height="90" fill="#8cc56b"/><polygon points="150,240 190,150 230,150 300,240" fill="#e3cf9f"/>
+<rect x="60" y="100" width="14" height="62" fill="#7a5230"/><circle cx="67" cy="88" r="36" fill="#3f8f4a"/>
+<rect x="96" y="170" width="70" height="7" fill="#8b5a2b"/><rect x="100" y="177" width="4" height="14" fill="#5e3c1c"/><rect x="158" y="177" width="4" height="14" fill="#5e3c1c"/><rect x="96" y="156" width="70" height="5" fill="#8b5a2b"/>
+<circle cx="126" cy="142" r="8" fill="#c68b59"/><rect x="119" y="150" width="14" height="20" rx="3" fill="#3d5a99"/><rect x="128" y="154" width="12" height="9" fill="#f5f5f5"/>
+<rect x="200" y="176" width="44" height="26" fill="#ffffff" stroke="#888" stroke-width="1"/><polygon points="194,176 222,150 250,176" fill="#e4572e"/><rect x="221" y="150" width="2" height="26" fill="#666"/><circle cx="208" cy="205" r="6" fill="#333"/><circle cx="236" cy="205" r="6" fill="#333"/>
+<circle cx="256" cy="168" r="7" fill="#8d5524"/><rect x="250" y="175" width="13" height="22" rx="3" fill="#2a9d8f"/>
+<polygon points="305,72 320,90 305,106 290,90" fill="#f4a261"/><line x1="305" y1="106" x2="330" y2="170" stroke="#444" stroke-width="1"/>
+<circle cx="332" cy="164" r="6" fill="#f1c27d"/><rect x="327" y="170" width="11" height="17" rx="3" fill="#e63946"/>
+<ellipse cx="350" cy="214" rx="14" ry="7" fill="#a0703c"/><circle cx="364" cy="207" r="6" fill="#a0703c"/><circle cx="385" cy="220" r="5" fill="#f4d03f"/></svg>`;
+const SVG_OBJ=`<svg class="scene" viewBox="0 0 260 210" role="img" aria-label="An unusual wooden clock with one hand, a drawer and three legs">
+<rect width="260" height="210" fill="#e9edf3"/>
+<line x1="100" y1="150" x2="82" y2="198" stroke="#5e3c1c" stroke-width="6"/><line x1="160" y1="150" x2="178" y2="198" stroke="#5e3c1c" stroke-width="6"/><line x1="130" y1="150" x2="130" y2="200" stroke="#5e3c1c" stroke-width="6"/>
+<rect x="96" y="132" width="68" height="22" rx="3" fill="#a8723a"/><circle cx="130" cy="143" r="4" fill="#c9a227"/>
+<circle cx="130" cy="72" r="64" fill="#b67d45"/><circle cx="130" cy="72" r="52" fill="#f3e3c3"/>
+<line x1="130" y1="72" x2="168" y2="38" stroke="#c9a227" stroke-width="5" stroke-linecap="round"/><circle cx="130" cy="72" r="6" fill="#c9a227"/>
+<circle cx="130" cy="30" r="3" fill="#7a5230"/><circle cx="172" cy="72" r="3" fill="#7a5230"/><circle cx="130" cy="114" r="3" fill="#7a5230"/><circle cx="88" cy="72" r="3" fill="#7a5230"/></svg>`;
+const SPEAK={
+S1:{task:'Task 1 · Giving Advice',prep:30,speak:90,prompt:'Your friend Marco has been offered a job in another city. The pay is much higher, but he would have to move away from his parents and his friends. Advise Marco on what to do.'},
+S2:{task:'Task 2 · Talking About a Personal Experience',prep:30,speak:60,prompt:'Talk about a time you had to learn a new skill quickly. What happened, and how did you feel about it?'},
+S3:{task:'Task 3 · Describing a Scene',prep:30,speak:60,prompt:'Describe what is happening in this picture to someone who cannot see it.',img:SVG_PARK},
+S4:{task:'Task 4 · Making Predictions',prep:30,speak:60,prompt:'Look at the same picture. What will probably happen next? Give details.',img:SVG_PARK},
+S5:{task:'Task 5 · Comparing and Persuading',choose:60,prep:60,speak:60,prompt:'Your family is buying a used vehicle. Choose the option you prefer. Then persuade your family member, who prefers the other option, that yours is better.',
+ opts:['<b>Compact car</b><br>2019 · 85,000 km<br>$14,500 · 5 seats<br>Very low fuel cost','<b>Minivan</b><br>2017 · 110,000 km<br>$16,000 · 7 seats<br>Large cargo space']},
+S6:{task:'Task 6 · Dealing with a Difficult Situation',prep:60,speak:60,prompt:'Your coworker asked you to cover their Saturday shift because of a family emergency. But you already promised to help your sister move to her new apartment that day. Choose ONE: talk to your coworker and explain why you cannot help, OR talk to your sister and explain why you need to change plans.'},
+S7:{task:'Task 7 · Expressing Opinions',prep:30,speak:90,prompt:'Should cities close downtown streets to cars on weekends? Explain your opinion.'},
+S8:{task:'Task 8 · Describing an Unusual Situation',prep:30,speak:60,prompt:'You see this unusual object in a second-hand shop. Call your friend, who collects strange clocks. Describe the object in detail so your friend can decide whether to buy it.',img:SVG_OBJ},
+S9:{task:'Final Sample · Expressing Opinions',prep:30,speak:90,prompt:'Should high school students be required to complete 40 hours of community volunteering before they graduate? Explain your opinion.'}
+};
+
+/* ---------- state helpers ---------- */
+const tasksDone=()=>store.get('tasks',{});
+const results=()=>store.get('res',{});
+function sessionProgress(s){const t=tasksDone();const done=s.tasks.filter((_,i)=>t[s.n+':'+i]).length;return {done,total:s.tasks.length,pct:Math.round(done/s.tasks.length*100)}}
+function nextSession(){return SESSIONS.find(s=>sessionProgress(s).pct<100)||SESSIONS[11]}
+function skillScores(r){r=r||results();const out={L:[],R:[],W:[],S:[]};
+  for(const [k,v] of Object.entries(r)){const tool=k.split(':')[1];const q=QUIZ[tool];
+    if(q&&q.kind==='listen')out.L.push(v.pct);else if(q&&q.kind==='read')out.R.push(v.pct);
+    else if(WRITE[tool]&&v.self)out.W.push(v.self);else if(SPEAK[tool]&&v.self)out.S.push(v.self);}
+  return out}
+function addLog(entry){const log=store.get('log',[]);log.unshift(Object.assign({id:Date.now()+Math.random(),date:new Date().toISOString().slice(0,10),cause:''},entry));store.set('log',log)}
+
+/* ---------- timers registry ---------- */
+let intervals=[];const every=(fn,ms)=>{const id=setInterval(fn,ms);intervals.push(id);return id};
+function clearAll(){intervals.forEach(clearInterval);intervals=[];try{speechSynthesis.cancel()}catch(e){}}
+const fmt=s=>`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+let audioCtx=null;function beep(f=880){try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.25)}catch(e){}}
+
+/* ---------- views ---------- */
+const app=document.getElementById('app');
+function view(soft){clearAll();const h=(location.hash||'#home').slice(1);
+  if(!cloud.code&&!cloud.tpass&&h!=='teacher'){document.querySelectorAll('[data-nav]').forEach(a=>a.removeAttribute('aria-current'));app.innerHTML=LoginView();bindLogin();if(!soft)window.scrollTo(0,0);return}
+  document.querySelectorAll('[data-nav]').forEach(a=>a.toggleAttribute('aria-current',false));
+  let m;
+  if(h==='syllabus'){mark('syllabus');app.innerHTML=Syllabus()}
+  else if(h==='log'){mark('log');app.innerHTML=LogView();bindLog()}
+  else if(h==='teacher'){mark('teacher');app.innerHTML=TeacherView();bindTeacher()}
+  else if((m=h.match(/^session-(\d+)$/))&&SESSIONS[m[1]-1]){mark('syllabus');renderSession(SESSIONS[m[1]-1])}
+  else {mark('home');app.innerHTML=Dashboard();bindDashboard()}
+  if(!soft)window.scrollTo(0,0)}
+function mark(n){const a=document.querySelector(`[data-nav="${n}"]`);if(a)a.setAttribute('aria-current','page')}
+
+const ICON={L:'<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>',
+ R:'<path d="M3 5.5C5.5 4 8.5 4 12 6c3.5-2 6.5-2 9-.5V19c-2.5-1.5-5.5-1.5-9 .5-3.5-2-6.5-2-9-.5z"/><path d="M12 6v13.5"/>',
+ W:'<path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 7l3 3"/>',
+ S:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
+ O:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+ T:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>'};
+const icon=(k,sz=22)=>`<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+const CHECK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-label="Complete"><path d="M5 12l5 5 9-10"/></svg>';
+const skv=k=>`--c:var(--sk${k});--ci:var(--sk${k}i)`;
+const SKSESS={L:[2,3],R:[4,5],W:[6,7,8],S:[9,10,11]};
+function Dashboard(){
+  const nx=nextSession();const targets=store.get('targets',{L:9,R:9,W:9,S:9});const sc=skillScores();
+  const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
+  const log=store.get('log',[]);const totalTasks=SESSIONS.reduce((a,s)=>a+s.tasks.length,0);const doneTasks=SESSIONS.reduce((a,s)=>a+sessionProgress(s).done,0);
+  const tavg=Math.round((+targets.L + +targets.R + +targets.W + +targets.S)/4);
+  const scoreLine=k=>{const v=avg(sc[k]);if(v==null)return '<span class="muted">No attempts yet</span>';return (k==='L'||k==='R')?`Practice accuracy <b>${v}%</b>`:`Self-score average <b>${(v/20).toFixed(1)}/5</b>`};
+  const np=sessionProgress(nx);
+  return `<div class="stack" style="gap:28px">
+  <section class="hero2">
+    <div class="stack" style="gap:16px;min-width:0">
+      <div class="eyebrow">${cloud.student&&cloud.student.name?'Welcome, '+esc(cloud.student.name.split(' ')[0]):'CELPIP-General · 12 sessions · 2 hours each'}</div>
+      <h1>Class time is for teaching. Practice happens in the Hub.</h1>
+      <p class="lead">Each session has two halves. In the live half, your instructor teaches. In the Study Hub half, you practise on your own before the next class.</p>
+      <div class="upnext" style="${skv(nx.k)}"><span class="ic">${icon(nx.k)}</span><div style="min-width:0;flex:1"><div class="eyebrow" style="color:var(--ci)">Up next · Session ${nx.n}</div><b>${esc(nx.title)}</b><div class="muted" style="font-size:13px">${np.done} of ${np.total} Hub tasks done</div></div><a class="btn primary" href="#session-${nx.n}">Open</a></div>
+    </div>
+    <figure class="ladder">
+      <figcaption><span class="eyebrow">Your CLB ladder</span><span>Average target <b>CLB ${tavg}</b></span></figcaption>
+      <div class="rungs" role="img" aria-label="CLB levels 4 to 12, target ${tavg} highlighted">${[4,5,6,7,8,9,10,11,12].map(v=>`<div class="rung ${v===tavg?'on':v<tavg?'below':''}" style="height:${20+(v-4)*10}%"><span>${v}</span></div>`).join('')}</div>
+      <div class="note">Each level you climb opens more immigration and citizenship options. Set your targets below.</div>
+    </figure>
+  </section>
+  <section>
+    <div class="secthead"><h2>Your four skills</h2><span class="muted" style="font-size:13px">Pick the CLB level your application requires</span></div>
+    <div class="skills4">${['L','R','W','S'].map(k=>{const ss=SKSESS[k].map(n=>SESSIONS[n-1]);const d=ss.reduce((a,x)=>a+sessionProgress(x).done,0),t=ss.reduce((a,x)=>a+x.tasks.length,0);
+      return `<div class="skcard" style="${skv(k)}">
+        <div class="row" style="flex-wrap:nowrap"><span class="ic">${icon(k)}</span><div style="min-width:0"><h3>${SKILL[k]}</h3><div class="muted" style="font-size:12.5px">Sessions ${SKSESS[k][0]}–${SKSESS[k][SKSESS[k].length-1]}</div></div></div>
+        <label class="tsel" for="tg-${k}">Target CLB<select id="tg-${k}" data-target="${k}">${[4,5,6,7,8,9,10,11,12].map(v=>`<option ${targets[k]==v?'selected':''}>${v}</option>`).join('')}</select></label>
+        <div class="score">${scoreLine(k)}</div>
+        <div><div class="row" style="justify-content:space-between;font-size:12px;margin-bottom:4px"><span class="muted">Hub tasks</span><span>${d}/${t}</span></div><div class="bar-track" style="background:var(--surface)"><div class="bar-fill" style="width:${t?d/t*100:0}%;background:var(--ci)"></div></div></div>
+      </div>`}).join('')}</div>
+  </section>
+  ${ClassCard()}
+  <section class="panel stack" style="gap:14px">
+    <div class="row"><h3>Study Hub progress</h3><span class="spacer"></span><span class="muted" style="font-size:13px">${doneTasks} of ${totalTasks} tasks</span></div>
+    <div class="strip">${SESSIONS.map(s=>{const p=sessionProgress(s);return `<a href="#session-${s.n}" style="${skv(s.k)}" class="${s===nx?'next':''}" title="Session ${s.n}: ${esc(s.title)}">${p.pct===100?`<span class="ck">${CHECK}</span>`:''}<span class="n">S${String(s.n).padStart(2,'0')}</span><span class="muted" style="font-size:11px">${SKILL[s.k]}</span><div class="bar-track"><div class="bar-fill" style="width:${p.pct}%"></div></div></a>`}).join('')}</div>
+  </section>
+  <section class="grid g2">
+    <div class="panel stack" style="gap:14px"><h3>How each session works</h3>
+      <div class="steps">
+        <div class="step"><i>1</i><p><b>Before class.</b> Finish the previous Hub module. Your instructor opens each class with your results.</p></div>
+        <div class="step live"><i>2</i><p><b>In class.</b> No quizzes and no quiet work. Watch strategies modelled live and work through errors together.</p></div>
+        <div class="step hub"><i>3</i><p><b>After class.</b> The Hub module opens: drills, timed writing and speaking practice.</p></div>
+      </div></div>
+    <div class="panel stack" style="gap:12px"><div class="row"><h3>Error Log</h3><span class="spacer"></span><a href="#log" class="btn">Open log</a></div>
+      <p class="muted">${log.length?`${log.length} logged misses. ${log.filter(e=>!e.cause).length} still need a cause.`:'Wrong answers from Hub quizzes land here automatically. Tag each one with a cause to find your pattern.'}</p>
+      ${causeBars(log)}</div>
+  </section></div>`}
+
+function ClassCard(){
+  if(!cloud.code)return cloud.tpass?`<section class="panel row" style="background:var(--lav)"><span class="ic" style="--c:var(--surface);--ci:var(--skRi)">${icon('O')}</span><div style="flex:1;min-width:0"><h3>You are signed in as the teacher</h3><p class="muted" style="font-size:14px">This is a preview of the student view. Practice you do here is not saved to any student.</p></div><a class="btn primary" href="#teacher">Open Teacher Portal</a></section>`:'';
+  const st=cloud.student||{},b=cloud.batch,fb=cloud.feedback;
+  return `<section class="panel classcard3">
+    <div class="stack" style="gap:6px"><div class="eyebrow">Student</div><h3>${esc(st.name)}</h3><p style="font-size:14px">${esc(st.email)}${st.phone?'<br>'+esc(st.phone):''}</p><p class="muted" style="font-size:12.5px">Access code <b>${esc(cloud.code)}</b>. To change your details, contact your teacher.</p></div>
+    <div class="stack" style="gap:6px"><div class="eyebrow">My batch</div>${b?`<h3>${esc(b.name)}</h3><p class="muted" style="font-size:14px">${esc(b.schedule)}${b.schedule&&b.start?' · ':''}${b.start?'Starts '+esc(fmtDate(b.start)):''}</p>`:'<p class="muted" style="font-size:14px">Your teacher has not assigned your batch yet.</p>'}<p style="font-size:14px">Your practice saves to your class automatically.</p></div>
+    <div class="stack" style="gap:8px"><div class="eyebrow" style="color:var(--skRi)">Feedback from your teacher</div>${fb&&fb.text?`<div class="fbnote">${esc(fb.text)}</div><span class="muted" style="font-size:12.5px">Updated ${ago(fb.updatedAt)}</span>`:`<div class="fbnote muted">No feedback yet. It appears here after your teacher reviews your work.</div>`}</div>
+  </section>`}
+function bindClassCard(){}
+function bindDashboard(){bindClassCard();app.querySelectorAll('[data-target]').forEach(sel=>sel.addEventListener('change',()=>{const t=store.get('targets',{L:9,R:9,W:9,S:9});t[sel.dataset.target]=+sel.value;store.set('targets',t)}))}
+const CAUSES=['distractor','vocabulary','timing','inference'];
+function causeBars(log){if(!log.length)return '';const max=Math.max(1,...CAUSES.map(c=>log.filter(e=>e.cause===c).length));
+  return `<div class="cause-bars">${CAUSES.map(c=>{const n=log.filter(e=>e.cause===c).length;return `<div><span style="text-transform:capitalize">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${n/max*100}%"></div></div><span class="mono">${n}</span></div>`}).join('')}</div>`}
+
+function Syllabus(){
+  const phases=[['O',[1]],['L',[2,3]],['R',[4,5]],['W',[6,7,8]],['S',[9,10,11]],['T',[12]]];
+  return `<div class="stack" style="gap:28px">
+  <section class="hero2 slim"><div class="stack" style="gap:12px"><div class="eyebrow">Course map</div><h1>Syllabus</h1>
+    <p class="lead">Twelve two-hour live sessions, each paired with a Study Hub module. Open a session to see the live teaching plan and its Hub work.</p>
+    <div class="legend">${phases.map(([k])=>`<span style="${skv(k)}">${icon(k,15)} ${SKILL[k]}</span>`).join('')}</div></div></section>
+  ${phases.map(([k,ns])=>`<section class="phase" style="${skv(k)}"><div class="phase-head"><span class="ic">${icon(k)}</span><div><h2>${SKILL[k]}</h2><div class="muted" style="font-size:13px">Session${ns.length>1?'s':''} ${ns[0]}${ns.length>1?'–'+ns[ns.length-1]:''}</div></div></div>
+   ${ns.map(n=>{const s=SESSIONS[n-1];const p=sessionProgress(s);return `<a class="srow" href="#session-${n}"><span class="num">${p.pct===100?CHECK:String(n).padStart(2,'0')}</span><div style="min-width:0"><h3>${esc(s.title)}</h3><p>${esc(s.obj)}</p></div><div class="prog"><div class="row" style="justify-content:space-between;font-size:12px;margin-bottom:4px"><span class="muted">Hub</span><span>${p.done}/${p.total}</span></div><div class="bar-track"><div class="bar-fill" style="width:${p.pct}%;background:var(--ci)"></div></div></div></a>`}).join('')}</section>`).join('')}</div>`}
+
+function renderSession(s){
+  const tab=store.get('tab','live');const prev=SESSIONS[s.n-2];const gated=prev&&sessionProgress(prev).pct<100;
+  const len=(a,b)=>{const m=x=>{const [h,mm]=x.split(':');return +h*60+ +mm};return m(b)-m(a)};
+  app.innerHTML=`<div class="stack">
+  <div class="row"><a href="#syllabus" class="muted" style="font-size:14px">← Syllabus</a><span class="spacer"></span>
+    ${s.n>1?`<a class="btn" href="#session-${s.n-1}">← S${s.n-1}</a>`:''}${s.n<12?`<a class="btn" href="#session-${s.n+1}">S${s.n+1} →</a>`:''}</div>
+  <section class="sband" style="${skv(s.k)}"><span class="bignum">${String(s.n).padStart(2,'0')}</span><div class="stack" style="gap:12px;min-width:0"><div class="row" style="gap:10px"><span class="chip">${icon(s.k,15)} ${SKILL[s.k]}</span><span class="eyebrow" style="color:var(--ci)">Session ${s.n} of 12</span></div><h1>${esc(s.title)}</h1><p style="font-size:16px;max-width:64ch"><b>Core lesson objective:</b> ${esc(s.obj)}</p></div></section>
+  <div class="tabs" role="tablist">
+    <button class="tab t-live" role="tab" id="tab-live" aria-selected="${tab==='live'}" data-tab="live">${icon('T',17)}In class · 2 hours</button>
+    <button class="tab t-hub" role="tab" id="tab-hub" aria-selected="${tab==='hub'}" data-tab="hub">${icon('W',17)}Study Hub · on your own</button>
+  </div>
+  <section id="pane-live" ${tab==='live'?'':'hidden'} class="stack">
+    <div class="boundary">${icon('S',20)}<p><b>What happens in class.</b> Your instructor teaches and models every strategy live. There are no quizzes and no quiet work during class time.</p></div>
+    <div class="grid g2" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+      <div class="panel"><h3 style="margin-bottom:6px">Teaching breakdown</h3><ol class="timeline">${s.live.map(([a,b,t,d])=>`<li><span class="t">${a}–${b}<span class="len">${len(a,b)} min</span></span><div><b>${esc(t)}</b><span class="muted">${esc(d)}</span></div></li>`).join('')}</ol></div>
+      <div class="panel"><h3 style="margin-bottom:12px">Live tools</h3><ul class="tools">${s.liveTools.map(([t,d])=>`<li><b>${esc(t)}</b>${esc(d)}</li>`).join('')}</ul></div>
+    </div>
+  </section>
+  <section id="pane-hub" ${tab==='hub'?'':'hidden'} class="stack">
+    <div class="boundary hubb">${icon('W',20)}<p><b>Do this on your own before ${s.n<12?'Session '+(s.n+1):'your test'}.</b> Work through the steps in order. Your instructor opens the next class with your results.</p></div>
+    ${gated?`<div class="notice" id="gate">Finish the Session ${prev.n} module first. You have done ${sessionProgress(prev).done} of ${prev.tasks.length} tasks. <a href="#session-${prev.n}">Go to Session ${prev.n}</a> · <button class="btn" id="gate-open" style="margin-left:6px">Preview anyway</button></div>`:''}
+    <div id="hub-body" class="stack" ${gated?'hidden':''}>
+      <div class="panel"><div class="row" style="margin-bottom:10px;flex-wrap:nowrap"><div class="ring" id="hubring"><span id="hubprog"></span></div><div style="min-width:0"><h3>Your to-do list</h3><p class="muted" style="font-size:13.5px">Tick each task when it is done. The practice tools are below, in order.</p></div></div>
+        <ul class="tasks">${s.tasks.map(([t,d],i)=>`<li><input type="checkbox" id="t-${s.n}-${i}" data-task="${s.n}:${i}" ${tasksDone()[s.n+':'+i]?'checked':''}><label for="t-${s.n}-${i}"><b>${esc(t)}</b><span>${esc(d)}</span></label></li>`).join('')}</ul></div>
+      ${s.tools.map(t=>`<div id="tool-${t}"></div>`).join('')}
+    </div>
+  </section></div>`;
+  const setProg=()=>{const p=sessionProgress(s);const el=document.getElementById('hubprog');if(el)el.textContent=`${p.done}/${p.total}`;const r=document.getElementById('hubring');if(r)r.style.setProperty('--p',p.pct)};setProg();
+  app.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{store.set('tab',b.dataset.tab);
+    app.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));
+    document.getElementById('pane-live').hidden=b.dataset.tab!=='live';document.getElementById('pane-hub').hidden=b.dataset.tab!=='hub'}));
+  app.querySelectorAll('[data-task]').forEach(c=>c.addEventListener('change',()=>{const t=tasksDone();t[c.dataset.task]=c.checked;store.set('tasks',t);setProg()}));
+  const go=document.getElementById('gate-open');if(go)go.addEventListener('click',()=>{document.getElementById('hub-body').hidden=false;document.getElementById('gate').hidden=true});
+  let opened=false;const res=results();
+  s.tools.forEach((t,i)=>{const host=document.getElementById('tool-'+t);
+    if(QUIZ[t])Quiz(host,s,t);else if(WRITE[t])Writer(host,s,t);else if(SPEAK[t])Speaker(host,s,t);else if(t==='READY')Ready(host);
+    const card=host.querySelector('.tool'),head=host.querySelector('.tool-head');if(!card||!head)return;
+    head.insertAdjacentHTML('afterbegin',`<span class="stepno">Step ${i+1}</span>`);
+    head.insertAdjacentHTML('beforeend','<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>');
+    head.setAttribute('role','button');head.tabIndex=0;
+    const done=!!res[s.n+':'+t];if(done)head.insertAdjacentHTML('beforeend',`<span class="chip good" style="background:var(--surface)">${CHECK} Done</span>`);
+    if(done||opened)card.classList.add('closed');else opened=true;
+    head.setAttribute('aria-expanded',!card.classList.contains('closed'));
+    const tog=e=>{if(e.target.closest('button,select,input,a'))return;card.classList.toggle('closed');head.setAttribute('aria-expanded',!card.classList.contains('closed'))};
+    head.addEventListener('click',tog);head.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tog(e)}})});
+}
+
+/* ---------- Quiz tool (listening / reading / mc) ---------- */
+function Quiz(host,s,key){
+  const q=QUIZ[key];const rk=s.n+':'+key;
+  const prior=results()[rk];
+  let remaining=q.minutes*60,timerId=null,submitted=false,played=false;
+  const kindLabel={listen:'Single-play listening',read:'Timed reading',mc:'Self-grading drill'}[q.kind];
+  host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">${kindLabel}</span><h3>${esc(q.title)}</h3><span class="spacer"></span>
+   ${prior?`<span class="chip good">Last score ${prior.score}/${prior.total}</span>`:''}${q.minutes?`<span class="timer" data-timer>${fmt(remaining)}</span>`:''}</div>
+   <div class="tool-body">
+   ${q.kind==='listen'?`<p class="muted">${esc(q.context)}</p><div class="player" data-player><button class="btn hub" data-play>▶ Play audio (plays once)</button><div class="wave">${'<i></i>'.repeat(14)}</div><span class="muted" data-pstatus style="font-size:13px">Questions unlock after the audio ends.</span></div>`:''}
+   ${q.kind==='read'?`<div class="splitread"><div class="passage">${q.passage}</div><div class="stack" data-qs></div></div>`:''}
+   ${q.kind==='mc'?`<p class="muted">${esc(q.context)}</p>`:''}
+   ${q.kind!=='read'?`<div class="stack" data-qs ${q.kind==='listen'?'hidden':''}></div>`:''}
+   <div class="row"><button class="btn primary" data-submit ${q.kind==='listen'?'hidden':''}>Submit answers</button><span class="spacer"></span><button class="btn" data-retake hidden>Retake</button></div>
+   <div data-out></div></div></div>`;
+  const qsEl=host.querySelector('[data-qs]');
+  qsEl.innerHTML=q.qs.map((x,i)=>`<fieldset class="q" style="border:0;margin:0;padding-inline:0"><legend class="qt">${i+1}. ${esc(x.q)}</legend>${x.o.map((o,j)=>`<label class="opt" data-opt="${i}-${j}"><input type="radio" name="${rk}-q${i}" value="${j}"><span>${esc(o)}</span></label>`).join('')}<div class="why" data-why="${i}" hidden></div></fieldset>`).join('');
+  const timerEl=host.querySelector('[data-timer]');
+  const startTimer=()=>{if(!q.minutes||timerId)return;timerId=every(()=>{remaining--;if(timerEl){timerEl.textContent=fmt(Math.max(0,remaining));timerEl.classList.toggle('low',remaining<=60)}if(remaining<=0){clearInterval(timerId);grade(true)}},1000)};
+  if(q.kind==='read')startTimer();
+  if(q.kind==='mc'){}
+  const play=host.querySelector('[data-play]');
+  if(play)play.addEventListener('click',()=>{if(played)return;played=true;play.disabled=true;const st=host.querySelector('[data-pstatus]');const pl=host.querySelector('[data-player]');
+    const reveal=()=>{pl.classList.remove('playing');st.textContent='Audio finished. Answer the questions.';qsEl.hidden=false;host.querySelector('[data-submit]').hidden=false;startTimer()};
+    if(!('speechSynthesis' in window)){st.textContent='Audio is not available in this browser. Read the transcript once instead.';showTranscript();reveal();return}
+    pl.classList.add('playing');st.textContent='Playing… listen carefully.';
+    const voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang));const speakers=[...new Set(q.audio.map(a=>a[0]))];
+    let i=0;const next=()=>{if(i>=q.audio.length){reveal();return}const [who,text]=q.audio[i++];const u=new SpeechSynthesisUtterance(text);u.lang='en-CA';u.rate=.98;
+      const idx=speakers.indexOf(who);if(voices.length)u.voice=voices[idx%voices.length];u.pitch=idx===1?.85:1.05;u.onend=next;u.onerror=next;speechSynthesis.speak(u)};
+    try{next()}catch(e){reveal()}});
+  function showTranscript(){if(host.querySelector('[data-transcript]'))return;const d=document.createElement('div');d.className='transcript';d.dataset.transcript='';d.innerHTML='<div class="eyebrow" style="margin-bottom:6px">Transcript</div>'+q.audio.map(([w,t])=>`<p><b>${esc(w)}:</b> ${esc(t)}</p>`).join('');host.querySelector('[data-out]').before(d)}
+  host.querySelector('[data-submit]').addEventListener('click',()=>grade(false));
+  function grade(auto){if(submitted)return;submitted=true;if(timerId)clearInterval(timerId);let score=0;
+    q.qs.forEach((x,i)=>{const sel=host.querySelector(`input[name="${CSS.escape(rk+'-q'+i)}"]:checked`);const v=sel?+sel.value:-1;
+      host.querySelectorAll(`input[name="${CSS.escape(rk+'-q'+i)}"]`).forEach(r=>r.disabled=true);
+      host.querySelector(`[data-opt="${i}-${x.a}"]`).classList.add('right');if(v===x.a)score++;else{if(v>=0)host.querySelector(`[data-opt="${i}-${v}"]`).classList.add('wrong');
+        addLog({session:s.n,skill:q.kind==='read'?'Reading':q.kind==='listen'?'Listening':'Drill',item:`${q.title}: Q${i+1} ${x.q}`,yours:v>=0?x.o[v]:'(no answer)',correct:x.o[x.a]})}
+      const w=host.querySelector(`[data-why="${i}"]`);w.textContent=x.why;w.hidden=false});
+    const pct=Math.round(score/q.qs.length*100);const r=results();r[rk]={score,total:q.qs.length,pct,at:Date.now()};store.set('res',r);
+    if(q.kind==='listen')showTranscript();
+    host.querySelector('[data-submit]').hidden=true;host.querySelector('[data-retake]').hidden=false;
+    host.querySelector('[data-out]').innerHTML=`<div class="result"><span class="big mono">${score}/${q.qs.length}</span><div>${auto?'Time is up. Answers were submitted automatically. ':''}${score===q.qs.length?'Perfect set.':`${q.qs.length-score} miss${q.qs.length-score>1?'es':''} added to your <a href="#log">Error Log</a>. Tag each one with a cause.`}${q.kind==='listen'?' Now audit the transcript: find the line that proves each answer.':''}</div></div>`}
+  host.querySelector('[data-retake]').addEventListener('click',()=>Quiz(host,s,key));
+}
+
+/* ---------- Writing tool ---------- */
+function Writer(host,s,key){
+  const w=WRITE[key];const dk='w:'+s.n+':'+key;const rk=s.n+':'+key;let remaining=w.minutes*60,tid=null;
+  host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">Timed writing</span><h3>${esc(w.title)}</h3><span class="spacer"></span><span class="timer" data-timer>${fmt(remaining)}</span></div>
+  <div class="tool-body"><div class="prompt">${w.prompt}</div>
+   <div class="row"><button class="btn hub" data-start>Start ${w.minutes}-minute timer</button><span class="muted" style="font-size:13px">Pasting is turned off, as on the real test.</span><span class="spacer"></span><span class="wc" data-wc>0 words</span></div>
+   <label for="ta-${rk}" class="eyebrow">Your response</label>
+   <textarea class="write" id="ta-${rk}" spellcheck="false" placeholder="Start typing your response here…"></textarea>
+   <div class="row"><button class="btn primary" data-submit>Submit response</button><span class="muted" data-msg style="font-size:13px"></span></div>
+   <div data-after hidden class="stack">
+     <div><h3 style="margin-bottom:8px">Score yourself first</h3><div class="rubric">${['Content & coherence','Vocabulary','Readability','Task fulfillment'].map((c,i)=>`<label>${c}<select data-rub="${i}"><option value="">–</option>${[1,2,3,4,5].map(v=>`<option>${v}</option>`).join('')}</select></label>`).join('')}</div></div>
+     <div class="row"><button class="btn" data-saverub>Save self-score</button><button class="btn hub" data-ai hidden>Get feedback from Claude</button><span class="muted" data-aimsg style="font-size:13px"></span></div>
+     <div class="feedback" data-fb hidden></div>
+   </div></div></div>`;
+  const ta=host.querySelector('textarea'),wc=host.querySelector('[data-wc]'),timer=host.querySelector('[data-timer]');
+  ta.value=store.get(dk,'');
+  const count=()=>{const n=(ta.value.trim().match(/\S+/g)||[]).length;wc.textContent=n+' words';wc.className='wc '+(n===0?'':(n>=150&&n<=200?'ok':'bad'));return n};count();
+  ta.addEventListener('input',()=>{count();store.set(dk,ta.value)});
+  ta.addEventListener('paste',e=>{e.preventDefault();host.querySelector('[data-msg]').textContent='Paste is turned off. Type your answer.'});
+  host.querySelector('[data-start]').addEventListener('click',e=>{e.target.disabled=true;ta.focus();tid=every(()=>{remaining--;timer.textContent=fmt(Math.max(0,remaining));timer.classList.toggle('low',remaining<=180);
+    if(remaining===180)host.querySelector('[data-msg]').textContent='3 minutes left. Start your proofreading pass.';
+    if(remaining<=0){clearInterval(tid);ta.readOnly=true;submit(true)}},1000)});
+  const after=host.querySelector('[data-after]');
+  function submit(auto){const n=count();if(n<20&&!auto){host.querySelector('[data-msg]').textContent='Write at least a few sentences before submitting.';return}
+    if(tid)clearInterval(tid);const r=results();r[rk]=Object.assign(r[rk]||{},{words:n,at:Date.now(),text:ta.value});store.set('res',r);
+    host.querySelector('[data-msg]').textContent=(auto?'Time is up. ':'')+`Submitted · ${n} words${n<150?' · under the 150-word target':n>200?' · over the 200-word target':''}.`;after.hidden=false}
+  host.querySelector('[data-submit]').addEventListener('click',()=>submit(false));
+  host.querySelector('[data-saverub]').addEventListener('click',()=>{const v=[...host.querySelectorAll('[data-rub]')].map(x=>+x.value).filter(Boolean);
+    if(v.length<4){host.querySelector('[data-aimsg]').textContent='Score all four criteria.';return}
+    const r=results();r[rk]=Object.assign(r[rk]||{},{self:Math.round(v.reduce((a,b)=>a+b)/4*20)});store.set('res',r);host.querySelector('[data-aimsg]').textContent='Self-score saved.'});
+  samplePromise.then(sample=>{if(!sample)return;const b=host.querySelector('[data-ai]');b.hidden=false;let ctrl=null;
+    b.addEventListener('click',async()=>{const fb=host.querySelector('[data-fb]');fb.hidden=false;fb.textContent='Reading your response…';b.disabled=true;
+      if(ctrl)ctrl.abort();ctrl=new AbortController();
+      const input=`You are an experienced rater for the CELPIP-General Writing test. Give feedback to a learner.\n\nTask (${w.minutes} minutes, target 150–200 words): ${w.plain}\n\nLearner response (${count()} words):\n"""\n${ta.value}\n"""\n\nReply in plain text, under 230 words, with these sections:\nESTIMATED LEVELS: one line each for Content & Coherence, Vocabulary, Readability, Task Fulfillment, each with a CELPIP level from 1–12 and a short reason.\nTOP 3 FIXES: numbered; for each, quote the learner's sentence and give an improved version.\nNEXT STEP: one sentence.\nEnd with: "Estimate only. Not an official CELPIP score."`;
+      try{const res=await sample(input,{signal:ctrl.signal,cache:false,onText:({text})=>{fb.textContent=text}});fb.textContent=res.text}
+      catch(err){if(err&&err.code==='not_granted'){b.hidden=true;fb.textContent='Claude feedback is not available on this view. Use the self-score and your instructor’s feedback.'}
+        else if(err&&err.code==='rate_limited'){fb.textContent='Too many requests right now. Try again in a few minutes.'}
+        else if(!(err&&err.name==='AbortError')){fb.textContent='Feedback could not be generated. Try again later.'}}
+      finally{b.disabled=false}})});
+}
+
+/* ---------- Speaking tool ---------- */
+function Speaker(host,s,key){
+  const t=SPEAK[key];const rk=s.n+':'+key;
+  const phases=[];if(t.choose)phases.push(['choose','Choose an option',t.choose]);phases.push(['prep','Preparation',t.prep]);phases.push(['speak','Speak now',t.speak]);
+  host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">Timed speaking</span><h3>${esc(t.task)}</h3><span class="spacer"></span><span class="mono muted" style="font-size:13px">${t.choose?t.choose+'s choose · ':''}${t.prep}s prep · ${t.speak}s speak</span></div>
+  <div class="tool-body"><div class="prompt"><p>${esc(t.prompt)}</p>${t.opts?`<div class="opts2" style="margin-top:10px">${t.opts.map(o=>`<div>${o}</div>`).join('')}</div>`:''}</div>
+   ${t.img?t.img:''}
+   <div class="notice"><b>Before you start:</b> open your phone’s voice recorder. Press record when the timer says <b>Speak now</b>. A beep marks the start and the end.</div>
+   <div class="stage" data-stage><div class="clock" data-clock>${fmt(phases[0][2])}</div><div><div class="eyebrow" data-phase>Ready</div><div class="muted" data-hint style="font-size:14px">The timer runs exactly like the test. You cannot pause it.</div></div></div>
+   <div class="row"><button class="btn hub" data-go>Start task</button><button class="btn" data-reset hidden>Try again</button></div>
+   <div data-after hidden class="stack">
+     <div class="row"><label class="btn" for="up-${rk}">Upload your recording</label><input type="file" id="up-${rk}" accept="audio/*" hidden><span class="muted" data-upmsg style="font-size:13px">Audio stays on this device.</span></div>
+     <audio controls data-audio hidden style="width:100%"></audio>
+     <div><h3 style="margin-bottom:8px">Score yourself as you listen back</h3><div class="rubric">${['Content & coherence','Vocabulary','Listenability','Task fulfillment'].map((c,i)=>`<label>${c}<select data-rub="${i}"><option value="">–</option>${[1,2,3,4,5].map(v=>`<option>${v}</option>`).join('')}</select></label>`).join('')}</div></div>
+     <div class="row"><button class="btn primary" data-save>Save self-score</button><span class="muted" data-msg style="font-size:13px"></span></div>
+   </div></div></div>`;
+  const clock=host.querySelector('[data-clock]'),ph=host.querySelector('[data-phase]'),hint=host.querySelector('[data-hint]'),stage=host.querySelector('[data-stage]');
+  const hints={choose:'Pick the option you can argue best.',prep:'Plan your frame. Note 2–3 key points.',speak:'Recording on your phone? Keep talking until the beep.'};
+  host.querySelector('[data-go]').addEventListener('click',e=>{e.target.hidden=true;let i=0;
+    const run=()=>{if(i>=phases.length){stage.classList.remove('speak');ph.textContent='Time is up';hint.textContent='Stop your recording, then upload it below.';clock.textContent='0:00';beep(520);host.querySelector('[data-after]').hidden=false;host.querySelector('[data-reset]').hidden=false;return}
+      const [id,label,sec]=phases[i++];let left=sec;ph.textContent=label;hint.textContent=hints[id];clock.textContent=fmt(left);stage.classList.toggle('speak',id==='speak');if(id==='speak')beep(880);
+      const iv=every(()=>{left--;clock.textContent=fmt(Math.max(0,left));if(left<=0){clearInterval(iv);run()}},1000)};run()});
+  host.querySelector('[data-reset]').addEventListener('click',()=>{clearAll();Speaker(host,s,key)});
+  host.querySelector('input[type=file]').addEventListener('change',ev=>{const f=ev.target.files[0];if(!f)return;const a=host.querySelector('[data-audio]');a.src=URL.createObjectURL(f);a.hidden=false;host.querySelector('[data-upmsg]').textContent=f.name});
+  host.querySelector('[data-save]').addEventListener('click',()=>{const v=[...host.querySelectorAll('[data-rub]')].map(x=>+x.value).filter(Boolean);
+    if(v.length<4){host.querySelector('[data-msg]').textContent='Score all four criteria.';return}
+    const r=results();r[rk]={self:Math.round(v.reduce((a,b)=>a+b)/4*20),at:Date.now()};store.set('res',r);host.querySelector('[data-msg]').textContent='Saved. It counts toward your speaking average on the Dashboard.'});
+}
+
+/* ---------- Readiness report ---------- */
+function Ready(host){const sc=skillScores();const tg=store.get('targets',{L:9,R:9,W:9,S:9});const log=store.get('log',[]);
+  const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
+  const top=CAUSES.map(c=>[c,log.filter(e=>e.cause===c).length]).sort((a,b)=>b[1]-a[1])[0];
+  host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">Readiness report</span><h3>Where you stand</h3></div><div class="tool-body">
+  <div class="tablewrap"><table class="log"><thead><tr><th>Skill</th><th>Target CLB</th><th>Your practice</th><th>Attempts</th></tr></thead><tbody>
+  ${['L','R','W','S'].map(k=>{const v=avg(sc[k]);return `<tr><td>${SKILL[k]}</td><td class="mono">${tg[k]}</td><td class="mono">${v==null?'–':(k==='L'||k==='R'?v+'% accuracy':(v/20).toFixed(1)+'/5 self-score')}</td><td class="mono">${sc[k].length}</td></tr>`}).join('')}</tbody></table></div>
+  <p>${top&&top[1]?`Your most frequent error cause is <b>${top[0]}</b> (${top[1]} logged). Redo every miss with that tag this week.`:'Tag your Error Log entries to see your top error cause here.'}</p>
+  <p class="muted" style="font-size:13px">Practice percentages are a guide, not a CELPIP score. Your instructor maps them to levels in the live debrief.</p></div></div>`}
+
+
+/* ---------- Teacher portal ---------- */
+let tSel=null,tStudent=null,tNewOpen=false,tConfirmDel=false,tLogFilter='',tForm=null,tConfirmStuDel=false,tShare=null;const fbDraft={};
+const TOTAL_TASKS=SESSIONS.reduce((a,s)=>a+s.tasks.length,0);
+const genCode=()=>{const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let c='CEL-';const r=crypto.getRandomValues(new Uint32Array(6));for(const x of r)c+=A[x%A.length];return c};
+const siteURL=()=>location.href.split('#')[0];
+const inviteText=st=>`Hi ${st.name}, welcome to the CELPIP Prep Course!\n\nOpen: ${siteURL()}\nYour access code: ${st.code}\n\nKeep this code private. It opens your dashboard and saves your practice.`;
+const tcall=(action,payload)=>api(action,Object.assign({pass:cloud.tpass},payload||{}));
+async function loadTeacher(){if(cloud.t.loading)return;cloud.t.loading=true;cloud.t.error=null;refreshIf(['teacher']);
+  try{const j=await tcall('teacher.data');Object.assign(cloud.t,{batches:j.batches||[],students:j.students||[],progress:j.progress||{},feedback:j.feedback||{},loaded:true,at:Date.now()})}
+  catch(e){if(e.code==='bad_password'){writeTPass(null);cloud.tpass=null;renderNav()}cloud.t.error=errMsg(e)}
+  finally{cloud.t.loading=false;refreshIf(['teacher'])}}
+function tRoster(){return cloud.t.students.map(st=>Object.assign({},cloud.t.progress[st.code]||{},{id:st.code,code:st.code,profile:{name:st.name,email:st.email,phone:st.phone},batch:st.batch}))}
+function stuStats(r){const tasks=r.tasks||{};const done=Object.values(tasks).filter(Boolean).length;
+  const cur=SESSIONS.find(s=>s.tasks.some((_,i)=>!tasks[s.n+':'+i]))||SESSIONS[11];
+  const sc=skillScores(r.res||{});const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
+  const log=r.log||[];return {done,cur,L:avg(sc.L),R:avg(sc.R),W:avg(sc.W),S:avg(sc.S),log,untagged:log.filter(e=>!e.cause).length}}
+
+function TeacherLogin(){return `<div class="login"><section class="logincard">
+  <span class="mark big" style="background:var(--lav);color:var(--skRi)">${icon('O',24)}</span>
+  <div class="eyebrow" style="color:var(--skRi)">Teacher Portal</div><h1>Teacher sign in</h1>
+  <p class="lead">Use the teacher password you set in your Apps Script project.</p>
+  <form id="tlogin-form" class="stack" style="gap:12px" novalidate>
+    <label class="field" for="tlogin-pass">Password<input id="tlogin-pass" type="password" autocomplete="current-password"></label>
+    <button class="btn primary" type="submit" id="tlogin-btn">Sign in</button><p class="err" id="tlogin-msg" role="alert"></p></form>
+  <p class="muted" style="font-size:13px"><a href="#home">Student sign in</a></p></section></div>`}
+
+function TeacherView(){
+  if(!cloud.tpass)return TeacherLogin();
+  const t=cloud.t;
+  const head=`<section class="hero2 slim" style="background:var(--lav)"><div class="row" style="align-items:flex-start"><div class="stack" style="gap:10px;flex:1;min-width:0"><div class="eyebrow" style="color:var(--skRi)">Teacher Portal</div><h1>Batches and students</h1>
+    <p class="lead">Create a batch, add your students and give each one an access code. Their practice, scores and writing appear here.</p></div>
+    <button class="btn" id="t-refresh" ${t.loading?'disabled':''}>${t.loading?'Refreshing…':'Refresh'}</button></div>${t.at?`<p class="muted" style="font-size:12.5px;margin-top:8px">Last updated ${ago(t.at)}</p>`:''}</section>`;
+  if(!t.loaded)return `<div class="stack" style="gap:24px">${head}${t.error?`<div class="notice">${esc(t.error)} <button class="btn sm" id="t-retry">Try again</button></div>`:'<div class="panel empty">Loading your classes…</div>'}</div>`;
+  const ros=tRoster();const ids=new Set(t.batches.map(b=>b.id));
+  const groups=t.batches.map(b=>({id:b.id,name:b.name||'Batch',b,list:ros.filter(r=>r.batch===b.id)}));
+  const un=ros.filter(r=>!ids.has(r.batch||''));if(un.length)groups.push({id:'__none',name:'No batch',list:un});
+  if(!tSel||!groups.find(g=>g.id===tSel))tSel=groups[0]?groups[0].id:null;
+  const g=groups.find(x=>x.id===tSel);
+  const errNote=t.error?`<div class="notice">${esc(t.error)}</div>`:'';
+  const pills=`<div class="pills">${groups.map(x=>`<button class="pill" data-batch="${esc(x.id)}" aria-pressed="${x.id===tSel}">${esc(x.name)}<span class="cnt">${x.list.length}</span></button>`).join('')}<button class="pill add" id="t-new">+ New batch</button></div>`;
+  const form=tNewOpen?`<section class="panel stack" style="gap:12px"><h3>Open a new batch</h3><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+    <label class="field" for="nb-name">Batch name<input id="nb-name" placeholder="January Evening Batch" maxlength="60"></label>
+    <label class="field" for="nb-start">Start date<input id="nb-start" type="date"></label>
+    <label class="field" for="nb-sched">Schedule<input id="nb-sched" placeholder="Tue & Thu · 7–9 pm" maxlength="60"></label></div>
+    <div class="row"><button class="btn primary" id="nb-save">Create batch</button><button class="btn" id="nb-cancel">Cancel</button><span class="muted" id="nb-msg" style="font-size:13px"></span></div></section>`:'';
+  if(!groups.length)return `<div class="stack" style="gap:24px">${head}${errNote}${pills}${form}<section class="panel empty"><h3 style="margin-bottom:6px">No batches yet</h3><p>Create your first batch. Then add students to it.</p></section></div>`;
+  const list=g.list;const st=list.map(r=>({r,s:stuStats(r)}));
+  const avgOf=k=>{const v=st.map(x=>x.s[k]).filter(v=>v!=null);return v.length?Math.round(v.reduce((a,b)=>a+b,0)/v.length):null};
+  const avgDone=st.length?Math.round(st.reduce((a,x)=>a+x.s.done,0)/st.length/TOTAL_TASKS*100):0;
+  const causes={};st.forEach(x=>x.s.log.forEach(e=>{if(e.cause)causes[e.cause]=(causes[e.cause]||0)+1}));const top=Object.entries(causes).sort((a,b)=>b[1]-a[1])[0];
+  const binfo=`<div class="row"><div style="flex:1;min-width:0">${g.b?`<h2>${esc(g.name)}</h2><p class="muted" style="font-size:14px">${esc(g.b.schedule)}${g.b.schedule&&g.b.start?' · ':''}${g.b.start?'Starts '+esc(fmtDate(g.b.start)):''}</p>`:`<h2>Students with no batch</h2><p class="muted" style="font-size:14px">Their batch was deleted or never set. Open a student and choose a batch.</p>`}</div>
+     <button class="btn primary" id="t-addstu">+ Add student</button>
+     ${g.b?(tConfirmDel?`<span class="notice">Delete this batch? Its students keep their codes and move to "No batch". <button class="btn sm" id="t-del-yes">Delete</button> <button class="btn sm" id="t-del-no">Keep</button></span>`:`<button class="btn" id="t-del">Delete batch</button>`):''}</div>`;
+  const tiles=`<div class="tiles">
+    <div class="tile"><b>${list.length}</b><span>Students</span></div>
+    <div class="tile" style="--c:var(--skO);--ci:var(--skOi)"><b>${avgDone}%</b><span>Average Hub completion</span></div>
+    <div class="tile" style="--c:var(--skL);--ci:var(--skLi)"><b>${avgOf('L')==null?'–':avgOf('L')+'%'}</b><span>Listening accuracy</span></div>
+    <div class="tile" style="--c:var(--skR);--ci:var(--skRi)"><b>${avgOf('R')==null?'–':avgOf('R')+'%'}</b><span>Reading accuracy</span></div>
+    <div class="tile" style="--c:var(--skS);--ci:var(--skSi)"><b style="text-transform:capitalize">${top?esc(top[0]):'–'}</b><span>Top error cause${top?` · ${top[1]} logged`:''}</span></div></div>`;
+  const share=tShare?(()=>{const s=t.students.find(x=>x.code===tShare);if(!s)return '';const txt=inviteText(s);
+    return `<section class="sharebox"><div class="row"><h3>Send ${esc(s.name)} their access code</h3><span class="spacer"></span><button class="btn sm" id="t-share-close">Done</button></div>
+      <pre id="t-share-text">${esc(txt)}</pre><div class="row"><button class="btn primary sm" data-copy="${esc(txt)}">Copy message</button><span class="muted" style="font-size:13px">Paste it into an email, text or WhatsApp.</span></div></section>`})():'';
+  const roster=list.length?`<div class="tablewrap"><table class="roster"><thead><tr><th>Student</th><th>Access code</th><th>Contact</th><th>Now on</th><th>Hub tasks</th><th>Listening</th><th>Reading</th><th>Writing</th><th>Speaking</th><th>Last active</th></tr></thead><tbody>
+    ${st.map(({r,s})=>`<tr class="pick ${r.id===tStudent?'on':''}" data-stu="${esc(r.id)}"><td><b>${esc(r.profile.name)}</b></td><td><span class="codechip">${esc(r.code)}</span></td>
+      <td style="font-size:13px;min-width:160px">${r.profile.email?esc(r.profile.email):'<span class="muted">No email</span>'}${r.profile.phone?`<br><span class="muted">${esc(r.profile.phone)}</span>`:''}</td>
+      <td><span class="chip" style="background:var(--sk${s.cur.k});color:var(--sk${s.cur.k}i)">S${s.cur.n}</span></td>
+      <td>${s.done}/${TOTAL_TASKS}</td><td>${s.L==null?'–':s.L+'%'}</td><td>${s.R==null?'–':s.R+'%'}</td><td>${s.W==null?'–':(s.W/20).toFixed(1)+'/5'}</td><td>${s.S==null?'–':(s.S/20).toFixed(1)+'/5'}</td>
+      <td class="muted">${r.updatedAt?ago(r.updatedAt):'Not started'}</td></tr>`).join('')}</tbody></table></div>`
+    :`<div class="panel empty">No students in this batch yet. Click <b>+ Add student</b> to create one and get their access code.</div>`;
+  return `<div class="stack" style="gap:24px">${head}${errNote}${pills}${form}<section class="stack" style="gap:16px">${binfo}${StudentForm()}${share}${tiles}${roster}</section>${tStudent?StudentDetail():''}</div>`}
+
+function StudentForm(){if(!tForm)return '';const d=tForm.data;const bopts=cloud.t.batches.map(b=>`<option value="${esc(b.id)}" ${b.id===d.batch?'selected':''}>${esc(b.name)}</option>`).join('');
+  return `<section class="panel stack" style="gap:12px" id="t-form"><h3>${tForm.mode==='new'?'Add a student':'Edit student details'}</h3>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+      <label class="field" for="sf-name">Full name<input id="sf-name" maxlength="80" value="${esc(d.name)}" placeholder="First and last name"></label>
+      <label class="field" for="sf-email">Email<input id="sf-email" type="email" maxlength="120" value="${esc(d.email)}" placeholder="student@example.com"></label>
+      <label class="field" for="sf-phone">Phone or WhatsApp<input id="sf-phone" type="tel" maxlength="40" value="${esc(d.phone)}" placeholder="+1 555 123 4567"></label>
+      <label class="field" for="sf-batch">Batch<select id="sf-batch"><option value="">No batch yet</option>${bopts}</select></label>
+      <label class="field" for="sf-code">Access code<span class="row" style="flex-wrap:nowrap;gap:6px"><input id="sf-code" class="codein" style="font-size:15px!important;flex:1;min-width:0" maxlength="20" value="${esc(d.code)}"><button class="btn sm" type="button" id="sf-gen">New code</button></span></label>
+    </div>
+    ${tForm.mode==='edit'&&tForm.orig!==d.code?'':''}<p class="muted" style="font-size:12.5px">You can type your own code (4–20 letters, numbers or dashes) or keep the generated one.${tForm.mode==='edit'?' Changing the code keeps the student’s progress; they will need the new code to sign in.':''}</p>
+    <div class="row"><button class="btn primary" id="sf-save">${tForm.mode==='new'?'Create student':'Save changes'}</button><button class="btn" id="sf-cancel">Cancel</button><span class="err" id="sf-msg" style="min-height:0"></span></div></section>`}
+
+function StudentDetail(){const r=tRoster().find(x=>x.id===tStudent);if(!r)return '';const pr=r.profile;const s=stuStats(r);const tasks=r.tasks||{};
+  const b=cloud.t.batches.find(x=>x.id===r.batch);
+  const subs=Object.entries(r.res||{}).filter(([k,v])=>v&&v.text).map(([k,v])=>{const [n,t]=k.split(':');return {n,t,v}});
+  const fb=cloud.t.feedback[r.code];const draft=fbDraft[r.code]!=null?fbDraft[r.code]:(fb&&fb.text)||'';
+  const causes=CAUSES.map(c=>[c,s.log.filter(e=>e.cause===c).length]);const max=Math.max(1,...causes.map(c=>c[1]));
+  return `<section class="panel stack" style="gap:18px" id="t-detail">
+    <div class="row" style="align-items:flex-start"><div style="flex:1;min-width:0" class="stack"><h2>${esc(pr.name)}</h2>
+      <div class="row" style="gap:8px;font-size:14px"><span class="codechip">${esc(r.code)}</span><button class="btn sm" data-copy="${esc(r.code)}">Copy code</button><button class="btn sm" data-copy="${esc(inviteText({name:pr.name,code:r.code}))}">Copy invite message</button></div>
+      <div style="font-size:14px">${pr.email?`${esc(pr.email)} <button class="btn sm" data-copy="${esc(pr.email)}">Copy</button>`:'<span class="muted">No email</span>'}${pr.phone?` · ${esc(pr.phone)} <button class="btn sm" data-copy="${esc(pr.phone)}">Copy</button>`:''}</div>
+      <div class="muted" style="font-size:13px">${b?esc(b.name):'No batch'} · Last active ${r.updatedAt?ago(r.updatedAt):'never'} · Targets L${(r.targets||{}).L||'–'} R${(r.targets||{}).R||'–'} W${(r.targets||{}).W||'–'} S${(r.targets||{}).S||'–'}</div></div>
+      <div class="row"><button class="btn" id="t-edit">Edit details</button>${tConfirmStuDel?`<span class="notice">Delete ${esc(pr.name)} and all their progress? <button class="btn sm" id="t-sdel-yes">Delete</button> <button class="btn sm" id="t-sdel-no">Keep</button></span>`:`<button class="btn" id="t-sdel">Delete</button>`}<button class="btn" id="t-close">Close</button></div></div>
+    <div><div class="eyebrow" style="margin-bottom:8px">Hub progress by session</div><div class="mini12">${SESSIONS.map(x=>{const d=x.tasks.filter((_,i)=>tasks[x.n+':'+i]).length;return `<div style="--ci:var(--sk${x.k}i)" title="Session ${x.n}: ${d}/${x.tasks.length}"><i style="height:${d/x.tasks.length*100}%"></i><span style="position:relative">${x.n}</span></div>`}).join('')}</div></div>
+    <div class="grid g2">
+      <div class="stack" style="gap:10px"><div class="eyebrow">Writing submissions</div>${subs.length?subs.map(x=>`<details class="subm"><summary>Session ${esc(x.n)} · ${esc(WRITE[x.t]?WRITE[x.t].title:x.t)} · ${x.v.words||0} words${x.v.self?` · self ${(x.v.self/20).toFixed(1)}/5`:''}</summary><pre>${esc(x.v.text)}</pre></details>`).join(''):'<p class="muted">No writing submitted yet.</p>'}</div>
+      <div class="stack" style="gap:10px"><div class="eyebrow">Error causes</div>${s.log.length?`<div class="cause-bars">${causes.map(([c,n])=>`<div><span style="text-transform:capitalize">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${n/max*100}%"></div></div><span class="mono">${n}</span></div>`).join('')}</div><p class="muted" style="font-size:13px">${s.log.length} logged · ${s.untagged} not tagged yet</p>`:'<p class="muted">No errors logged yet.</p>'}</div>
+    </div>
+    <div class="stack" style="gap:10px"><div class="row"><div class="eyebrow">Error log · ${s.log.length} entr${s.log.length===1?'y':'ies'}</div><span class="spacer"></span>
+      ${s.log.length?`<label class="field" for="t-logf" style="flex-direction:row;align-items:center;gap:8px">Show<select id="t-logf"><option value="">All causes</option>${CAUSES.map(c=>`<option value="${c}" ${tLogFilter===c?'selected':''}>${c}</option>`).join('')}<option value="__none" ${tLogFilter==='__none'?'selected':''}>Not tagged</option></select></label>`:''}</div>
+      ${s.log.length?`<div class="tablewrap"><table class="log"><thead><tr><th>Date</th><th>Session</th><th>Question</th><th>Their answer</th><th>Correct</th><th>Cause</th></tr></thead><tbody>
+      ${s.log.filter(e=>!tLogFilter||(tLogFilter==='__none'?!e.cause:e.cause===tLogFilter)).map(e=>`<tr><td class="mono">${esc(e.date)}</td><td class="mono">S${esc(e.session)}</td><td style="min-width:220px">${esc(e.item)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td>${e.cause?`<span class="chip" style="text-transform:capitalize">${esc(e.cause)}</span>`:'<span class="muted">Not tagged</span>'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="muted">This student has no logged errors yet.</p>'}</div>
+    <div class="stack" style="gap:10px"><label class="field" for="t-fb">Feedback for ${esc(pr.name)}<textarea id="t-fb" placeholder="What to keep doing, what to fix, and one task for this week.">${esc(draft)}</textarea></label>
+      <div class="row"><button class="btn primary" id="t-fb-send">${fb&&fb.text?'Update feedback':'Send feedback'}</button><span class="muted" id="t-fb-msg" style="font-size:13px">${fb&&fb.updatedAt?'Last sent '+ago(fb.updatedAt):''}</span></div></div>
+  </section>`}
+
+function bindTeacher(){
+  const on=(id,ev,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn);return el};
+  on('tlogin-form','submit',async e=>{e.preventDefault();const pass=document.getElementById('tlogin-pass').value;const msg=document.getElementById('tlogin-msg');const btn=document.getElementById('tlogin-btn');
+    if(!pass){msg.textContent='Enter your password.';return}btn.disabled=true;btn.textContent='Checking…';
+    try{await api('teacher.login',{pass});cloud.tpass=pass;writeTPass(pass);if(!cloud.code)PREFIX='bcs:teacher:';renderNav();view();loadTeacher()}
+    catch(err){msg.textContent=errMsg(err);btn.disabled=false;btn.textContent='Sign in'}});
+  if(document.getElementById('tlogin-pass')){document.getElementById('tlogin-pass').focus();return}
+  if(cloud.tpass&&!cloud.t.loaded&&!cloud.t.loading&&!cloud.t.error)loadTeacher();
+  on('t-refresh','click',loadTeacher);on('t-retry','click',()=>{cloud.t.error=null;loadTeacher()});
+  app.querySelectorAll('[data-batch]').forEach(b=>b.addEventListener('click',()=>{tSel=b.dataset.batch;tStudent=null;tForm=null;tShare=null;tConfirmDel=false;view(true)}));
+  on('t-new','click',()=>{tNewOpen=true;view(true);const i=document.getElementById('nb-name');if(i)i.focus()});
+  on('nb-cancel','click',()=>{tNewOpen=false;view(true)});
+  on('nb-save','click',async e=>{const name=document.getElementById('nb-name').value.trim();const msg=document.getElementById('nb-msg');
+    if(!name){msg.textContent='Give the batch a name.';return}e.target.disabled=true;msg.textContent='Creating…';
+    try{const j=await tcall('teacher.batch.save',{batch:{name,start:document.getElementById('nb-start').value||'',schedule:document.getElementById('nb-sched').value.trim()}});
+      cloud.t.batches.push(j.batch);tSel=j.batch.id;tNewOpen=false;view(true)}
+    catch(err){e.target.disabled=false;msg.textContent=errMsg(err)}});
+  on('t-del','click',()=>{tConfirmDel=true;view(true)});on('t-del-no','click',()=>{tConfirmDel=false;view(true)});
+  on('t-del-yes','click',async e=>{e.target.disabled=true;try{await tcall('teacher.batch.delete',{id:tSel});cloud.t.batches=cloud.t.batches.filter(b=>b.id!==tSel);tSel=null;tConfirmDel=false}catch(err){cloud.t.error=errMsg(err)}view(true)});
+  on('t-addstu','click',()=>{tForm={mode:'new',data:{name:'',email:'',phone:'',batch:tSel&&tSel!=='__none'?tSel:'',code:genCode()}};tShare=null;view(true);const i=document.getElementById('sf-name');if(i)i.focus()});
+  on('sf-gen','click',()=>{document.getElementById('sf-code').value=genCode()});
+  on('sf-cancel','click',()=>{tForm=null;view(true)});
+  on('sf-save','click',async e=>{const v=id=>document.getElementById(id).value.trim();const msg=document.getElementById('sf-msg');
+    const d={name:v('sf-name'),email:v('sf-email'),phone:v('sf-phone'),batch:v('sf-batch'),code:v('sf-code').toUpperCase()};tForm.data=d;
+    if(d.name.length<2){msg.textContent='Enter the student’s full name.';return}
+    if(d.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)){msg.textContent='Check the email address.';return}
+    if(!/^[A-Z0-9-]{4,20}$/.test(d.code)){msg.textContent=ERR.bad_code_format;return}
+    e.target.disabled=true;msg.textContent='';
+    try{const j=await tcall('teacher.student.save',{student:d,originalCode:tForm.orig||''});const st=j.student;
+      const i=cloud.t.students.findIndex(x=>x.code===(tForm.orig||st.code));
+      if(tForm.orig&&tForm.orig!==st.code){if(cloud.t.progress[tForm.orig]){cloud.t.progress[st.code]=cloud.t.progress[tForm.orig];delete cloud.t.progress[tForm.orig]}if(cloud.t.feedback[tForm.orig]){cloud.t.feedback[st.code]=cloud.t.feedback[tForm.orig];delete cloud.t.feedback[tForm.orig]}}
+      if(i>=0)cloud.t.students[i]=st;else cloud.t.students.push(st);
+      if(tForm.mode==='new'||(tForm.orig&&tForm.orig!==st.code))tShare=st.code;
+      tSel=st.batch&&cloud.t.batches.some(b=>b.id===st.batch)?st.batch:'__none';tStudent=st.code;tForm=null;view(true)}
+    catch(err){e.target.disabled=false;msg.textContent=errMsg(err)}});
+  on('t-share-close','click',()=>{tShare=null;view(true)});
+  app.querySelectorAll('tr[data-stu]').forEach(tr=>tr.addEventListener('click',()=>{tStudent=tr.dataset.stu;tLogFilter='';tConfirmStuDel=false;view(true);const d=document.getElementById('t-detail');if(d)d.scrollIntoView({behavior:'smooth',block:'start'})}));
+  on('t-close','click',()=>{tStudent=null;view(true)});
+  on('t-edit','click',()=>{const st=cloud.t.students.find(x=>x.code===tStudent);if(!st)return;tForm={mode:'edit',orig:st.code,data:{name:st.name,email:st.email,phone:st.phone,batch:st.batch,code:st.code}};view(true);const f=document.getElementById('t-form');if(f)f.scrollIntoView({behavior:'smooth',block:'start'})});
+  on('t-sdel','click',()=>{tConfirmStuDel=true;view(true)});on('t-sdel-no','click',()=>{tConfirmStuDel=false;view(true)});
+  on('t-sdel-yes','click',async e=>{e.target.disabled=true;const code=tStudent;try{await tcall('teacher.student.delete',{code});cloud.t.students=cloud.t.students.filter(x=>x.code!==code);delete cloud.t.progress[code];delete cloud.t.feedback[code];tStudent=null;tConfirmStuDel=false;if(tShare===code)tShare=null}catch(err){cloud.t.error=errMsg(err)}view(true)});
+  on('t-logf','change',e=>{tLogFilter=e.target.value;view(true)});
+  app.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',async ev=>{ev.stopPropagation();const t=b.dataset.copy;const old=b.textContent;
+    try{await navigator.clipboard.writeText(t);b.textContent='Copied'}catch(e){b.textContent='Copy failed · select and copy manually'}setTimeout(()=>{b.textContent=old},1600)}));
+  const fb=document.getElementById('t-fb');if(fb)fb.addEventListener('input',()=>{fbDraft[tStudent]=fb.value});
+  on('t-fb-send','click',async e=>{const text=fb.value.trim();const msg=document.getElementById('t-fb-msg');if(!text){msg.textContent='Write some feedback first.';return}
+    e.target.disabled=true;msg.textContent='Sending…';const code=tStudent;
+    try{await tcall('teacher.feedback',{code,text});cloud.t.feedback[code]={text,updatedAt:Date.now()};delete fbDraft[code];msg.textContent='Sent. The student sees it on their dashboard.'}
+    catch(err){msg.textContent=errMsg(err)}e.target.disabled=false});
+}
+
+/* ---------- Error log ---------- */
+function LogView(){const log=store.get('log',[]);
+  return `<div class="stack"><div><div class="eyebrow">Study Hub</div><h1>Error Log</h1><p class="muted" style="margin-top:8px;max-width:62ch">Every wrong answer from a Hub quiz lands here. Give each one a cause. Your instructor groups the class’s causes to plan the next live session.</p></div>
+  <div class="grid g2"><div class="panel stack" style="gap:10px"><h3>By cause</h3>${log.length?causeBars(log):'<p class="muted">No entries yet.</p>'}</div>
+  <div class="panel stack" style="gap:8px"><h3>The four causes</h3><p><b>Distractor:</b> you picked a detail that was mentioned but corrected or rejected.</p><p><b>Vocabulary:</b> you missed a paraphrase or did not know a word.</p><p><b>Timing:</b> you ran out of time or rushed.</p><p><b>Inference:</b> you missed what was implied.</p></div></div>
+  <div class="panel"><div class="row" style="margin-bottom:10px"><h3>Entries</h3><span class="spacer"></span>${log.length?'<button class="btn" data-clear>Clear log</button>':''}</div>
+  ${log.length?`<div class="tablewrap"><table class="log"><thead><tr><th>Date</th><th>Session</th><th>Question</th><th>Your answer</th><th>Correct</th><th>Cause</th></tr></thead><tbody>
+  ${log.map(e=>`<tr><td class="mono">${e.date}</td><td class="mono">S${e.session}</td><td style="min-width:220px">${esc(e.item)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td><select data-id="${e.id}" aria-label="Cause"><option value="">Choose…</option>${CAUSES.map(c=>`<option value="${c}" ${e.cause===c?'selected':''}>${c}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>`
+  :'<p class="muted">Finish a listening or reading set in any session’s Study Hub. Your misses appear here.</p>'}
+  <div data-confirm hidden class="notice" style="margin-top:12px">Delete every entry? <button class="btn" data-yes>Delete all</button> <button class="btn" data-no>Keep</button></div></div></div>`}
+function bindLog(){app.querySelectorAll('select[data-id]').forEach(sel=>sel.addEventListener('change',()=>{const log=store.get('log',[]);const e=log.find(x=>String(x.id)===sel.dataset.id);if(e){e.cause=sel.value;store.set('log',log)}}));
+  const c=app.querySelector('[data-clear]');if(c){const box=app.querySelector('[data-confirm]');c.addEventListener('click',()=>box.hidden=false);
+    app.querySelector('[data-no]').addEventListener('click',()=>box.hidden=true);app.querySelector('[data-yes]').addEventListener('click',()=>{store.set('log',[]);view()})}}
+
+window.addEventListener('hashchange',()=>view());
+try{speechSynthesis.getVoices()}catch(e){}
+initCloud();
+</script>
+</body>
+</html>
