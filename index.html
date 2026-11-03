@@ -1367,6 +1367,7 @@ function Dashboard(){
       </div>`}).join('')}</div>
   </section>
   ${ClassCard()}
+  ${ClassSlidesCard()}
   ${MessagesCard()}
   ${ProgressSection()}
   ${ErrorSection()}
@@ -1388,7 +1389,7 @@ function ClassCard(){
     <div class="stack" style="gap:8px"><div class="eyebrow" style="color:var(--skRi)">Feedback from your teacher</div>${fb&&fb.text?`<div class="fbnote">${esc(fb.text)}</div><span class="muted" style="font-size:12.5px">Updated ${ago(fb.updatedAt)}</span>`:`<div class="fbnote muted">No feedback yet. It appears here after your teacher reviews your work.</div>`}</div>
   </section>`}
 function bindClassCard(){}
-function bindDashboard(){bindClassCard();bindCauseSelects();app.querySelectorAll('[data-target]').forEach(sel=>sel.addEventListener('change',()=>{const t=store.get('targets',{L:9,R:9,W:9,S:9});t[sel.dataset.target]=+sel.value;store.set('targets',t)}))}
+function bindDashboard(){bindClassCard();bindClassSlides();bindCauseSelects();app.querySelectorAll('[data-target]').forEach(sel=>sel.addEventListener('change',()=>{const t=store.get('targets',{L:9,R:9,W:9,S:9});t[sel.dataset.target]=+sel.value;store.set('targets',t)}))}
 const CAUSES=['distractor','vocabulary','timing','inference'];
 function causeBars(log){if(!log.length)return '';const max=Math.max(1,...CAUSES.map(c=>log.filter(e=>e.cause===c).length));
   return `<div class="cause-bars">${CAUSES.map(c=>{const n=log.filter(e=>e.cause===c).length;return `<div><span style="text-transform:capitalize">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${n/max*100}%"></div></div><span class="mono">${n}</span></div>`}).join('')}</div>`}
@@ -1986,6 +1987,19 @@ function bindTeacherHome(){if(cloud.tpass&&!cloud.t.loaded&&!cloud.t.loading&&!c
   app.querySelectorAll('[data-live]').forEach(a=>a.addEventListener('click',()=>store.set('ttab','live')));
   app.querySelectorAll('[data-present]').forEach(b=>b.addEventListener('click',()=>{const n=+b.dataset.present;const url=(cloud.settings||{})['deck:'+n];
     if(url){window.open(deckOpen(url),'_blank','noopener')}else if(SESSIONS[n-1].slides)openSlides(SLIDESETS[SESSIONS[n-1].slides])}))}
+
+
+/* ---------- student dashboard: this week's class slides ---------- */
+function ClassSlidesCard(){if(!cloud.code)return '';const s=nextSession();const url=(cloud.settings||{})['deck:'+s.n];const p=sessionProgress(s);
+  if(!url&&!s.slides)return `<section class="panel row" style="${skv(s.k)};background:var(--c)"><span class="ic" style="background:var(--surface)">${icon(s.k)}</span><div style="flex:1;min-width:0"><div class="eyebrow" style="color:var(--ci)">This week's class · Session ${s.n}</div><h3>${esc(s.title)}</h3><p class="muted" style="font-size:13.5px">Slides for this session will appear here when your teacher shares them.</p></div><a class="btn primary" href="#session-${s.n}">Open session</a></section>`;
+  return `<section class="panel stack" style="gap:14px" id="class-slides"><div class="row"><div style="flex:1;min-width:0"><div class="eyebrow" style="color:var(--sk${s.k}i)">This week's class · Session ${s.n}</div><h2>${esc(s.title)}</h2></div>
+     <a class="btn" href="#session-${s.n}">Open session</a></div>
+   ${url?`<div class="deckframe"><div class="stripe"></div><iframe src="${esc(url)}" title="Session ${s.n} slides" loading="lazy" allow="fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>
+     <p class="muted" style="font-size:13.5px">Use the arrows inside the slides to review the class. <a href="${esc(deckOpen(url))}" target="_blank" rel="noopener">Open full screen</a>.</p>`
+     :`<div class="present"><div><b>Class slides</b><span class="muted">${SLIDESETS[s.slides].length} slides · review what we covered in class</span></div><button class="btn primary" id="dash-slides">▶ View slides</button></div>`}
+   <div class="row" style="gap:10px"><span class="muted" style="font-size:13.5px">Study Hub for this session: <b>${p.done}/${p.total}</b> tasks done</span><span class="spacer"></span><a class="btn hub sm" href="#session-${s.n}" data-hub>Go to Study Hub</a></div></section>`}
+function bindClassSlides(){const b=document.getElementById('dash-slides');if(b)b.addEventListener('click',()=>{const s=nextSession();openSlides(SLIDESETS[s.slides])});
+  app.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',()=>store.set('tab','hub')))}
 
 /* ---------- Teacher portal ---------- */
 let tSel=null,tStudent=null,tNewOpen=false,tConfirmDel=false,tLogFilter='',tForm=null,tConfirmStuDel=false,tShare=null,tBatchMsg=false,tFlash='';const fbDraft={};
