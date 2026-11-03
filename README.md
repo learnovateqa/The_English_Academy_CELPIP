@@ -48,6 +48,23 @@ API_URL:'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE'
 3. Click **Copy message** and send it to the student by email, text or WhatsApp.
 4. The student opens the link, types the code, and their dashboard opens.
 
+## AI scoring for Writing (Claude)
+
+After a student submits a writing task, Claude (Anthropic's AI model) scores it like a CELPIP rater and shows:
+- an estimated level (1–12)
+- the four criteria, with evidence
+- whether each bullet is covered
+- sentence fixes
+- a cleaned-up version of the answer
+- how to score higher, a habit for next time, and which session to study next
+
+**Turn it on:**
+1. Create an account at **console.anthropic.com**, add credit under **Billing**, then create a key under **API Keys**.
+2. In the Sheet: **CELPIP Course → 4. Turn on AI scoring (Claude API key)**, then paste the key. It's stored in Script Properties, never in the code.
+3. **Deploy → Manage deployments → Edit → New version → Deploy**.
+
+**Cost:** about 5–10 US cents per scored essay (model `claude-opus-5-5`). Each student can score up to 10 essays per day; change `AI_DAILY_LIMIT` in `Code.gs` to adjust this. Failed attempts don't count. Without a key, students see their self-score form instead.
+
 ## Slide decks
 
 - Each session's PowerPoint is in `decks/`. Session 1 is ready, and more are coming.
