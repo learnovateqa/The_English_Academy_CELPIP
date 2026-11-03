@@ -630,6 +630,53 @@ nav.main a[aria-current="page"]{background:#14213D;color:#fff}
 .tstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 .tstats div{background:var(--surface-2);border-radius:14px;padding:12px;display:flex;flex-direction:column}
 .tstats b{font-size:28px;line-height:1.1}.tstats span{font-size:12.5px;color:var(--muted)}
+
+/* AI writing feedback */
+.aiwait{display:flex;gap:14px;align-items:center;background:var(--surface-2);border-radius:16px;padding:16px}
+.aiwait>div{display:flex;flex-direction:column}
+.spin{width:28px;height:28px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--hub);animation:spin 1s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.spin{animation:none}}
+.aifb{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:var(--shadow)}
+.aifb-top{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:center}
+@media(max-width:560px){.aifb-top{grid-template-columns:minmax(0,1fr)}}
+.lvlcard{background:var(--skW);border-radius:18px;padding:16px 22px;text-align:center;min-width:150px}
+.lvlcard b{font-size:56px;line-height:1;color:var(--skWi)}.lvlcard span{color:var(--muted);font-weight:600;margin-left:4px}
+.lvlcard small{display:block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-top:6px}
+.aisum p{font-size:16px;font-weight:600;margin-bottom:8px}
+.ladder12{display:flex;align-items:flex-end;gap:5px;padding-top:22px}
+.ladder12 .rg{flex:1;border-radius:6px;background:var(--surface-2);position:relative}
+.ladder12 .rg.on{background:var(--skWi);opacity:.85}
+.ladder12 .rg.tg{outline:2px dashed var(--hub);outline-offset:2px}
+.ladder12 em{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);font-style:normal;font-size:11px;font-weight:700;color:var(--hub);white-space:nowrap}
+.ladder-lab{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:-12px}
+.crit4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 24px;border-top:1px solid var(--line);padding-top:16px}
+@media(max-width:640px){.crit4{grid-template-columns:minmax(0,1fr)}}
+.crit4 p{font-size:14px;color:var(--muted);margin-top:6px}
+.clv{font-size:20px;color:var(--skWi)}
+.segs{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-top:6px}
+.segs i{height:7px;border-radius:3px;background:var(--surface-2)}
+.ai-note{background:var(--peach);border-radius:12px;padding:10px 14px;font-size:14px}
+.aisec{border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:10px}
+.covl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.covl li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:12px;align-items:start;background:var(--surface-2);border-radius:14px;padding:12px}
+.covl li>div{display:flex;flex-direction:column}.covl .muted{font-size:13px}
+.covic{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:var(--surface)}
+.covic.good{color:var(--hub)}.covic.mid{color:var(--warn)}.covic.low{color:var(--bad)}
+.rchip.low{background:#FDE2E2;color:var(--bad)}
+.fixrow{background:var(--surface-2);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.fx-old{text-decoration:line-through;text-decoration-color:var(--bad);color:var(--muted)}
+.fx-old::before{content:'✕ ';color:var(--bad);text-decoration:none;display:inline-block}
+.fx-new{font-weight:600}.fx-new::before{content:'✓ ';color:var(--hub)}
+.fixrow p{font-size:13px}
+pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;background:var(--hub-soft);border-radius:14px;padding:14px;margin:0;line-height:1.7}
+.ai-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+@media(max-width:640px){.ai-grid{grid-template-columns:minmax(0,1fr)}}
+.ai-grid ul{margin:6px 0 0;padding-left:18px;font-size:14.5px;display:flex;flex-direction:column;gap:6px}
+.habit{background:var(--lav);border-radius:12px;padding:10px 14px;font-size:14.5px}
+.studyn{display:flex;flex-direction:column;gap:2px;background:var(--surface-2);border-radius:12px;padding:10px 12px;font-size:14px}
+.studyn .chip{align-self:flex-start;text-decoration:none}
+.selfbox{background:var(--surface-2);border-radius:14px;padding:10px 14px}.selfbox summary{cursor:pointer;font-weight:600}
 </style>
 </head>
 <body>
@@ -1141,25 +1188,25 @@ DR:{kind:'read',title:'Diagnostic · Reading Check',minutes:7,
   {q:'What will NOT change?',o:['Weekday opening time','The monthly fee','Weekend hours','The pool schedule'],a:2,why:'"Weekend hours will stay the same."'}]}
 };
 const WRITE={
-W1:{title:'Writing Task 1 · Email',minutes:27,
+W1:{title:'Writing Task 1 · Email',minutes:27,type:'Email (formal complaint)',reqs:['Say when you stayed and why', 'Describe the problems', 'Explain what you want the hotel to do'],
  prompt:`<p>You recently stayed at a hotel for a family wedding. Several things went wrong during your stay.</p><p>Write an email to the hotel manager in about 150–200 words. In your email:</p><ul><li>say when you stayed and why</li><li>describe the problems</li><li>explain what you want the hotel to do</li></ul>`,
  plain:'You recently stayed at a hotel for a family wedding. Several things went wrong. Write an email to the hotel manager (150–200 words): say when you stayed and why; describe the problems; explain what you want the hotel to do.'},
-W2:{title:'Writing Task 2 · Survey Response',minutes:26,
+W2:{title:'Writing Task 2 · Survey Response',minutes:26,type:'Survey response',reqs:['Choose one option clearly', 'Give developed reasons with examples', 'Explain why the other option is less suitable'],
  prompt:`<p>Your city has money for one new project and is asking residents to choose.</p><div class="opts2" style="margin-top:10px"><div><b>Option A</b><br>Build a new indoor sports and recreation centre.</div><div><b>Option B</b><br>Add more bus routes and run buses more often.</div></div><p style="margin-top:10px">Choose one option. Explain your choice in about 150–200 words.</p>`,
  plain:'City survey: choose between Option A (build a new indoor sports and recreation centre) and Option B (add more bus routes and run buses more often). Choose one and explain why, 150–200 words.'},
-W3:{title:'Writing Task 1 · Email (Set B: to a friend)',minutes:27,
+W3:{title:'Writing Task 1 · Email (Set B: to a friend)',minutes:27,type:'Email (semi-formal, to a friend)',reqs:['Welcome your friend to the city', 'Recommend a neighbourhood and explain why', 'Offer to help with something specific'],
  prompt:`<p>Your friend is moving to your city next month and has asked you for advice.</p><p>Write an email to your friend in about 150–200 words. In your email:</p><ul><li>welcome your friend to the city</li><li>recommend a neighbourhood to live in and explain why</li><li>offer to help with something specific</li></ul>`,
  plain:'Your friend is moving to your city next month and asked for advice. Write an email (150–200 words): welcome them; recommend a neighbourhood and explain why; offer to help with something specific. Semi-formal tone.'},
-W4:{title:'Writing Task 1 · Email (Set C: a request at work)',minutes:27,
+W4:{title:'Writing Task 1 · Email (Set C: a request at work)',minutes:27,type:'Email (formal, to a manager)',reqs:['Explain why you are interested in the classes', 'Describe the problem with the schedule', 'Suggest a solution'],
  prompt:`<p>Your employer has started free online language classes for staff, but the class time does not work for you.</p><p>Write an email to your manager in about 150–200 words. In your email:</p><ul><li>explain why you are interested in the classes</li><li>describe the problem with the schedule</li><li>suggest a solution</li></ul>`,
  plain:'Your employer offers free online language classes, but the time does not work for you. Write to your manager (150–200 words): explain your interest; describe the scheduling problem; suggest a solution. Formal tone.'},
-W5:{title:'Writing Task 2 · Survey (Set B)',minutes:26,
+W5:{title:'Writing Task 2 · Survey (Set B)',minutes:26,type:'Survey response',reqs:['Choose one option clearly', 'Give developed reasons with examples', 'Explain why the other option is less suitable'],
  prompt:`<p>Your town owns an old factory building and is asking residents how to use it.</p><div class="opts2" style="margin-top:10px"><div><b>Option A</b><br>Turn it into a public library and study centre.</div><div><b>Option B</b><br>Turn it into an indoor farmers’ market open all year.</div></div><p style="margin-top:10px">Choose one option. Explain your choice in about 150–200 words.</p>`,
  plain:'Town survey about an old factory: Option A (public library and study centre) or Option B (indoor farmers’ market open all year). Choose one and explain why, 150–200 words.'},
-W6:{title:'Writing Task 2 · Survey (Set C)',minutes:26,
+W6:{title:'Writing Task 2 · Survey (Set C)',minutes:26,type:'Survey response',reqs:['Choose one option clearly', 'Give developed reasons with examples', 'Explain why the other option is less suitable'],
  prompt:`<p>Your company is asking employees about a new work schedule.</p><div class="opts2" style="margin-top:10px"><div><b>Option A</b><br>Work from home three days a week.</div><div><b>Option B</b><br>Work in the office every day, but finish one hour earlier.</div></div><p style="margin-top:10px">Choose one option. Explain your choice in about 150–200 words.</p>`,
  plain:'Company survey: Option A (work from home three days a week) or Option B (work in the office every day but finish one hour earlier). Choose one and explain why, 150–200 words.'},
-W7:{title:'Diagnostic · Baseline Email',minutes:27,
+W7:{title:'Diagnostic · Baseline Email',minutes:27,type:'Email (to a landlord)',reqs:['Describe the problem', 'Explain how it is affecting you', 'Ask for a specific action and a time'],
  prompt:`<p>The kitchen sink in your apartment has been leaking for a week.</p><p>Write an email to your landlord in about 150–200 words. In your email:</p><ul><li>describe the problem</li><li>explain how it is affecting you</li><li>ask for a specific action and a time</li></ul>`,
  plain:'Baseline email: the kitchen sink has leaked for a week. Write to your landlord (150–200 words): describe the problem; explain how it affects you; ask for a specific action and time.'}
 };
@@ -1456,44 +1503,75 @@ function Quiz(host,s,key){
 
 /* ---------- Writing tool ---------- */
 function Writer(host,s,key){
-  const w=WRITE[key];const dk='w:'+s.n+':'+key;const rk=s.n+':'+key;let remaining=w.minutes*60,tid=null;
-  host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">Timed writing</span><h3>${esc(w.title)}</h3><span class="spacer"></span><span class="timer" data-timer>${fmt(remaining)}</span></div>
+  const w=WRITE[key];const dk='w:'+s.n+':'+key;const rk=s.n+':'+key;let remaining=w.minutes*60,tid=null,firstAt=0,timerOn=false;
+  const prev=(results()[rk]||{}).ai;
+  host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">Timed writing · AI scored</span><h3>${esc(w.title)}</h3><span class="spacer"></span><span class="timer" data-timer>${fmt(remaining)}</span></div>
   <div class="tool-body"><div class="prompt">${w.prompt}</div>
    <div class="row"><button class="btn hub" data-start>Start ${w.minutes}-minute timer</button><span class="muted" style="font-size:13px">Pasting is turned off, as on the real test.</span><span class="spacer"></span><span class="wc" data-wc>0 words</span></div>
    <label for="ta-${rk}" class="eyebrow">Your response</label>
    <textarea class="write" id="ta-${rk}" spellcheck="false" placeholder="Start typing your response here…"></textarea>
-   <div class="row"><button class="btn primary" data-submit>Submit response</button><span class="muted" data-msg style="font-size:13px"></span></div>
-   <div data-after hidden class="stack">
-     <div><h3 style="margin-bottom:8px">Score yourself first</h3><div class="rubric">${['Content & coherence','Vocabulary','Readability','Task fulfillment'].map((c,i)=>`<label>${c}<select data-rub="${i}"><option value="">–</option>${[1,2,3,4,5].map(v=>`<option>${v}</option>`).join('')}</select></label>`).join('')}</div></div>
-     <div class="row"><button class="btn" data-saverub>Save self-score</button><button class="btn hub" data-ai hidden>Get feedback from Claude</button><span class="muted" data-aimsg style="font-size:13px"></span></div>
-     <div class="feedback" data-fb hidden></div>
-   </div></div></div>`;
-  const ta=host.querySelector('textarea'),wc=host.querySelector('[data-wc]'),timer=host.querySelector('[data-timer]');
+   <div class="row"><button class="btn primary" data-submit>Submit and get my score</button><span class="muted" data-msg style="font-size:13px"></span></div>
+   <div data-ai-out>${prev?`<div class="eyebrow" style="margin-bottom:8px">Your last score</div>${AIFeedback(prev,w)}`:''}</div>
+   <details class="selfbox" data-self ${prev?'':'hidden'}><summary>Score yourself too (optional)</summary>
+     <div class="rubric" style="margin-top:10px">${['Content & coherence','Vocabulary','Readability','Task fulfillment'].map((c,i)=>`<label>${c}<select data-rub="${i}"><option value="">–</option>${[1,2,3,4,5].map(v=>`<option>${v}</option>`).join('')}</select></label>`).join('')}</div>
+     <div class="row" style="margin-top:8px"><button class="btn" data-saverub>Save self-score</button><span class="muted" data-rubmsg style="font-size:13px"></span></div></details>
+  </div></div>`;
+  const ta=host.querySelector('textarea'),wc=host.querySelector('[data-wc]'),timer=host.querySelector('[data-timer]'),out=host.querySelector('[data-ai-out]'),msg=host.querySelector('[data-msg]');
   ta.value=store.get(dk,'');
   const count=()=>{const n=(ta.value.trim().match(/\S+/g)||[]).length;wc.textContent=n+' words';wc.className='wc '+(n===0?'':(n>=150&&n<=200?'ok':'bad'));return n};count();
-  ta.addEventListener('input',()=>{count();store.set(dk,ta.value)});
-  ta.addEventListener('paste',e=>{e.preventDefault();host.querySelector('[data-msg]').textContent='Paste is turned off. Type your answer.'});
-  host.querySelector('[data-start]').addEventListener('click',e=>{e.target.disabled=true;ta.focus();tid=every(()=>{remaining--;timer.textContent=fmt(Math.max(0,remaining));timer.classList.toggle('low',remaining<=180);
-    if(remaining===180)host.querySelector('[data-msg]').textContent='3 minutes left. Start your proofreading pass.';
+  ta.addEventListener('input',()=>{if(!firstAt)firstAt=Date.now();count();store.set(dk,ta.value)});
+  ta.addEventListener('paste',e=>{e.preventDefault();msg.textContent='Paste is turned off. Type your answer.'});
+  host.querySelector('[data-start]').addEventListener('click',e=>{e.target.disabled=true;timerOn=true;ta.focus();tid=every(()=>{remaining--;timer.textContent=fmt(Math.max(0,remaining));timer.classList.toggle('low',remaining<=180);
+    if(remaining===180)msg.textContent='3 minutes left. Start your proofreading pass.';
     if(remaining<=0){clearInterval(tid);ta.readOnly=true;submit(true)}},1000)});
-  const after=host.querySelector('[data-after]');
-  function submit(auto){const n=count();if(n<20&&!auto){host.querySelector('[data-msg]').textContent='Write at least a few sentences before submitting.';return}
-    if(tid)clearInterval(tid);const r=results();r[rk]=Object.assign(r[rk]||{},{words:n,at:Date.now(),text:ta.value});store.set('res',r);
-    host.querySelector('[data-msg]').textContent=(auto?'Time is up. ':'')+`Submitted · ${n} words${n<150?' · under the 150-word target':n>200?' · over the 200-word target':''}.`;after.hidden=false}
+  async function submit(auto){const n=count();if(n<20&&!auto){msg.textContent='Write at least a few sentences before submitting.';return}
+    if(tid)clearInterval(tid);const seconds=timerOn?w.minutes*60-remaining:(firstAt?Math.round((Date.now()-firstAt)/1000):0);
+    const r=results();r[rk]=Object.assign(r[rk]||{},{words:n,at:Date.now(),text:ta.value,seconds});store.set('res',r);
+    msg.textContent=(auto?'Time is up. ':'')+`Submitted · ${n} words.`;
+    if(!cloud.code){out.innerHTML=`<div class="notice">AI scoring works when a student is signed in with an access code.</div>`;host.querySelector('[data-self]').hidden=false;return}
+    const btn=host.querySelector('[data-submit]');btn.disabled=true;
+    out.innerHTML=`<div class="aiwait"><span class="spin"></span><div><b>Scoring your writing…</b><span class="muted">This takes about 30–60 seconds. Keep this page open.</span></div></div>`;
+    try{const j=await api('student.score',{code:cloud.code,text:ta.value,seconds,task:{type:w.type||'',minutes:w.minutes,prompt:w.plain,reqs:w.reqs||[]}});
+      const rr=results();rr[rk]=Object.assign(rr[rk]||{},{ai:j.result,aiLevel:j.result.overall_level});store.set('res',rr);
+      out.innerHTML=AIFeedback(j.result,w)+(j.remaining!=null?`<p class="muted" style="font-size:12.5px;margin-top:8px">${j.remaining} AI scoring${j.remaining===1?'':'s'} left today.</p>`:'');bindAIFeedback(out)}
+    catch(e){const M={ai_off:'AI scoring is not turned on yet. Score yourself below, and your teacher will give feedback.',ai_limit:'You have used today\u2019s AI scorings. Try again tomorrow, or score yourself below.',ai_short:'Write at least 20 words before scoring.',ai_busy:'The scorer is busy right now. Wait a minute and click Submit again.',ai_key:'AI scoring is not working right now. Please tell your teacher.'};
+      out.innerHTML=`<div class="notice">${esc(M[e.code]||errMsg(e))}</div>`}
+    btn.disabled=false;host.querySelector('[data-self]').hidden=false}
   host.querySelector('[data-submit]').addEventListener('click',()=>submit(false));
   host.querySelector('[data-saverub]').addEventListener('click',()=>{const v=[...host.querySelectorAll('[data-rub]')].map(x=>+x.value).filter(Boolean);
-    if(v.length<4){host.querySelector('[data-aimsg]').textContent='Score all four criteria.';return}
-    const r=results();r[rk]=Object.assign(r[rk]||{},{self:Math.round(v.reduce((a,b)=>a+b)/4*20)});store.set('res',r);host.querySelector('[data-aimsg]').textContent='Self-score saved.'});
-  samplePromise.then(sample=>{if(!sample)return;const b=host.querySelector('[data-ai]');b.hidden=false;let ctrl=null;
-    b.addEventListener('click',async()=>{const fb=host.querySelector('[data-fb]');fb.hidden=false;fb.textContent='Reading your response…';b.disabled=true;
-      if(ctrl)ctrl.abort();ctrl=new AbortController();
-      const input=`You are an experienced rater for the CELPIP-General Writing test. Give feedback to a learner.\n\nTask (${w.minutes} minutes, target 150–200 words): ${w.plain}\n\nLearner response (${count()} words):\n"""\n${ta.value}\n"""\n\nReply in plain text, under 230 words, with these sections:\nESTIMATED LEVELS: one line each for Content & Coherence, Vocabulary, Readability, Task Fulfillment, each with a CELPIP level from 1–12 and a short reason.\nTOP 3 FIXES: numbered; for each, quote the learner's sentence and give an improved version.\nNEXT STEP: one sentence.\nEnd with: "Estimate only. Not an official CELPIP score."`;
-      try{const res=await sample(input,{signal:ctrl.signal,cache:false,onText:({text})=>{fb.textContent=text}});fb.textContent=res.text}
-      catch(err){if(err&&err.code==='not_granted'){b.hidden=true;fb.textContent='Claude feedback is not available on this view. Use the self-score and your instructor’s feedback.'}
-        else if(err&&err.code==='rate_limited'){fb.textContent='Too many requests right now. Try again in a few minutes.'}
-        else if(!(err&&err.name==='AbortError')){fb.textContent='Feedback could not be generated. Try again later.'}}
-      finally{b.disabled=false}})});
+    if(v.length<4){host.querySelector('[data-rubmsg]').textContent='Score all four criteria.';return}
+    const r=results();r[rk]=Object.assign(r[rk]||{},{self:Math.round(v.reduce((a,b)=>a+b)/4*20)});store.set('res',r);host.querySelector('[data-rubmsg]').textContent='Self-score saved.'});
+  bindAIFeedback(out);
 }
+
+/* ---------- AI feedback panel ---------- */
+const CRIT=[['content_coherence','Content & coherence'],['vocabulary','Vocabulary'],['readability','Readability'],['task_fulfillment','Task fulfillment']];
+const clampL=v=>Math.max(1,Math.min(12,Math.round(Number(v)||0)));
+function segs(l,k){return `<div class="segs">${Array.from({length:12},(_,i)=>`<i class="${i<l?'on':''}" style="${i<l?`background:var(--sk${k}i)`:''}"></i>`).join('')}</div>`}
+function AIFeedback(a,w){if(!a)return '';const L=clampL(a.overall_level);const tg=(store.get('targets',{W:9})||{}).W||9;const mins=w&&w.minutes||27;
+  const secs=Number(a.seconds||0);const mm=Math.floor(secs/60),ss=secs%60;
+  const cov=a.coverage||[];const done=cov.filter(c=>c.status==='covered').length;
+  const ST={covered:['Covered','good','✓'],partial:['Half there','mid','–'],missing:['Missing','low','✕']};
+  const timeNote=secs&&secs<mins*60*0.5?`<p class="ai-note">⏱ You used ${mm} of ${mins} minutes. On the real test, use 20–25 minutes to plan, write every point fully and proofread.</p>`:'';
+  return `<section class="aifb">
+   <div class="aifb-top"><div class="lvlcard"><div><b>${L}</b><span>/ 12</span></div><small>Estimated level</small></div>
+     <div class="aisum"><p>${esc(a.summary||'')}</p><div class="row" style="gap:16px"><span><b>${a.words||0}</b> words</span>${secs?`<span>⏱ <b>${mm}m ${String(ss).padStart(2,'0')}s</b> of ${mins}m</span>`:''}</div></div></div>
+   <div class="ladder12">${[3,4,5,6,7,8,9,10,11,12].map(v=>`<div class="rg ${v<=L?'on':''} ${v===tg?'tg':''}" style="height:${18+(v-3)*5}px">${v===tg?`<em>Your target · CLB ${tg}</em>`:''}</div>`).join('')}</div>
+   <div class="ladder-lab"><span>3</span><span>12</span></div>
+   <div class="crit4">${CRIT.map(([k,n],i)=>{const c=(a.criteria||{})[k]||{};const l=clampL(c.level);return `<div><div class="row"><span class="eyebrow" style="color:var(--fg)">${n}</span><span class="spacer"></span><b class="clv">${l}</b></div>${segs(l,'LRWS'[i])}<p>${esc(c.comment||'')}</p></div>`}).join('')}</div>
+   ${timeNote}
+   ${cov.length?`<div class="aisec"><div class="row"><h3>Coverage</h3><span class="spacer"></span><span class="chip">${done} / ${cov.length} covered</span></div>
+     <ol class="covl">${cov.map(c=>{const [t,cl,ic]=ST[c.status]||ST.missing;return `<li><span class="covic ${cl}">${ic}</span><div><b>${esc(c.requirement)}</b><span class="muted">${esc(c.note||'')}</span></div><span class="rchip ${cl}">${t}</span></li>`}).join('')}</ol>
+     <p class="muted" style="font-size:13px">A promise is not coverage. Each point needs its own developed sentences.</p></div>`:''}
+   ${(a.fixes||[]).length?`<div class="aisec"><h3>Fix these sentences</h3>${a.fixes.map(f=>`<div class="fixrow"><div class="fx-old">${esc(f.original)}</div><div class="fx-new">${esc(f.improved)}</div><p class="muted">${esc(f.why)}</p></div>`).join('')}</div>`:''}
+   ${a.cleaned_version?`<div class="aisec"><div class="row"><h3>Your answer, cleaned up</h3><span class="spacer"></span><button class="btn sm" data-copyclean>Copy</button></div><pre class="clean">${esc(a.cleaned_version)}</pre><p class="muted" style="font-size:13px">Your ideas, rewritten to score higher. Compare it with yours line by line, then try the task again in your own words.</p></div>`:''}
+   <div class="aisec ai-grid">
+     <div><h3>How to score higher</h3><ul>${(a.score_higher||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>
+     <div><h3>Next time</h3><p class="habit">🔁 ${esc(a.next_time_habit||'')}</p>
+       <h3 style="margin-top:12px">Study next</h3><div class="stack" style="gap:6px">${(a.study_next||[]).map(x=>`<div class="studyn">${x.session>=1&&x.session<=12?`<a class="chip" href="#session-${x.session}">Session ${x.session}</a>`:''}<b>${esc(x.topic)}</b><span class="muted">${esc(x.why)}</span></div>`).join('')}</div></div></div>
+   <p class="muted" style="font-size:12px">AI estimate to guide your practice. It is not an official CELPIP score.</p></section>`}
+function bindAIFeedback(root){root.querySelectorAll('[data-copyclean]').forEach(b=>b.addEventListener('click',async()=>{const t=b.closest('.aisec').querySelector('pre').textContent;
+  try{await navigator.clipboard.writeText(t);b.textContent='Copied'}catch(e){b.textContent='Select and copy'}setTimeout(()=>b.textContent='Copy',1600)}))}
 
 /* ---------- Speaking tool ---------- */
 function Speaker(host,s,key){
@@ -1539,7 +1617,7 @@ function Ready(host){const sc=skillScores();const tg=store.get('targets',{L:9,R:
 /* ---------- results helpers ---------- */
 function toolTitle(t){if(t==='DIAG')return 'Diagnostic baseline';return QUIZ[t]?QUIZ[t].title:WRITE[t]?WRITE[t].title:SPEAK[t]?SPEAK[t].task:t}
 function resultLabel(t,v){if(QUIZ[t])return v.total?`${v.score}/${v.total} correct`:'Done';
-  if(WRITE[t])return `${v.words||0} words${v.self?` · self ${(v.self/20).toFixed(1)}/5`:''}`;
+  if(WRITE[t])return `${v.ai?`AI level ${clampL(v.ai.overall_level)} · `:''}${v.words||0} words${v.self?` · self ${(v.self/20).toFixed(1)}/5`:''}`;
   if(SPEAK[t])return v.self?`Self-score ${(v.self/20).toFixed(1)}/5`:'Done';return 'Done'}
 function resultTone(t,v){if(QUIZ[t]&&v.total){const p=v.score/v.total;return p>=.75?'good':p>=.5?'mid':'low'}return 'mid'}
 
@@ -2033,7 +2111,7 @@ function StudentDetail(){const r=tRoster().find(x=>x.id===tStudent);if(!r)return
       ${Composer('sm','Write to '+esc(pr.name),!!pr.email,pr.email?'Email goes to '+esc(pr.email)+'. Their reply arrives here.':'Add an email address to also send by email.')}</div>
     <div><div class="eyebrow" style="margin-bottom:8px">Hub progress by session</div><div class="mini12">${SESSIONS.map(x=>{const d=x.tasks.filter((_,i)=>tasks[x.n+':'+i]).length;return `<div style="--ci:var(--sk${x.k}i)" title="Session ${x.n}: ${d}/${x.tasks.length}"><i style="height:${d/x.tasks.length*100}%"></i><span style="position:relative">${x.n}</span></div>`}).join('')}</div></div>
     <div class="grid g2">
-      <div class="stack" style="gap:10px"><div class="eyebrow">Writing submissions</div>${subs.length?subs.map(x=>`<details class="subm"><summary>Session ${esc(x.n)} · ${esc(WRITE[x.t]?WRITE[x.t].title:(x.v.task?'Email task reply: '+x.v.task:x.t))} · ${x.v.words||0} words${x.v.self?` · self ${(x.v.self/20).toFixed(1)}/5`:''}</summary><pre>${esc(x.v.text)}</pre></details>`).join(''):'<p class="muted">No writing submitted yet.</p>'}</div>
+      <div class="stack" style="gap:10px"><div class="eyebrow">Writing submissions</div>${subs.length?subs.map(x=>`<details class="subm"><summary>Session ${esc(x.n)} · ${esc(WRITE[x.t]?WRITE[x.t].title:(x.v.task?'Email task reply: '+x.v.task:x.t))} · ${x.v.words||0} words${x.v.ai?` · <b>AI level ${clampL(x.v.ai.overall_level)}</b>`:''}${x.v.self?` · self ${(x.v.self/20).toFixed(1)}/5`:''}</summary><pre>${esc(x.v.text)}</pre>${x.v.ai?AIFeedback(x.v.ai,WRITE[x.t]):''}</details>`).join(''):'<p class="muted">No writing submitted yet.</p>'}</div>
       <div class="stack" style="gap:10px"><div class="eyebrow">Error causes</div>${s.log.length?`<div class="cause-bars">${causes.map(([c,n])=>`<div><span style="text-transform:capitalize">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${n/max*100}%"></div></div><span class="mono">${n}</span></div>`).join('')}</div><p class="muted" style="font-size:13px">${s.log.length} logged · ${s.untagged} not tagged yet</p>`:'<p class="muted">No errors logged yet.</p>'}</div>
     </div>
     <div class="stack" style="gap:10px"><div class="row"><div class="eyebrow">Error log · ${s.log.length} entr${s.log.length===1?'y':'ies'}</div><span class="spacer"></span>
