@@ -338,6 +338,37 @@ table.roster tr.on td{background:var(--lav)}
 .sharebox{background:var(--hub-soft);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:10px}
 .sharebox pre{white-space:pre-wrap;font-family:var(--body);font-size:14px;margin:0;background:var(--surface);border-radius:12px;padding:12px}
 .codechip{font-weight:700;letter-spacing:.06em;background:var(--surface-2);border-radius:8px;padding:2px 8px;font-size:13px;white-space:nowrap}
+
+.badge{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--live);color:var(--surface);font-size:11.5px;font-weight:700;line-height:1}
+.tiles{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:860px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.hero2 .row>.stack{flex:1 1 260px!important}
+@media(max-width:860px){#prog-grid,#err-grid{grid-template-columns:minmax(0,1fr)!important}}
+table.sess td{vertical-align:middle}
+.slink{display:flex;gap:10px;align-items:center;text-decoration:none;min-width:200px}
+.slink .sn{flex:none;width:28px;height:28px;border-radius:50%;background:var(--c);color:var(--ci);display:grid;place-items:center;font-weight:700;font-size:12.5px}
+.stat{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.stat.good{background:var(--hub-soft);color:var(--hub)}.stat.mid{background:var(--peach);color:var(--warn)}
+.rchip{display:inline-block;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--surface-2);margin:2px 4px 2px 0;white-space:nowrap}
+.rchip.good{background:var(--hub-soft);color:var(--hub)}.rchip.mid{background:var(--blue)}.rchip.low{background:var(--peach);color:var(--warn)}
+.recent{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.recent li{display:flex;gap:10px;align-items:center;justify-content:space-between;background:var(--surface-2);border-radius:14px;padding:10px 12px}
+.recent li>div{display:flex;flex-direction:column;min-width:0}
+.recent li .muted{font-size:12.5px}
+.pickmsg{cursor:pointer;background:var(--surface)!important}
+.thread{display:flex;flex-direction:column;gap:12px}
+.threadbox{max-height:460px;overflow-y:auto;padding:4px}
+.bubble{max-width:min(620px,92%);border-radius:18px;padding:12px 16px;display:flex;flex-direction:column;gap:6px;background:var(--lav)}
+.bubble.mine{align-self:flex-end;background:var(--blue)}
+.bubble.theirs{align-self:flex-start}
+.bubble.task{border:2px dashed var(--skWi);background:var(--peach)}
+.bmeta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px}
+.bmeta .chip{background:var(--surface)}
+.bsubj{font-weight:700}
+.bbody{white-space:pre-wrap;font-size:14.5px}
+.chk{display:inline-flex;gap:8px;align-items:center;font-size:14px;font-weight:600;cursor:pointer}
+.chk input{width:18px;height:18px;accent-color:var(--hub)}
+.composer textarea{min-height:140px}
 </style>
 </head>
 <body>
@@ -347,6 +378,7 @@ table.roster tr.on td{background:var(--lav)}
     <a href="#home" data-nav="home">My Dashboard</a>
     <a href="#syllabus" data-nav="syllabus">Syllabus</a>
     <a href="#log" data-nav="log">Error Log</a>
+    <a href="#messages" data-nav="messages" id="nav-msg" hidden>Messages <span class="badge" id="msg-badge" hidden></span></a>
     <a href="#teacher" data-nav="teacher" id="nav-teacher" hidden>Teacher Portal</a>
   </nav>
   <span id="sync" class="sync" hidden></span>
@@ -392,7 +424,7 @@ const writeTPass=v=>{try{v?sessionStorage.setItem('bcs:tpass',v):sessionStorage.
 
 const SYNC_KEYS=['tasks','res','targets','log'];
 const cloud={code:null,student:null,batch:null,feedback:null,state:'local',tpass:null,
-  t:{loaded:false,loading:false,error:null,at:0,batches:[],students:[],progress:{},feedback:{}}};
+  messages:[],t:{loaded:false,loading:false,error:null,at:0,batches:[],students:[],progress:{},feedback:{},messages:[]}};
 const _set=store.set.bind(store);
 store.set=function(k,v){_set(k,v);if(SYNC_KEYS.includes(k)){_set('updatedAt',Date.now());schedulePush()}};
 let pushTimer=null,pushPending=false,pushing=false,pushAgain=false;
@@ -410,14 +442,14 @@ function updateSyncBadge(){const el=document.getElementById('sync');if(!el)retur
   const [t,c]=M[cloud.code?cloud.state:(cloud.tpass?'teacher':'local')]||M.local;el.textContent=t;el.className='sync '+c}
 function renderNav(){const signed=!!(cloud.code||cloud.tpass);
   document.querySelector('nav.main').hidden=!signed;document.getElementById('nav-teacher').hidden=!cloud.tpass;
-  document.getElementById('signout').hidden=!signed;document.getElementById('sync').hidden=!signed;updateSyncBadge()}
-function curRoute(){const h=(location.hash||'#home').slice(1);return h.startsWith('session-')?'session':(['syllabus','log','teacher'].includes(h)?h:'home')}
+  document.getElementById('signout').hidden=!signed;document.getElementById('sync').hidden=!signed;document.getElementById('nav-msg').hidden=!cloud.code;updateSyncBadge();updateMsgBadge()}
+function curRoute(){const h=(location.hash||'#home').slice(1);return h.startsWith('session-')?'session':(['syllabus','log','teacher','messages'].includes(h)?h:'home')}
 let pendingRefresh=false;
 function refreshIf(rs){if(!rs.includes(curRoute()))return;const a=document.activeElement;
   if(a&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)&&app.contains(a)){pendingRefresh=true;return}view(true)}
 document.addEventListener('focusout',()=>{if(!pendingRefresh)return;setTimeout(()=>{const a=document.activeElement;if(pendingRefresh&&!(a&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName))){pendingRefresh=false;view(true)}},700)});
 
-function applyStudent(j){cloud.code=j.student.code;PREFIX='bcs:'+cloud.code+':';cloud.student=j.student;cloud.batch=j.batch;cloud.feedback=j.feedback;
+function applyStudent(j){cloud.code=j.student.code;PREFIX='bcs:'+cloud.code+':';cloud.student=j.student;cloud.batch=j.batch;cloud.feedback=j.feedback;cloud.messages=j.messages||[];
   writeSession({code:cloud.code,student:j.student,batch:j.batch,feedback:j.feedback});
   const r=j.progress;const localT=store.get('updatedAt',0);
   if(r&&(r.updatedAt||0)>localT){SYNC_KEYS.forEach(k=>{if(r[k]!==undefined)_set(k,r[k])});_set('updatedAt',r.updatedAt)}
@@ -714,6 +746,7 @@ function view(soft){clearAll();const h=(location.hash||'#home').slice(1);
   if(h==='syllabus'){mark('syllabus');app.innerHTML=Syllabus()}
   else if(h==='log'){mark('log');app.innerHTML=LogView();bindLog()}
   else if(h==='teacher'){mark('teacher');app.innerHTML=TeacherView();bindTeacher()}
+  else if(h==='messages'){mark('messages');app.innerHTML=MessagesView();bindMessages()}
   else if((m=h.match(/^session-(\d+)$/))&&SESSIONS[m[1]-1]){mark('syllabus');renderSession(SESSIONS[m[1]-1])}
   else {mark('home');app.innerHTML=Dashboard();bindDashboard()}
   if(!soft)window.scrollTo(0,0)}
@@ -761,20 +794,16 @@ function Dashboard(){
       </div>`}).join('')}</div>
   </section>
   ${ClassCard()}
-  <section class="panel stack" style="gap:14px">
-    <div class="row"><h3>Study Hub progress</h3><span class="spacer"></span><span class="muted" style="font-size:13px">${doneTasks} of ${totalTasks} tasks</span></div>
-    <div class="strip">${SESSIONS.map(s=>{const p=sessionProgress(s);return `<a href="#session-${s.n}" style="${skv(s.k)}" class="${s===nx?'next':''}" title="Session ${s.n}: ${esc(s.title)}">${p.pct===100?`<span class="ck">${CHECK}</span>`:''}<span class="n">S${String(s.n).padStart(2,'0')}</span><span class="muted" style="font-size:11px">${SKILL[s.k]}</span><div class="bar-track"><div class="bar-fill" style="width:${p.pct}%"></div></div></a>`}).join('')}</div>
-  </section>
-  <section class="grid g2">
+  ${MessagesCard()}
+  ${ProgressSection()}
+  ${ErrorSection()}
+  <section class="grid">
     <div class="panel stack" style="gap:14px"><h3>How each session works</h3>
       <div class="steps">
         <div class="step"><i>1</i><p><b>Before class.</b> Finish the previous Hub module. Your instructor opens each class with your results.</p></div>
         <div class="step live"><i>2</i><p><b>In class.</b> No quizzes and no quiet work. Watch strategies modelled live and work through errors together.</p></div>
         <div class="step hub"><i>3</i><p><b>After class.</b> The Hub module opens: drills, timed writing and speaking practice.</p></div>
       </div></div>
-    <div class="panel stack" style="gap:12px"><div class="row"><h3>Error Log</h3><span class="spacer"></span><a href="#log" class="btn">Open log</a></div>
-      <p class="muted">${log.length?`${log.length} logged misses. ${log.filter(e=>!e.cause).length} still need a cause.`:'Wrong answers from Hub quizzes land here automatically. Tag each one with a cause to find your pattern.'}</p>
-      ${causeBars(log)}</div>
   </section></div>`}
 
 function ClassCard(){
@@ -786,7 +815,7 @@ function ClassCard(){
     <div class="stack" style="gap:8px"><div class="eyebrow" style="color:var(--skRi)">Feedback from your teacher</div>${fb&&fb.text?`<div class="fbnote">${esc(fb.text)}</div><span class="muted" style="font-size:12.5px">Updated ${ago(fb.updatedAt)}</span>`:`<div class="fbnote muted">No feedback yet. It appears here after your teacher reviews your work.</div>`}</div>
   </section>`}
 function bindClassCard(){}
-function bindDashboard(){bindClassCard();app.querySelectorAll('[data-target]').forEach(sel=>sel.addEventListener('change',()=>{const t=store.get('targets',{L:9,R:9,W:9,S:9});t[sel.dataset.target]=+sel.value;store.set('targets',t)}))}
+function bindDashboard(){bindClassCard();bindCauseSelects();app.querySelectorAll('[data-target]').forEach(sel=>sel.addEventListener('change',()=>{const t=store.get('targets',{L:9,R:9,W:9,S:9});t[sel.dataset.target]=+sel.value;store.set('targets',t)}))}
 const CAUSES=['distractor','vocabulary','timing','inference'];
 function causeBars(log){if(!log.length)return '';const max=Math.max(1,...CAUSES.map(c=>log.filter(e=>e.cause===c).length));
   return `<div class="cause-bars">${CAUSES.map(c=>{const n=log.filter(e=>e.cause===c).length;return `<div><span style="text-transform:capitalize">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${n/max*100}%"></div></div><span class="mono">${n}</span></div>`}).join('')}</div>`}
@@ -973,15 +1002,152 @@ function Ready(host){const sc=skillScores();const tg=store.get('targets',{L:9,R:
   <p class="muted" style="font-size:13px">Practice percentages are a guide, not a CELPIP score. Your instructor maps them to levels in the live debrief.</p></div></div>`}
 
 
+
+/* ---------- results helpers ---------- */
+function toolTitle(t){return QUIZ[t]?QUIZ[t].title:WRITE[t]?WRITE[t].title:SPEAK[t]?SPEAK[t].task:t}
+function resultLabel(t,v){if(QUIZ[t])return v.total?`${v.score}/${v.total} correct`:'Done';
+  if(WRITE[t])return `${v.words||0} words${v.self?` · self ${(v.self/20).toFixed(1)}/5`:''}`;
+  if(SPEAK[t])return v.self?`Self-score ${(v.self/20).toFixed(1)}/5`:'Done';return 'Done'}
+function resultTone(t,v){if(QUIZ[t]&&v.total){const p=v.score/v.total;return p>=.75?'good':p>=.5?'mid':'low'}return 'mid'}
+
+/* ---------- dashboard: progress ---------- */
+function ProgressSection(){
+  const res=results();const keys=Object.keys(res);const totalTasks=SESSIONS.reduce((a,s)=>a+s.tasks.length,0);
+  const doneTasks=SESSIONS.reduce((a,s)=>a+sessionProgress(s).done,0);const doneSess=SESSIONS.filter(s=>sessionProgress(s).pct===100).length;
+  const writing=keys.filter(k=>WRITE[k.split(':')[1]]&&res[k].text).length;const speaking=keys.filter(k=>SPEAK[k.split(':')[1]]).length;
+  const quizzes=keys.filter(k=>QUIZ[k.split(':')[1]]).length;const nx=nextSession();
+  const recent=keys.map(k=>({k,t:k.split(':')[1],n:k.split(':')[0],v:res[k]})).filter(x=>x.v&&x.v.at).sort((a,b)=>b.v.at-a.v.at).slice(0,6);
+  const status=s=>{const p=sessionProgress(s);const anyRes=s.tools.some(t=>res[s.n+':'+t]);
+    return p.pct===100?['Complete','good']:(p.done||anyRes)?['In progress','mid']:['Not started','']};
+  return `<section class="panel stack" style="gap:18px" id="progress">
+    <div class="row"><div><div class="eyebrow">My progress</div><h2>${doneSess} of 12 sessions complete</h2></div><span class="spacer"></span><a class="btn primary" href="#session-${nx.n}">Continue: Session ${nx.n}</a></div>
+    <div class="tiles">
+      <div class="tile" style="--c:var(--skO);--ci:var(--skOi)"><b>${Math.round(doneTasks/totalTasks*100)}%</b><span>Hub tasks · ${doneTasks}/${totalTasks}</span></div>
+      <div class="tile" style="--c:var(--skL);--ci:var(--skLi)"><b>${quizzes}</b><span>Practice sets graded</span></div>
+      <div class="tile" style="--c:var(--skW);--ci:var(--skWi)"><b>${writing}</b><span>Writing responses</span></div>
+      <div class="tile" style="--c:var(--skS);--ci:var(--skSi)"><b>${speaking}</b><span>Speaking answers</span></div>
+      <div class="tile" style="--c:var(--skR);--ci:var(--skRi)"><b>${store.get('log',[]).length}</b><span>Errors logged</span></div>
+    </div>
+    <div class="strip">${SESSIONS.map(s=>{const p=sessionProgress(s);return `<a href="#session-${s.n}" style="${skv(s.k)}" class="${s===nx?'next':''}" title="Session ${s.n}: ${esc(s.title)}">${p.pct===100?`<span class="ck">${CHECK}</span>`:''}<span class="n">S${String(s.n).padStart(2,'0')}</span><span class="muted" style="font-size:11px">${SKILL[s.k]}</span><div class="bar-track"><div class="bar-fill" style="width:${p.pct}%"></div></div></a>`}).join('')}</div>
+    <div class="grid" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px" id="prog-grid">
+      <div class="stack" style="gap:8px;min-width:0"><h3>Session by session</h3><div class="tablewrap"><table class="log sess"><thead><tr><th>Session</th><th>Status</th><th>Tasks</th><th>Results</th></tr></thead><tbody>
+        ${SESSIONS.map(s=>{const p=sessionProgress(s);const [st,tone]=status(s);const rs=s.tools.filter(t=>res[s.n+':'+t]&&t!=='READY').map(t=>`<span class="rchip ${resultTone(t,res[s.n+':'+t])}">${esc(resultLabel(t,res[s.n+':'+t]))}</span>`).join('');
+          return `<tr><td><a href="#session-${s.n}" class="slink" style="${skv(s.k)}"><span class="sn">${s.n}</span><span>${esc(s.title)}</span></a></td><td><span class="stat ${tone}">${st}</span></td><td class="mono">${p.done}/${p.total}</td><td>${rs||'<span class="muted">–</span>'}</td></tr>`}).join('')}
+      </tbody></table></div></div>
+      <div class="stack" style="gap:8px;min-width:0"><h3>Recent results</h3>${recent.length?`<ul class="recent">${recent.map(x=>`<li><div><b>${esc(toolTitle(x.t))}</b><span class="muted">Session ${esc(x.n)} · ${ago(x.v.at)}</span></div><span class="rchip ${resultTone(x.t,x.v)}">${esc(resultLabel(x.t,x.v))}</span></li>`).join('')}</ul>`:'<p class="muted">Your scores appear here after your first practice set.</p>'}</div>
+    </div>
+  </section>`}
+
+/* ---------- dashboard: error log ---------- */
+function ErrorSection(){const log=store.get('log',[]);const untagged=log.filter(e=>!e.cause).length;
+  return `<section class="panel stack" style="gap:16px" id="errors">
+    <div class="row"><div><div class="eyebrow">My error log</div><h2>${log.length?`${log.length} mistake${log.length>1?'s':''} to learn from`:'No mistakes logged yet'}</h2></div><span class="spacer"></span><a href="#log" class="btn">Open full log</a></div>
+    ${log.length?`<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:18px" id="err-grid">
+      <div class="stack" style="gap:10px">${causeBars(log)}<p class="muted" style="font-size:13px">${untagged?`<b>${untagged}</b> still need a cause. Choosing one shows you your pattern.`:'Every mistake is tagged. Nice work.'}</p></div>
+      <div class="tablewrap"><table class="log"><thead><tr><th>Session</th><th>Question</th><th>Your answer</th><th>Correct</th><th>Cause</th></tr></thead><tbody>
+        ${log.slice(0,6).map(e=>`<tr><td class="mono">S${esc(e.session)}</td><td style="min-width:200px">${esc(e.item)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td><select data-id="${esc(e.id)}" aria-label="Cause"><option value="">Choose…</option>${CAUSES.map(c=>`<option value="${c}" ${e.cause===c?'selected':''}>${c}</option>`).join('')}</select></td></tr>`).join('')}
+      </tbody></table>${log.length>6?`<p class="muted" style="font-size:13px;margin-top:8px">Showing the 6 newest. <a href="#log">See all ${log.length}</a></p>`:''}</div></div>`
+    :'<p class="muted">Wrong answers from listening, reading and drill sets land here automatically. Tag each one as distractor, vocabulary, timing or inference to find your pattern.</p>'}
+  </section>`}
+function bindCauseSelects(){app.querySelectorAll('select[data-id]').forEach(sel=>sel.addEventListener('change',()=>{const log=store.get('log',[]);const e=log.find(x=>String(x.id)===sel.dataset.id);if(e){e.cause=sel.value;store.set('log',log)}}))}
+
+/* ---------- messages (student) ---------- */
+const seenSet=()=>new Set(store.get('seenMsgs',[]));
+function unreadCount(){if(!cloud.code)return 0;const seen=seenSet();return (cloud.messages||[]).filter(m=>m.from==='teacher'&&!seen.has(m.id)).length}
+function updateMsgBadge(){const b=document.getElementById('msg-badge');if(!b)return;const n=unreadCount();b.textContent=n;b.hidden=!n}
+async function refreshMessages(){if(!cloud.code)return;try{const j=await api('student.messages',{code:cloud.code});
+  const before=JSON.stringify([(cloud.messages||[]).length,cloud.feedback&&cloud.feedback.updatedAt]);cloud.messages=j.messages||[];cloud.feedback=j.feedback;
+  updateMsgBadge();if(before!==JSON.stringify([cloud.messages.length,cloud.feedback&&cloud.feedback.updatedAt]))refreshIf(['home','messages'])}catch(e){}}
+setInterval(()=>{if(cloud.code&&document.visibilityState==='visible')refreshMessages()},90000);
+const KIND={message:'Message',task:'Email-writing task',invite:'Welcome','task-reply':'Task reply'};
+function Bubble(m,viewer){const mine=m.from===viewer;const ann=m.from==='teacher'&&!m.code;
+  const who=m.from==='teacher'?'Ms. Maria':(viewer==='teacher'?'Student':'You');
+  return `<article class="bubble ${mine?'mine':'theirs'} ${m.kind==='task'?'task':''}" id="m-${esc(m.id)}">
+    <div class="bmeta"><b>${who}</b>${ann?'<span class="chip">To the whole batch</span>':''}${m.kind!=='message'?`<span class="chip kind-${esc(m.kind)}">${KIND[m.kind]||esc(m.kind)}</span>`:''}${m.emailed?'<span class="chip">Also emailed</span>':''}<span class="muted">${ago(m.createdAt)}</span></div>
+    ${m.subject?`<div class="bsubj">${esc(m.subject)}</div>`:''}<div class="bbody">${esc(m.body)}</div>
+    ${m.kind==='task'&&viewer==='student'?`<div><button class="btn hub sm" data-reply="${esc(m.id)}">${(cloud.messages||[]).some(x=>x.replyTo===m.id)?'Write another reply':'Write your email reply'}</button></div>`:''}
+    ${viewer==='teacher'&&m.from==='teacher'&&m.code?`<div class="muted" style="font-size:12px">${m.readS?'Read '+ago(m.readS):'Not read yet'}</div>`:''}
+  </article>`}
+function Thread(msgs,viewer){const list=msgs.slice().sort((a,b)=>a.createdAt-b.createdAt);
+  return list.length?`<div class="thread">${list.map(m=>Bubble(m,viewer)).join('')}</div>`:`<div class="empty">No messages yet.</div>`}
+let sReply=null;
+function MessagesView(){
+  if(!cloud.code)return `<div class="panel stack"><h2>Messages</h2><p class="muted">Messages are for students. Teachers message students from the Teacher Portal.</p><a class="btn" href="#teacher">Open Teacher Portal</a></div>`;
+  const msgs=cloud.messages||[];const task=sReply?msgs.find(m=>m.id===sReply):null;
+  const comp=task?`<section class="panel stack composer" style="gap:12px" id="s-comp">
+      <div class="row"><span class="chip kind-task">Email-writing task</span><h3 style="flex:1;min-width:0">Reply: ${esc(task.subject||'Email task')}</h3><span class="timer" id="s-timer">27:00</span></div>
+      <div class="prompt" style="white-space:pre-wrap">${esc(task.body)}</div>
+      <div class="row"><button class="btn hub" id="s-start">Start 27-minute timer</button><span class="muted" style="font-size:13px">Pasting is turned off, as on the real test.</span><span class="spacer"></span><span class="wc" id="s-wc">0 words</span></div>
+      <label class="field" for="s-body">Your email<textarea class="write" id="s-body" placeholder="Dear …"></textarea></label>
+      <div class="row"><button class="btn primary" id="s-send">Send my reply</button><button class="btn" id="s-cancel">Cancel</button><span class="muted" id="s-msg" style="font-size:13px"></span></div></section>`
+    :`<section class="panel stack composer" style="gap:12px" id="s-comp"><h3>Write to Ms. Maria</h3>
+      <label class="field" for="s-subj">Subject (optional)<input id="s-subj" maxlength="150" placeholder="Question about Session 6"></label>
+      <label class="field" for="s-body">Message<textarea id="s-body" placeholder="Type your message…"></textarea></label>
+      <div class="row"><button class="btn primary" id="s-send">Send message</button><span class="muted" id="s-msg" style="font-size:13px"></span></div></section>`;
+  return `<div class="stack" style="gap:24px">
+    <section class="hero2 slim" style="background:var(--skL)"><div class="row"><div class="stack" style="gap:10px;flex:1;min-width:0"><div class="eyebrow" style="color:var(--skLi)">Messages</div><h1>Talk with your teacher</h1>
+      <p class="lead">Ask questions and read announcements. When Ms. Maria sends an <b>email-writing task</b>, reply here like CELPIP Writing Task 1: 150–200 words in 27 minutes.</p></div><button class="btn" id="s-refresh">Check for new messages</button></div></section>
+    <section class="panel">${Thread(msgs,'student')}</section>${comp}</div>`}
+function bindMessages(){if(!cloud.code)return;
+  const seen=seenSet();const unread=(cloud.messages||[]).filter(m=>m.from==='teacher'&&!seen.has(m.id));
+  if(unread.length){unread.forEach(m=>seen.add(m.id));store.set('seenMsgs',[...seen].slice(-500));updateMsgBadge();
+    const direct=unread.filter(m=>m.code===cloud.code).map(m=>m.id);if(direct.length)api('student.read',{code:cloud.code,ids:direct}).catch(()=>{})}
+  const on=(id,ev,fn)=>{const el=document.getElementById(id);if(el)el.addEventListener(ev,fn);return el};
+  on('s-refresh','click',async e=>{e.target.disabled=true;e.target.textContent='Checking…';await refreshMessages();view(true)});
+  app.querySelectorAll('[data-reply]').forEach(b=>b.addEventListener('click',()=>{sReply=b.dataset.reply;view(true);const c=document.getElementById('s-comp');if(c)c.scrollIntoView({behavior:'smooth'})}));
+  on('s-cancel','click',()=>{sReply=null;view(true)});
+  const ta=document.getElementById('s-body');const wc=document.getElementById('s-wc');
+  const dk='msgdraft:'+(sReply||'free');if(ta){ta.value=store.get(dk,'');ta.addEventListener('input',()=>{store.set(dk,ta.value);count()})}
+  const count=()=>{if(!wc)return 0;const n=(ta.value.trim().match(/\S+/g)||[]).length;wc.textContent=n+' words';wc.className='wc '+(n===0?'':(n>=150&&n<=200?'ok':'bad'));return n};count();
+  if(sReply&&ta)ta.addEventListener('paste',e=>{e.preventDefault();document.getElementById('s-msg').textContent='Paste is turned off. Type your reply.'});
+  on('s-start','click',e=>{e.target.disabled=true;let left=27*60;const tm=document.getElementById('s-timer');ta.focus();
+    const iv=every(()=>{left--;tm.textContent=fmt(Math.max(0,left));tm.classList.toggle('low',left<=180);if(left<=0){clearInterval(iv);ta.readOnly=true;document.getElementById('s-msg').textContent='Time is up. Send your reply.'}},1000)});
+  on('s-send','click',async e=>{const body=ta.value.trim();const msg=document.getElementById('s-msg');if(!body){msg.textContent='Write something first.';return}
+    const task=sReply?(cloud.messages||[]).find(m=>m.id===sReply):null;const subjEl=document.getElementById('s-subj');
+    e.target.disabled=true;msg.textContent='Sending…';
+    try{const j=await api('student.send',{code:cloud.code,body,subject:task?('Re: '+(task.subject||'Email task')):(subjEl?subjEl.value.trim():''),kind:task?'task-reply':'message',replyTo:task?task.id:''});
+      cloud.messages=(cloud.messages||[]).concat(j.message);store.set(dk,'');
+      if(task){const r=results();r['msg:'+task.id]={words:count(),text:body,at:Date.now(),task:task.subject||'Email task'};store.set('res',r)}
+      sReply=null;view(true)}
+    catch(err){e.target.disabled=false;msg.textContent=errMsg(err)}});
+}
+function MessagesCard(){if(!cloud.code)return '';const n=unreadCount();const last=(cloud.messages||[]).filter(m=>m.from==='teacher').sort((a,b)=>b.createdAt-a.createdAt)[0];
+  const tasksOpen=(cloud.messages||[]).filter(m=>m.kind==='task'&&!(cloud.messages||[]).some(x=>x.replyTo===m.id)).length;
+  return `<div class="panel stack" style="gap:12px;background:var(--skL)"><div class="row"><h3>Messages</h3>${n?`<span class="badge">${n} new</span>`:''}<span class="spacer"></span><a href="#messages" class="btn primary">Open messages</a></div>
+    ${last?`<div class="fbnote" style="background:var(--surface)"><b>${esc(last.subject||KIND[last.kind]||'Message')}</b><br>${esc(last.body.length>160?last.body.slice(0,160)+'…':last.body)}</div><span class="muted" style="font-size:12.5px">From Ms. Maria · ${ago(last.createdAt)}</span>`:'<p class="muted">No messages yet. You can write to your teacher any time.</p>'}
+    ${tasksOpen?`<p style="font-size:14px"><b>${tasksOpen}</b> email-writing task${tasksOpen>1?'s':''} waiting for your reply.</p>`:''}</div>`}
+
 /* ---------- Teacher portal ---------- */
-let tSel=null,tStudent=null,tNewOpen=false,tConfirmDel=false,tLogFilter='',tForm=null,tConfirmStuDel=false,tShare=null;const fbDraft={};
+let tSel=null,tStudent=null,tNewOpen=false,tConfirmDel=false,tLogFilter='',tForm=null,tConfirmStuDel=false,tShare=null,tBatchMsg=false,tFlash='';const fbDraft={};
+const SAMPLE_TASKS=[
+ {subject:'Email task: A noisy neighbour',body:'Your new neighbour has been doing renovation work late in the evening for two weeks. The noise is affecting your sleep and your work.\n\nWrite an email to your neighbour in about 150–200 words. In your email:\n• introduce yourself and describe the problem\n• explain how it is affecting you\n• suggest a solution that could work for both of you'},
+ {subject:'Email task: A cancelled class',body:'You paid for a six-week evening cooking class at a community centre. After two classes, the centre cancelled the course without explanation.\n\nWrite an email to the centre manager in about 150–200 words. In your email:\n• describe the course and what happened\n• explain why you are disappointed\n• say what you would like the centre to do'},
+ {subject:'Email task: Thanking a coworker',body:'A coworker helped you a lot during your first month at a new job.\n\nWrite an email to your coworker in about 150–200 words. In your email:\n• remind them of how they helped you\n• explain why their help was important\n• invite them to do something with you to say thank you'}];
+const msgsFor=r=>cloud.t.messages.filter(m=>m.code===r.code||(!m.code&&m.batch&&m.batch===r.batch));
+const unreadFrom=code=>cloud.t.messages.filter(m=>m.from==='student'&&!m.readT&&(!code||m.code===code));
+function Composer(px,title,canEmail,emailNote){return `<div class="stack composer" style="gap:10px" id="${px}-comp"><h3>${title}</h3>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+    <label class="field" for="${px}-kind">Type<select id="${px}-kind"><option value="message">Message</option><option value="task">CELPIP email-writing task (student replies in 150–200 words)</option></select></label>
+    <label class="field" for="${px}-subj">Subject<input id="${px}-subj" maxlength="150" placeholder="Subject"></label></div>
+  <label class="field" for="${px}-body">Message<textarea id="${px}-body" placeholder="Write your message…"></textarea></label>
+  <div class="row"><label class="chk" for="${px}-email"><input type="checkbox" id="${px}-email" ${canEmail?'checked':'disabled'}> Also send by email</label><span class="muted" style="font-size:12.5px">${emailNote}</span></div>
+  <div class="row"><button class="btn primary" id="${px}-send">Send</button><button class="btn" type="button" id="${px}-sample">Insert a sample email task</button><span class="muted" id="${px}-msg" style="font-size:13px"></span></div></div>`}
+function bindComposer(px,to,after){const on=(id,ev,fn)=>{const el=document.getElementById(px+id);if(el)el.addEventListener(ev,fn)};
+  on('-sample','click',()=>{const t=SAMPLE_TASKS[Math.floor(Math.random()*SAMPLE_TASKS.length)];document.getElementById(px+'-kind').value='task';document.getElementById(px+'-subj').value=t.subject;document.getElementById(px+'-body').value=t.body});
+  on('-send','click',async e=>{const body=document.getElementById(px+'-body').value.trim();const msg=document.getElementById(px+'-msg');if(!body){msg.textContent='Write a message first.';return}
+    const email=document.getElementById(px+'-email').checked;e.target.disabled=true;msg.textContent=email?'Sending and emailing…':'Sending…';
+    try{const j=await tcall('teacher.send',{to,kind:document.getElementById(px+'-kind').value,subject:document.getElementById(px+'-subj').value.trim(),body,email,siteUrl:siteURL()});
+      cloud.t.messages.push(j.message);const em=j.email||{};
+      tFlash=email?`Sent. Emailed ${em.sent||0} student${em.sent===1?'':'s'}${em.skipped?` · ${em.skipped} had no email address`:''}${em.failed?` · ${em.failed} email${em.failed>1?'s':''} failed (check that you ran testEmail in Apps Script)`:''}.`:'Sent. The student sees it under Messages.';
+      if(after)after();view(true)}
+    catch(err){e.target.disabled=false;msg.textContent=errMsg(err)}})}
 const TOTAL_TASKS=SESSIONS.reduce((a,s)=>a+s.tasks.length,0);
 const genCode=()=>{const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let c='CEL-';const r=crypto.getRandomValues(new Uint32Array(6));for(const x of r)c+=A[x%A.length];return c};
 const siteURL=()=>location.href.split('#')[0];
 const inviteText=st=>`Hi ${st.name}, welcome to the CELPIP Prep Course!\n\nOpen: ${siteURL()}\nYour access code: ${st.code}\n\nKeep this code private. It opens your dashboard and saves your practice.`;
 const tcall=(action,payload)=>api(action,Object.assign({pass:cloud.tpass},payload||{}));
 async function loadTeacher(){if(cloud.t.loading)return;cloud.t.loading=true;cloud.t.error=null;refreshIf(['teacher']);
-  try{const j=await tcall('teacher.data');Object.assign(cloud.t,{batches:j.batches||[],students:j.students||[],progress:j.progress||{},feedback:j.feedback||{},loaded:true,at:Date.now()})}
+  try{const j=await tcall('teacher.data');Object.assign(cloud.t,{batches:j.batches||[],students:j.students||[],progress:j.progress||{},feedback:j.feedback||{},messages:j.messages||[],loaded:true,at:Date.now()})}
   catch(e){if(e.code==='bad_password'){writeTPass(null);cloud.tpass=null;renderNav()}cloud.t.error=errMsg(e)}
   finally{cloud.t.loading=false;refreshIf(['teacher'])}}
 function tRoster(){return cloud.t.students.map(st=>Object.assign({},cloud.t.progress[st.code]||{},{id:st.code,code:st.code,profile:{name:st.name,email:st.email,phone:st.phone},batch:st.batch}))}
@@ -1024,7 +1190,7 @@ function TeacherView(){
   const avgDone=st.length?Math.round(st.reduce((a,x)=>a+x.s.done,0)/st.length/TOTAL_TASKS*100):0;
   const causes={};st.forEach(x=>x.s.log.forEach(e=>{if(e.cause)causes[e.cause]=(causes[e.cause]||0)+1}));const top=Object.entries(causes).sort((a,b)=>b[1]-a[1])[0];
   const binfo=`<div class="row"><div style="flex:1;min-width:0">${g.b?`<h2>${esc(g.name)}</h2><p class="muted" style="font-size:14px">${esc(g.b.schedule)}${g.b.schedule&&g.b.start?' · ':''}${g.b.start?'Starts '+esc(fmtDate(g.b.start)):''}</p>`:`<h2>Students with no batch</h2><p class="muted" style="font-size:14px">Their batch was deleted or never set. Open a student and choose a batch.</p>`}</div>
-     <button class="btn primary" id="t-addstu">+ Add student</button>
+     <button class="btn primary" id="t-addstu">+ Add student</button>${g.b?'<button class="btn" id="t-bmsg">Message batch</button>':''}
      ${g.b?(tConfirmDel?`<span class="notice">Delete this batch? Its students keep their codes and move to "No batch". <button class="btn sm" id="t-del-yes">Delete</button> <button class="btn sm" id="t-del-no">Keep</button></span>`:`<button class="btn" id="t-del">Delete batch</button>`):''}</div>`;
   const tiles=`<div class="tiles">
     <div class="tile"><b>${list.length}</b><span>Students</span></div>
@@ -1036,13 +1202,18 @@ function TeacherView(){
     return `<section class="sharebox"><div class="row"><h3>Send ${esc(s.name)} their access code</h3><span class="spacer"></span><button class="btn sm" id="t-share-close">Done</button></div>
       <pre id="t-share-text">${esc(txt)}</pre><div class="row"><button class="btn primary sm" data-copy="${esc(txt)}">Copy message</button><span class="muted" style="font-size:13px">Paste it into an email, text or WhatsApp.</span></div></section>`})():'';
   const roster=list.length?`<div class="tablewrap"><table class="roster"><thead><tr><th>Student</th><th>Access code</th><th>Contact</th><th>Now on</th><th>Hub tasks</th><th>Listening</th><th>Reading</th><th>Writing</th><th>Speaking</th><th>Last active</th></tr></thead><tbody>
-    ${st.map(({r,s})=>`<tr class="pick ${r.id===tStudent?'on':''}" data-stu="${esc(r.id)}"><td><b>${esc(r.profile.name)}</b></td><td><span class="codechip">${esc(r.code)}</span></td>
+    ${st.map(({r,s})=>`<tr class="pick ${r.id===tStudent?'on':''}" data-stu="${esc(r.id)}"><td><b>${esc(r.profile.name)}</b>${unreadFrom(r.code).length?` <span class="badge">${unreadFrom(r.code).length}</span>`:''}</td><td><span class="codechip">${esc(r.code)}</span></td>
       <td style="font-size:13px;min-width:160px">${r.profile.email?esc(r.profile.email):'<span class="muted">No email</span>'}${r.profile.phone?`<br><span class="muted">${esc(r.profile.phone)}</span>`:''}</td>
       <td><span class="chip" style="background:var(--sk${s.cur.k});color:var(--sk${s.cur.k}i)">S${s.cur.n}</span></td>
       <td>${s.done}/${TOTAL_TASKS}</td><td>${s.L==null?'–':s.L+'%'}</td><td>${s.R==null?'–':s.R+'%'}</td><td>${s.W==null?'–':(s.W/20).toFixed(1)+'/5'}</td><td>${s.S==null?'–':(s.S/20).toFixed(1)+'/5'}</td>
       <td class="muted">${r.updatedAt?ago(r.updatedAt):'Not started'}</td></tr>`).join('')}</tbody></table></div>`
     :`<div class="panel empty">No students in this batch yet. Click <b>+ Add student</b> to create one and get their access code.</div>`;
-  return `<div class="stack" style="gap:24px">${head}${errNote}${pills}${form}<section class="stack" style="gap:16px">${binfo}${StudentForm()}${share}${tiles}${roster}</section>${tStudent?StudentDetail():''}</div>`}
+  const inboxList=unreadFrom().sort((a,b)=>b.createdAt-a.createdAt);
+  const inbox=`<section class="panel stack" style="gap:10px;background:var(--skL)"><div class="row"><h3>Inbox</h3>${inboxList.length?`<span class="badge">${inboxList.length} new</span>`:''}<span class="spacer"></span><span class="muted" style="font-size:13px">Student messages and task replies</span></div>
+    ${inboxList.length?`<ul class="recent">${inboxList.slice(0,6).map(m=>{const st=t.students.find(x=>x.code===m.code);return `<li class="pickmsg" data-open="${esc(m.code)}"><div><b>${esc(st?st.name:m.code)}</b><span class="muted">${esc(m.subject||KIND[m.kind]||'Message')} · ${ago(m.createdAt)}</span><span style="font-size:13.5px">${esc(m.body.length>120?m.body.slice(0,120)+'…':m.body)}</span></div><button class="btn sm">Open</button></li>`}).join('')}</ul>`:'<p class="muted" style="font-size:14px">No new messages from students.</p>'}</section>`;
+  const flash=tFlash?`<div class="notice" style="background:var(--hub-soft)">${esc(tFlash)} <button class="btn sm" id="t-flash-x">OK</button></div>`:'';
+  const bmsg=tBatchMsg&&g.b?`<section class="panel">${Composer('bm','Message everyone in '+esc(g.name),list.some(r=>r.profile.email),'Emails go to every student in this batch who has an email address.')}<div class="row" style="margin-top:8px"><button class="btn" id="bm-cancel">Close</button></div></section>`:'';
+  return `<div class="stack" style="gap:24px">${head}${flash}${errNote}${inbox}${pills}${form}<section class="stack" style="gap:16px">${binfo}${bmsg}${StudentForm()}${share}${tiles}${roster}</section>${tStudent?StudentDetail():''}</div>`}
 
 function StudentForm(){if(!tForm)return '';const d=tForm.data;const bopts=cloud.t.batches.map(b=>`<option value="${esc(b.id)}" ${b.id===d.batch?'selected':''}>${esc(b.name)}</option>`).join('');
   return `<section class="panel stack" style="gap:12px" id="t-form"><h3>${tForm.mode==='new'?'Add a student':'Edit student details'}</h3>
@@ -1054,22 +1225,26 @@ function StudentForm(){if(!tForm)return '';const d=tForm.data;const bopts=cloud.
       <label class="field" for="sf-code">Access code<span class="row" style="flex-wrap:nowrap;gap:6px"><input id="sf-code" class="codein" style="font-size:15px!important;flex:1;min-width:0" maxlength="20" value="${esc(d.code)}"><button class="btn sm" type="button" id="sf-gen">New code</button></span></label>
     </div>
     ${tForm.mode==='edit'&&tForm.orig!==d.code?'':''}<p class="muted" style="font-size:12.5px">You can type your own code (4–20 letters, numbers or dashes) or keep the generated one.${tForm.mode==='edit'?' Changing the code keeps the student’s progress; they will need the new code to sign in.':''}</p>
+    ${tForm.mode==='new'?'<label class="chk" for="sf-invite"><input type="checkbox" id="sf-invite" checked> Email the access code to the student now (needs an email address)</label>':''}
     <div class="row"><button class="btn primary" id="sf-save">${tForm.mode==='new'?'Create student':'Save changes'}</button><button class="btn" id="sf-cancel">Cancel</button><span class="err" id="sf-msg" style="min-height:0"></span></div></section>`}
 
 function StudentDetail(){const r=tRoster().find(x=>x.id===tStudent);if(!r)return '';const pr=r.profile;const s=stuStats(r);const tasks=r.tasks||{};
   const b=cloud.t.batches.find(x=>x.id===r.batch);
-  const subs=Object.entries(r.res||{}).filter(([k,v])=>v&&v.text).map(([k,v])=>{const [n,t]=k.split(':');return {n,t,v}});
+  const subs=Object.entries(r.res||{}).filter(([k,v])=>v&&v.text).map(([k,v])=>{const [n,t]=k.split(':');return {n:n==='msg'?'–':n,t,v}});
   const fb=cloud.t.feedback[r.code];const draft=fbDraft[r.code]!=null?fbDraft[r.code]:(fb&&fb.text)||'';
   const causes=CAUSES.map(c=>[c,s.log.filter(e=>e.cause===c).length]);const max=Math.max(1,...causes.map(c=>c[1]));
   return `<section class="panel stack" style="gap:18px" id="t-detail">
     <div class="row" style="align-items:flex-start"><div style="flex:1;min-width:0" class="stack"><h2>${esc(pr.name)}</h2>
-      <div class="row" style="gap:8px;font-size:14px"><span class="codechip">${esc(r.code)}</span><button class="btn sm" data-copy="${esc(r.code)}">Copy code</button><button class="btn sm" data-copy="${esc(inviteText({name:pr.name,code:r.code}))}">Copy invite message</button></div>
+      <div class="row" style="gap:8px;font-size:14px"><span class="codechip">${esc(r.code)}</span><button class="btn sm" data-copy="${esc(r.code)}">Copy code</button><button class="btn sm" data-copy="${esc(inviteText({name:pr.name,code:r.code}))}">Copy invite message</button>${pr.email?'<button class="btn sm" id="t-invite">Email access code</button>':''}</div>
       <div style="font-size:14px">${pr.email?`${esc(pr.email)} <button class="btn sm" data-copy="${esc(pr.email)}">Copy</button>`:'<span class="muted">No email</span>'}${pr.phone?` · ${esc(pr.phone)} <button class="btn sm" data-copy="${esc(pr.phone)}">Copy</button>`:''}</div>
       <div class="muted" style="font-size:13px">${b?esc(b.name):'No batch'} · Last active ${r.updatedAt?ago(r.updatedAt):'never'} · Targets L${(r.targets||{}).L||'–'} R${(r.targets||{}).R||'–'} W${(r.targets||{}).W||'–'} S${(r.targets||{}).S||'–'}</div></div>
       <div class="row"><button class="btn" id="t-edit">Edit details</button>${tConfirmStuDel?`<span class="notice">Delete ${esc(pr.name)} and all their progress? <button class="btn sm" id="t-sdel-yes">Delete</button> <button class="btn sm" id="t-sdel-no">Keep</button></span>`:`<button class="btn" id="t-sdel">Delete</button>`}<button class="btn" id="t-close">Close</button></div></div>
+    <div class="stack" style="gap:12px" id="t-msgs"><div class="row"><div class="eyebrow">Messages with ${esc(pr.name)}</div><span class="spacer"></span><span class="muted" style="font-size:12.5px">${msgsFor(r).length} total</span></div>
+      <div class="threadbox">${Thread(msgsFor(r),'teacher')}</div>
+      ${Composer('sm','Write to '+esc(pr.name),!!pr.email,pr.email?'Email goes to '+esc(pr.email)+'. Their reply arrives here.':'Add an email address to also send by email.')}</div>
     <div><div class="eyebrow" style="margin-bottom:8px">Hub progress by session</div><div class="mini12">${SESSIONS.map(x=>{const d=x.tasks.filter((_,i)=>tasks[x.n+':'+i]).length;return `<div style="--ci:var(--sk${x.k}i)" title="Session ${x.n}: ${d}/${x.tasks.length}"><i style="height:${d/x.tasks.length*100}%"></i><span style="position:relative">${x.n}</span></div>`}).join('')}</div></div>
     <div class="grid g2">
-      <div class="stack" style="gap:10px"><div class="eyebrow">Writing submissions</div>${subs.length?subs.map(x=>`<details class="subm"><summary>Session ${esc(x.n)} · ${esc(WRITE[x.t]?WRITE[x.t].title:x.t)} · ${x.v.words||0} words${x.v.self?` · self ${(x.v.self/20).toFixed(1)}/5`:''}</summary><pre>${esc(x.v.text)}</pre></details>`).join(''):'<p class="muted">No writing submitted yet.</p>'}</div>
+      <div class="stack" style="gap:10px"><div class="eyebrow">Writing submissions</div>${subs.length?subs.map(x=>`<details class="subm"><summary>Session ${esc(x.n)} · ${esc(WRITE[x.t]?WRITE[x.t].title:(x.v.task?'Email task reply: '+x.v.task:x.t))} · ${x.v.words||0} words${x.v.self?` · self ${(x.v.self/20).toFixed(1)}/5`:''}</summary><pre>${esc(x.v.text)}</pre></details>`).join(''):'<p class="muted">No writing submitted yet.</p>'}</div>
       <div class="stack" style="gap:10px"><div class="eyebrow">Error causes</div>${s.log.length?`<div class="cause-bars">${causes.map(([c,n])=>`<div><span style="text-transform:capitalize">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${n/max*100}%"></div></div><span class="mono">${n}</span></div>`).join('')}</div><p class="muted" style="font-size:13px">${s.log.length} logged · ${s.untagged} not tagged yet</p>`:'<p class="muted">No errors logged yet.</p>'}</div>
     </div>
     <div class="stack" style="gap:10px"><div class="row"><div class="eyebrow">Error log · ${s.log.length} entr${s.log.length===1?'y':'ies'}</div><span class="spacer"></span>
@@ -1088,7 +1263,16 @@ function bindTeacher(){
     catch(err){msg.textContent=errMsg(err);btn.disabled=false;btn.textContent='Sign in'}});
   if(document.getElementById('tlogin-pass')){document.getElementById('tlogin-pass').focus();return}
   if(cloud.tpass&&!cloud.t.loaded&&!cloud.t.loading&&!cloud.t.error)loadTeacher();
-  on('t-refresh','click',loadTeacher);on('t-retry','click',()=>{cloud.t.error=null;loadTeacher()});
+  on('t-refresh','click',loadTeacher);every(()=>{if(document.visibilityState==='visible'&&!cloud.t.loading)loadTeacher()},120000);
+  on('t-flash-x','click',()=>{tFlash='';view(true)});
+  app.querySelectorAll('[data-open]').forEach(li=>li.addEventListener('click',()=>{const st=cloud.t.students.find(x=>x.code===li.dataset.open);if(!st)return;tStudent=st.code;tSel=st.batch&&cloud.t.batches.some(b=>b.id===st.batch)?st.batch:'__none';view(true);const d=document.getElementById('t-msgs');if(d)d.scrollIntoView({behavior:'smooth',block:'start'})}));
+  on('t-bmsg','click',()=>{tBatchMsg=true;view(true)});on('bm-cancel','click',()=>{tBatchMsg=false;view(true)});
+  if(tBatchMsg&&tSel&&tSel!=='__none')bindComposer('bm',{batch:tSel},()=>{tBatchMsg=false});
+  if(tStudent){bindComposer('sm',{code:tStudent});const ur=unreadFrom(tStudent);if(ur.length){const ids=ur.map(m=>m.id);ur.forEach(m=>m.readT=Date.now());tcall('teacher.read',{ids}).catch(()=>{})}
+    const tb=app.querySelector('.threadbox');if(tb)tb.scrollTop=tb.scrollHeight}
+  on('t-invite','click',async e=>{const st=cloud.t.students.find(x=>x.code===tStudent);if(!st)return;e.target.disabled=true;e.target.textContent='Emailing…';
+    try{const m=await tcall('teacher.send',{to:{code:st.code},kind:'invite',subject:'Your CELPIP Prep Course access code',body:'Here is your access code for the CELPIP Prep Course website.',email:true,siteUrl:siteURL()});cloud.t.messages.push(m.message);tFlash=m.email&&m.email.sent?`Access code emailed to ${st.email}.`:'The email could not be sent. Run testEmail in Apps Script to allow email.'}
+    catch(err){tFlash=errMsg(err)}view(true)});on('t-retry','click',()=>{cloud.t.error=null;loadTeacher()});
   app.querySelectorAll('[data-batch]').forEach(b=>b.addEventListener('click',()=>{tSel=b.dataset.batch;tStudent=null;tForm=null;tShare=null;tConfirmDel=false;view(true)}));
   on('t-new','click',()=>{tNewOpen=true;view(true);const i=document.getElementById('nb-name');if(i)i.focus()});
   on('nb-cancel','click',()=>{tNewOpen=false;view(true)});
@@ -1113,6 +1297,8 @@ function bindTeacher(){
       if(tForm.orig&&tForm.orig!==st.code){if(cloud.t.progress[tForm.orig]){cloud.t.progress[st.code]=cloud.t.progress[tForm.orig];delete cloud.t.progress[tForm.orig]}if(cloud.t.feedback[tForm.orig]){cloud.t.feedback[st.code]=cloud.t.feedback[tForm.orig];delete cloud.t.feedback[tForm.orig]}}
       if(i>=0)cloud.t.students[i]=st;else cloud.t.students.push(st);
       if(tForm.mode==='new'||(tForm.orig&&tForm.orig!==st.code))tShare=st.code;
+      const inv=document.getElementById('sf-invite');
+      if(tForm.mode==='new'&&inv&&inv.checked&&st.email){try{const m=await tcall('teacher.send',{to:{code:st.code},kind:'invite',subject:'Your CELPIP Prep Course access code',body:'Welcome to the CELPIP Prep Course! Open the course website and sign in with your personal access code below.',email:true,siteUrl:siteURL()});cloud.t.messages.push(m.message);tFlash=m.email&&m.email.sent?`Access code emailed to ${st.email}.`:'The student was created, but the email could not be sent. Run testEmail in Apps Script to allow email, then use "Email access code".'}catch(e){tFlash='The student was created, but the email could not be sent: '+errMsg(e)}}
       tSel=st.batch&&cloud.t.batches.some(b=>b.id===st.batch)?st.batch:'__none';tStudent=st.code;tForm=null;view(true)}
     catch(err){e.target.disabled=false;msg.textContent=errMsg(err)}});
   on('t-share-close','click',()=>{tShare=null;view(true)});

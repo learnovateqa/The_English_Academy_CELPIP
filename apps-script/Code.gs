@@ -6,13 +6,17 @@
  *   Progress · each student's saved practice (JSON, split across p1–p8)
  *   Feedback · your feedback to each student
  *
+ *   Messages · messages and email-writing tasks between you and students
+ *
  * Setup: see README.md. Set the script property TEACHER_PASSWORD before use.
+ * Run testEmail once from the editor so Google asks for permission to send email.
  */
 const SHEET_HEADERS = {
   Batches:  ['id', 'name', 'start', 'schedule', 'createdAt'],
   Students: ['code', 'name', 'email', 'phone', 'batch', 'createdAt', 'updatedAt'],
   Progress: ['code', 'updatedAt', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'],
-  Feedback: ['code', 'text', 'updatedAt']
+  Feedback: ['code', 'text', 'updatedAt'],
+  Messages: ['id', 'code', 'batch', 'from', 'kind', 'subject', 'body', 'createdAt', 'readS', 'readT', 'emailed', 'replyTo']
 };
 const CHUNK = 45000;          // a Sheets cell holds at most 50,000 characters
 const CODE_RE = /^[A-Z0-9-]{4,20}$/;
@@ -33,26 +37,49 @@ function doPost(e) {
   finally { lock.releaseLock(); }
 }
 
-/** Run once from the editor to create the four sheets. */
+/** Run once from the editor to create the sheets. */
 function setup() {
   Object.keys(SHEET_HEADERS).forEach(sheet_);
+}
+
+/** Run once from the editor: sends you a test email and grants email permission. */
+function testEmail() {
+  const me = Session.getEffectiveUser().getEmail();
+  MailApp.sendEmail(me, 'CELPIP Prep Course: email is working', 'Your course can now email students. Daily quota left: ' + MailApp.getRemainingDailyQuota());
 }
 
 function route_(q) {
   const a = String(q.action || '');
   if (a === 'ping') return {};
 
-  if (a === 'student.login' || a === 'student.save') {
+  if (a.indexOf('student.') === 0) {
     const st = find_('Students', 'code', normCode_(q.code));
     if (!st) fail_('bad_code', 'Access code not found');
     if (a === 'student.save') { saveProgress_(st.code, q.progress); return { savedAt: Date.now() }; }
+    if (a === 'student.messages') {
+      const fb0 = find_('Feedback', 'code', st.code);
+      return { messages: studentMsgs_(st), feedback: fb0 ? { text: String(fb0.text), updatedAt: Number(fb0.updatedAt) || 0 } : null };
+    }
+    if (a === 'student.send') {
+      const body = clean_(q.body, 6000);
+      if (!body) fail_('bad_request', 'Message is empty');
+      const row = { id: newId_('M'), code: st.code, batch: String(st.batch || ''), from: 'student',
+        kind: q.kind === 'task-reply' ? 'task-reply' : 'message', subject: clean_(q.subject, 150), body: body,
+        createdAt: Date.now(), readS: Date.now(), readT: '', emailed: '', replyTo: clean_(q.replyTo, 20) };
+      write_('Messages', row);
+      notifyTeacher_(st, row);
+      return { message: pubMsg_(row) };
+    }
+    if (a === 'student.read') { markRead_('readS', q.ids, function (r) { return String(r.code) === st.code; }); return {}; }
+    if (a !== 'student.login') fail_('bad_request', 'Unknown action');
     const b = st.batch ? find_('Batches', 'id', st.batch) : null;
     const fb = find_('Feedback', 'code', st.code);
     return {
       student: pubStudent_(st),
       batch: b ? pubBatch_(b) : null,
       progress: readProgress_(find_('Progress', 'code', st.code)),
-      feedback: fb ? { text: String(fb.text), updatedAt: Number(fb.updatedAt) || 0 } : null
+      feedback: fb ? { text: String(fb.text), updatedAt: Number(fb.updatedAt) || 0 } : null,
+      messages: studentMsgs_(st)
     };
   }
 
@@ -102,6 +129,8 @@ function route_(q) {
             const r = find_(n, 'code', orig);
             if (r) sheet_(n).getRange(r._row, 1).setValue(code);
           });
+          const col = SHEET_HEADERS.Messages.indexOf('code') + 1;
+          rows_('Messages').forEach(function (r) { if (String(r.code) === orig) sheet_('Messages').getRange(r._row, col).setValue(code); });
         }
         return { student: pubStudent_(row) };
       }
@@ -109,8 +138,49 @@ function route_(q) {
       case 'teacher.student.delete': {
         const code = normCode_(q.code);
         ['Students', 'Progress', 'Feedback'].forEach(function (n) { del_(n, 'code', code); });
+        rows_('Messages').filter(function (r) { return String(r.code) === code; }).reverse()
+          .forEach(function (r) { sheet_('Messages').deleteRow(r._row); });
         return {};
       }
+
+      case 'teacher.send': {
+        const to = q.to || {};
+        const body = clean_(q.body, 6000);
+        if (!body) fail_('bad_request', 'Message is empty');
+        const kind = ['message', 'task', 'invite'].indexOf(q.kind) >= 0 ? q.kind : 'message';
+        let recipients = [], row;
+        if (to.code) {
+          const st = find_('Students', 'code', normCode_(to.code));
+          if (!st) fail_('bad_code', 'Student not found');
+          recipients = [st];
+          row = { code: st.code, batch: String(st.batch || '') };
+        } else if (to.batch) {
+          if (!find_('Batches', 'id', to.batch)) fail_('bad_request', 'Batch not found');
+          recipients = rows_('Students').filter(function (r) { return String(r.batch) === String(to.batch); });
+          row = { code: '', batch: String(to.batch) };
+        } else fail_('bad_request', 'No recipient');
+        Object.assign(row, { id: newId_('M'), from: 'teacher', kind: kind, subject: clean_(q.subject, 150), body: body,
+          createdAt: Date.now(), readS: '', readT: Date.now(), emailed: '', replyTo: clean_(q.replyTo, 20) });
+        const result = { sent: 0, skipped: 0, failed: 0 };
+        if (q.email) {
+          recipients.forEach(function (st) {
+            if (!st.email) { result.skipped++; return; }
+            try {
+              MailApp.sendEmail({ to: String(st.email), name: 'CELPIP Prep Course',
+                subject: row.subject || (kind === 'task' ? 'New CELPIP email-writing task' : 'Message from your CELPIP teacher'),
+                body: emailBody_(row, st, clean_(q.siteUrl, 300)) });
+              result.sent++;
+            } catch (err) { result.failed++; }
+          });
+          row.emailed = result.sent ? new Date().toISOString() : '';
+        }
+        write_('Messages', row);
+        return { message: pubMsg_(row), email: result };
+      }
+
+      case 'teacher.read':
+        markRead_('readT', q.ids, function () { return true; });
+        return {};
 
       case 'teacher.feedback': {
         const code = normCode_(q.code);
@@ -132,7 +202,8 @@ function teacherData_() {
   return {
     batches: rows_('Batches').map(pubBatch_),
     students: rows_('Students').map(pubStudent_),
-    progress: progress, feedback: feedback
+    progress: progress, feedback: feedback,
+    messages: rows_('Messages').map(pubMsg_)
   };
 }
 
@@ -166,6 +237,41 @@ function pubBatch_(r) {
            createdAt: Number(r.createdAt) || 0 };
 }
 
+/* ---------- messages ---------- */
+function pubMsg_(r) {
+  return { id: String(r.id), code: String(r.code || ''), batch: String(r.batch || ''), from: String(r.from || ''),
+    kind: String(r.kind || 'message'), subject: String(r.subject || ''), body: String(r.body || ''),
+    createdAt: Number(r.createdAt) || 0, readS: Number(r.readS) || 0, readT: Number(r.readT) || 0,
+    emailed: String(r.emailed || ''), replyTo: String(r.replyTo || '') };
+}
+function studentMsgs_(st) {
+  return rows_('Messages').filter(function (r) {
+    return String(r.code) === st.code || (String(r.code) === '' && st.batch && String(r.batch) === String(st.batch));
+  }).map(pubMsg_);
+}
+function markRead_(col, ids, allowed) {
+  if (!Array.isArray(ids) || !ids.length) return;
+  const want = {}; ids.forEach(function (i) { want[String(i)] = true; });
+  const c = SHEET_HEADERS.Messages.indexOf(col) + 1, now = Date.now(), sh = sheet_('Messages');
+  rows_('Messages').forEach(function (r) { if (want[String(r.id)] && !r[col] && allowed(r)) sh.getRange(r._row, c).setValue(now); });
+}
+function emailBody_(row, st, siteUrl) {
+  let t = 'Hi ' + (st.name || 'there') + ',\n\n' + row.body + '\n\n';
+  if (row.kind === 'task') t += 'This is a CELPIP email-writing task. Write your reply (150–200 words) on your course dashboard, under Messages.\n';
+  else t += 'You can reply on your course dashboard, under Messages.\n';
+  if (siteUrl) t += siteUrl + '\n';
+  if (row.kind === 'invite') t += 'Your access code: ' + st.code + '\n';
+  return t + '\nCELPIP Prep Course';
+}
+function notifyTeacher_(st, row) {
+  if (PropertiesService.getScriptProperties().getProperty('NOTIFY_ME') !== 'yes') return;
+  try {
+    MailApp.sendEmail(Session.getEffectiveUser().getEmail(), 'New message from ' + st.name + (row.subject ? ': ' + row.subject : ''),
+      row.body + '\n\nOpen the Teacher Portal to reply.');
+  } catch (e) {}
+}
+function newId_(p) { return p + Utilities.getUuid().replace(/-/g, '').slice(0, 10); }
+
 /* ---------- sheet helpers ---------- */
 function fail_(code, msg) { const e = new Error(msg || code); e.code = code; throw e; }
 function out_(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
@@ -174,7 +280,7 @@ function sheet_(name) {
   let sh = ss.getSheetByName(name);
   if (!sh) {
     sh = ss.insertSheet(name);
-    sh.getRange('A:J').setNumberFormat('@');   // keep codes, phones and dates as plain text
+    sh.getRange('A:Z').setNumberFormat('@');   // keep codes, phones and dates as plain text
     sh.appendRow(SHEET_HEADERS[name]);
     sh.setFrozenRows(1);
   }
