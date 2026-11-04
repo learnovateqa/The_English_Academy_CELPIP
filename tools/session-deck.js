@@ -114,7 +114,7 @@ const plain = t => parseMarks(t).map(x => x[0]).join('');
     [/diagram|table|chart/i, 'LuTable'], [/paragraph/i, 'LuAlignLeft'], [/claim/i, 'LuFlag'], [/evidence/i, 'LuFileText'], [/concession/i, 'LuHandMetal'],
     [/plan|outline/i, 'LuListOrdered'], [/proofread|check/i, 'LuCheckCheck'], [/readab/i, 'LuGlasses'], [/content|coheren/i, 'LuLayers'], [/task|fulfil/i, 'LuBadgeCheck'],
     [/tone|formal|friend/i, 'LuUser'], [/book|test/i, 'LuAward'], [/ruler|clb/i, 'LuRuler'], [/start/i, 'LuPlay'], [/finish/i, 'LuFlag'], [/add|explain/i, 'LuPlus']];
-  const iconFor = (t, k) => { const x = String(t).replace(/^\d+\s*·\s*/, ''); for (const [r, ic] of ICON_RULES) if (r.test(x)) return ic; return ICON[k] || 'LuSparkles'; };
+  const iconFor = (t, k) => { const x = String(t).replace(/^\d+\s*·\s*/, ''); for (const [r, ic] of ICON_RULES) if (r.test(x)) return ic; return ICON[C.k] || 'LuSparkles'; };
 
   // ---------- timing + notes ----------
   let clock = 0; // minutes from the start of class

@@ -67,7 +67,7 @@ After a student submits a writing task, Claude (Anthropic's AI model) scores it 
 
 ## Slide decks
 
-- Each session's PowerPoint is in `decks/`. Sessions 1–6 are ready, and more are coming.
+- Each session's PowerPoint is in `decks/`. Sessions 1–11 are ready; Session 12 is coming.
 - In the **Teacher Portal → Slide decks**, click **Download PowerPoint**.
 - In Canva, use **Create a design → Import file** and make the deck your own.
 - In Canva, use **Share → More → Embed** (or a Public view link). Paste it into the session's **Canva link** box in the Teacher Portal and click **Save**. The deck appears on that session's page for everyone.
