@@ -418,7 +418,7 @@ const plain = t => parseMarks(t).map(x => x[0]).join('');
     rows.forEach((r, i) => {
       const y = 1.95 + (i + 1) * rh;
       card(s, 0.75, y + 0.04, 11.8, rh - 0.08, i % 2 ? 'FFFFFF' : 'F6F7FB', 'Row ' + (i + 1), false, i % 2 ? LINE : null);
-      r.forEach((v, c) => T(s, String(v), { x: 0.75 + (c ? firstW + (c - 1) * otherW : 0) + 0.2, y, w: (c ? otherW : firstW) - 0.2, h: rh, fontSize: c ? 14 : 14.5, bold: !!c && sl.boldVals, align: c ? 'center' : 'left', color: c && sl.colorVals ? SK[ROT[(c - 1) % 5]][1] : NAVY }));
+      r.forEach((v, c) => T(s, String(v), { x: 0.75 + (c ? firstW + (c - 1) * otherW : 0) + 0.2, y, w: (c ? otherW : firstW) - 0.2, h: rh, fontSize: c ? (String(v).length > 38 ? 12.5 : 14) : 14.5, bold: !!c && sl.boldVals, align: c ? 'center' : 'left', color: c && sl.colorVals ? SK[ROT[(c - 1) % 5]][1] : NAVY }));
     });
     if (tips.length) await tipsBox(s, 0.75, 5.45, 11.8, 1.2, tips, 'Tips', sl.tipHead || 'Remember');
     s.addNotes(notes(sl));
