@@ -1668,6 +1668,13 @@ function buildSteps(s){stepCleanup();
 
 /* ---------- full mock tests (data in mocks/*.js) ---------- */
 const MOCKS=window.MOCKS||{};
+// spread correct answers evenly across A–D (deterministic, so reviews always match)
+function balanceMock(m){let n=0;
+  for(const sec of ['L','R'])for(const p of (m[sec]||[]))for(const sc of (p.screens||[p]))for(const q of sc.qs){
+    if(q.fixed||q.o.every(o=>/^([A-E]|E \(not given\))$/.test(o))||q.o.every(o=>/^\$?\d[\d:,.]*$/.test(o)))continue;
+    const target=(n++*3+1)%q.o.length,shift=(q.a-target+q.o.length)%q.o.length;
+    q.o=q.o.slice(shift).concat(q.o.slice(0,shift));q.a=target}}
+Object.values(MOCKS).forEach(balanceMock);
 const MOCK_SEC={L:['Listening','46–55 min'],R:['Reading','43–56 min'],W:['Writing','53 min'],S:['Speaking','about 15 min']};
 const MOCK_ORDER=['L','R','W','S'];
 // register mock writing / speaking tasks so the existing Writer and Speaker tools can run them
@@ -1723,9 +1730,9 @@ function renderMock(id,sec){const m=MOCKS[id];if(!m||!m[sec]){app.innerHTML='<di
    </section></div>`;
   app.querySelectorAll('#mk-qs input').forEach(r=>r.addEventListener('change',()=>{const s2=store.get(SK);s2.ans[r.name.slice(3)]=+r.value;store.set(SK,s2)}));
   const timerEl=document.getElementById('mk-timer');
-  const go=()=>{const s2=store.get(SK);s2.i++;s2.deadline=null;store.set(SK,s2);TTS.stopAll();renderMock(id,sec);window.scrollTo(0,0)};
+  let moved=false;const go=()=>{if(moved)return;moved=true;clearAll();const s2=store.get(SK);if(!s2||s2.i!==st.i)return renderMock(id,sec);s2.i++;s2.deadline=null;store.set(SK,s2);renderMock(id,sec);window.scrollTo(0,0)};
   const startTimer=()=>{let s2=store.get(SK);if(!s2.deadline){s2.deadline=Date.now()+secs*1000;store.set(SK,s2)}
-    const tick=()=>{const left=Math.max(0,Math.round((store.get(SK).deadline-Date.now())/1000));timerEl.textContent=fmt(left);timerEl.classList.toggle('low',left<=30);if(left<=0){clearInterval(iv);go()}};const iv=every(tick,1000);tick()};
+    const tick=()=>{const cur2=store.get(SK);if(moved||!cur2||!cur2.deadline||cur2.i!==st.i){clearInterval(iv);return}const left=Math.max(0,Math.round((cur2.deadline-Date.now())/1000));timerEl.textContent=fmt(left);timerEl.classList.toggle('low',left<=30);if(left<=0){clearInterval(iv);go()}};const iv=every(tick,1000);tick()};
   document.getElementById('mk-next').onclick=()=>{const unanswered=sc.qs.filter((_,qi)=>store.get(SK).ans[qid(qi)]==null).length;
     if(unanswered&&!confirm(`${unanswered} question${unanswered>1?'s are':' is'} not answered. A guess cannot lose points. Go on anyway?`))return;go()};
   if(!listen){startTimer();return}
