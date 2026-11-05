@@ -761,6 +761,14 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 .step-next{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 18px;background:var(--hub-soft);color:var(--hub);font-weight:600;font-size:14px}
 @media(max-width:560px){.st-ic{display:none}.step-head{padding:12px 14px;gap:10px}.st-stat .chip{font-size:11px}}
 .todo summary{cursor:pointer;list-style:none}.todo summary::-webkit-details-marker{display:none}.todo[open] summary{margin-bottom:10px}
+.mock-secs{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.mock-sec{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:14px;background:var(--c);color:var(--fg);text-decoration:none;transition:transform .15s,box-shadow .15s}
+.mock-sec:hover{transform:translateY(-2px);box-shadow:var(--shadow)}.mock-sec .ic{color:var(--ci)}.mock-sec div{display:flex;flex-direction:column;font-size:14px}.mock-sec .muted{font-size:12px}
+.mock-intro{background:var(--c)}.mock-rules{margin:0;padding-left:20px;font-size:14.5px;display:flex;flex-direction:column;gap:4px}
+.mock-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--c);border-radius:14px;padding:10px 16px;position:sticky;top:70px;z-index:5}
+.mock-ctx{background:var(--surface-2);border-radius:12px;padding:10px 14px;font-size:14.5px}
+.mock-parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}.mock-parts div{display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--surface);border-radius:10px;padding:8px 12px;font-size:13.5px}
+.mock-rev{display:flex;flex-direction:column;gap:8px}.mock-q{display:flex;flex-direction:column;gap:2px;padding:8px 12px;border-radius:10px;font-size:14px;border-left:4px solid var(--good);background:var(--surface-2)}.mock-q.no{border-left-color:var(--bad)}
 </style>
 </head>
 <body>
@@ -769,6 +777,7 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
   <nav class="main" aria-label="Main" hidden>
     <a href="#home" data-nav="home" id="nav-home">My Dashboard</a>
     <a href="#syllabus" data-nav="syllabus">Syllabus</a>
+    <a href="#mocks" data-nav="mocks">Mock Tests</a>
     <a href="#log" data-nav="log" id="nav-log">Error Log</a>
     <a href="#messages" data-nav="messages" id="nav-msg" hidden>Messages <span class="badge" id="msg-badge" hidden></span></a>
     <a href="#teacher" data-nav="teacher" id="nav-teacher" hidden>Teacher Portal</a>
@@ -780,6 +789,9 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 <main><div class="wrap" id="app"></div></main>
 <footer><div class="wrap"><p class="foot1">© 2026 Elevate with Ms. Maria · Learnovate Qatar · <a href="#teacher">Teacher portal</a></p><p>Independent prep course for the CELPIP-General test. Not affiliated with or endorsed by the test publisher. All practice items are original. Your practice saves to your class with your personal access code.</p></div></footer>
 
+<script src="mocks/scenes.js"></script>
+<script src="mocks/mock1.js"></script>
+<script src="mocks/mock2.js"></script>
 <script>
 /* ---------- settings ---------- */
 const CONFIG={
@@ -837,7 +849,7 @@ function renderNav(){const signed=!!(cloud.code||cloud.tpass);
   document.querySelector('nav.main').hidden=!signed;document.getElementById('nav-teacher').hidden=!cloud.tpass;
   document.getElementById('signout').hidden=!signed;document.getElementById('tp-btn').hidden=signed;document.getElementById('sync').hidden=!signed;document.getElementById('nav-msg').hidden=!cloud.code;
   const T=!!cloud.tpass&&!cloud.code;document.getElementById('nav-home').textContent=T?'Teaching':'My Dashboard';document.getElementById('nav-log').hidden=T;document.getElementById('nav-teacher').textContent=T?'Students & Batches':'Teacher Portal';updateSyncBadge();updateMsgBadge()}
-function curRoute(){const h=(location.hash||'#home').slice(1);return h.startsWith('session-')?'session':(['syllabus','log','teacher','messages'].includes(h)?h:'home')}
+function curRoute(){const h=(location.hash||'#home').slice(1);return h.startsWith('session-')?'session':(['syllabus','log','teacher','messages','mocks'].includes(h)?h:h.startsWith('mock-')?'mocks':'home')}
 let pendingRefresh=false;
 function refreshIf(rs){if(!rs.includes(curRoute()))return;const a=document.activeElement;
   if(a&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)&&app.contains(a)){pendingRefresh=true;return}view(true)}
@@ -972,7 +984,7 @@ const SESSIONS=[
   ['1:45','2:00','Analyze Inference Questions','Separate what is said from what is implied.']],
  liveTools:[['News Structure Sorter','Headline → details → impact.'],['Discussion Tracker','Three-speaker grid: who said what.'],['Attitude Marker Highlighter','Tags positive, negative, hedge and contrast words.']],
  tasks:[['Drill the News Item Set','Listen for the headline first, then the details.'],['Complete the Attitude Marker Sort','Classify each phrase.'],['Take Full Listening Mock #1','Scheduled by your instructor. One sitting.'],['Update the Error Log','Focus on inference errors.'],['Complete Set B: Three-Speaker Discussion','Track who says what in a grid.'],['Complete Set C: Viewpoints Report','Listen for attitude words and hedges.'],['Complete Set D: Storm News Report','Headline first, then details and impact.']],
- tools:['L2','L8','T1','L5','L6'],slides:'S3',widgets:['NEWS','TRACK','ATTITUDE'],guide:'S3'},
+ tools:['L2','L8','T1','L5','L6','MK1L'],slides:'S3',widgets:['NEWS','TRACK','ATTITUDE'],guide:'S3'},
 {n:4,k:'R',title:'Attack Reading Parts 1–2',
  obj:'Students scan efficiently and match text details to visual information.',
  live:[['0:00','0:15','Debrief Listening Mock #1','Class trends and fixes for the top three errors.'],
@@ -992,7 +1004,7 @@ const SESSIONS=[
   ['1:50','2:00','Preview the Mock','Set the strategy for Reading Mock #1.']],
  liveTools:[['Paragraph Labeler','Instructor tags each paragraph with a summary live.'],['Argument Structure Overlay','Colour codes claim, evidence and concession.']],
  tasks:[['Drill the Viewpoints Set','Write a 3–5 word summary per paragraph first.'],['Take Full Reading Mock #1','Scheduled by your instructor.'],['Update the Error Log','Tag inference misses.'],['Complete Set B: Paragraph Matching','Use "not given" only when nothing matches.'],['Complete the Paraphrase Match Drill','Five quick paraphrases.']],
- tools:['R2','R4','T2']},
+ tools:['R2','R4','T2','MK1R']},
 {n:6,k:'W',title:'Build the High-Scoring Email',
  obj:'Students write a complete 150–200 word email in 27 minutes that covers every bullet in the prompt.',
  live:[['0:00','0:15','Debrief Reading Mock #1','Class trends.'],
@@ -1022,7 +1034,7 @@ const SESSIONS=[
   ['1:45','2:00','Teach the Proofreading Pass','A three-minute end-of-task checklist.']],
  liveTools:[['Error Frequency Dashboard','Class-wide error chart.'],['Before/After Sentence Editor','Live upgrade demonstrations.']],
  tasks:[['Complete the Grammar Repair Quiz','Pick the correct sentence.'],['Take Writing Mock #1: Task 1','Email, 27 minutes.'],['Take Writing Mock #1: Task 2','Survey, 26 minutes.'],['Proofread Before Submitting','Use the three-minute checklist.'],['Complete the Vocabulary Upgrade Drill','Swap basic words for precise ones.'],['Complete the Connectors Drill','Link ideas correctly.']],
- tools:['G1','W1','W2','G2','G3']},
+ tools:['G1','W1','W2','G2','G3','MK1W']},
 {n:9,k:'S',title:'Structure Speaking Tasks 1–3',
  obj:'Students use prep time well and deliver organized answers that fill the speaking time.',
  live:[['0:00','0:15','Debrief Writing Mock #1','Class trends.'],
@@ -1053,7 +1065,7 @@ const SESSIONS=[
   ['1:45','2:00','Brief the Full Mock','Test-day conditions for Mock #2.']],
  liveTools:[['Stress and Intonation Visualizer','Pitch contour on instructor audio.'],['Description Frame Card','Task 8 order checklist.']],
  tasks:[['Answer Task 7: Expressing Opinions','90 seconds. Use the full time.'],['Answer Task 8: Unusual Situation','Describe it so your listener can picture it.'],['Take Full Mock Test #2','All four parts, one sitting, before Session 12.'],['Answer Set B: Expressing Opinions','Fill all 90 seconds.'],['Answer Set B: Unusual Situation','Shape, size, colour, parts, comparison.']],
- tools:['S7','S8','S16','S17']},
+ tools:['S7','S8','S16','S17','MK2']},
 {n:12,k:'T',title:'Execute the Test-Day Game Plan',
  obj:'Students turn mock results into a personal plan for the final weeks and for test day.',
  live:[['0:00','0:25','Debrief Full Mock #2','Compare results to baseline by skill.'],
@@ -1400,6 +1412,7 @@ function nextSession(){const open=SESSIONS.filter(s=>typeof sessionState!=='func
 function skillScores(r){r=r||results();const out={L:[],R:[],W:[],S:[]};
   for(const [k,v] of Object.entries(r)){const tool=k.split(':')[1];const q=QUIZ[tool];
     if(q&&q.kind==='listen')out.L.push(v.pct);else if(q&&q.kind==='read')out.R.push(v.pct);
+    else if(/^M\d+L$/.test(tool)&&v.pct!=null)out.L.push(v.pct);else if(/^M\d+R$/.test(tool)&&v.pct!=null)out.R.push(v.pct);
     else if(WRITE[tool]&&v.self)out.W.push(v.self);else if(SPEAK[tool]&&v.self)out.S.push(v.self);}
   return out}
 function addLog(entry){const log=store.get('log',[]);log.unshift(Object.assign({id:Date.now()+Math.random(),date:new Date().toISOString().slice(0,10),cause:''},entry));store.set('log',log)}
@@ -1464,6 +1477,8 @@ function view(soft){clearAll();const h=(location.hash||'#home').slice(1);
   else if(h==='log'){mark('log');app.innerHTML=LogView();bindLog()}
   else if(h==='teacher'){mark('teacher');app.innerHTML=TeacherView();bindTeacher()}
   else if(h==='messages'){mark('messages');app.innerHTML=MessagesView();bindMessages()}
+  else if(h==='mocks'){mark('mocks');app.innerHTML=MocksView()}
+  else if((m=h.match(/^mock-(\d+)-([LRWS])$/))){mark('mocks');renderMock(m[1],m[2])}
   else if((m=h.match(/^session-(\d+)$/))&&SESSIONS[m[1]-1]){mark('syllabus');renderSession(SESSIONS[m[1]-1])}
   else if(cloud.tpass&&!cloud.code){mark('home');app.innerHTML=TeacherHome();bindTeacherHome()}
   else {mark('home');app.innerHTML=Dashboard();bindDashboard()}
@@ -1614,6 +1629,7 @@ function stepMeta(t){
     return {k:'O',type:'Drill',what:'Answer each question, then check your answers. There is no timer.',info:[`${n} questions`,'No timer']}}
   if(WRITE[t]){const w=WRITE[t];return {k:'W',type:'Writing',what:'Plan for 3 minutes, write 150–200 words, then proofread. Cover every bullet point.',info:[`${w.minutes} min`,'150–200 words']}}
   if(SPEAK[t]){const k=SPEAK[t];return {k:'S',type:'Speaking',what:'Prepare, then speak until the timer ends. Record your answer on your phone.',info:[`${k.prep}s prep`,`${k.speak}s speak`],need:'Phone voice recorder or microphone'}}
+  {const mm=String(t).match(/^MK(\d+)([LRWS]?)$/);if(mm){const secs=mm[2]?[mm[2]]:MOCK_ORDER;return {k:mm[2]||'O',type:'Mock test',what:mm[2]?`Take the ${MOCK_SEC[mm[2]][0]} section of ${MOCKS[mm[1]]?MOCKS[mm[1]].title:'the mock'} in one sitting, with real timers.`:'Take all four sections in order, like test day.',info:secs.map(k=>MOCK_SEC[k][0]+' '+MOCK_SEC[k][1]),noIntro:true}}}
   if(t==='DIAG')return {k:'O',type:'Summary',what:'See your four starting levels and save them as your baseline.',info:['2 min'],noIntro:true};
   if(t==='READY')return {k:'O',type:'Readiness',what:'See how close each skill is to your target.',info:['5 min'],noIntro:true};
   return {k:'O',type:'',what:'',info:[],noIntro:true}}
@@ -1623,7 +1639,7 @@ function buildSteps(s){stepCleanup();
   const isDone=t=>!!results()[s.n+':'+t];
   const firstOpen=()=>{const k=s.tools.findIndex(t=>!isDone(t));return k};
   const render=i=>{const t=s.tools[i],host=hosts[i];started[t]=false;
-    if(QUIZ[t])Quiz(host,s,t);else if(WRITE[t])Writer(host,s,t);else if(SPEAK[t])Speaker(host,s,t);else if(t==='READY')Ready(host);else if(t==='DIAG')Diag(host)};
+    if(QUIZ[t])Quiz(host,s,t);else if(WRITE[t])Writer(host,s,t);else if(SPEAK[t])Speaker(host,s,t);else if(t==='READY')Ready(host);else if(t==='DIAG')Diag(host);else if(/^MK\d+/.test(t))MockStep(host,t)};
   const decorate=i=>{const t=s.tools[i],host=hosts[i],card=host.querySelector('.tool'),head=host.querySelector('.tool-head');if(!card||!head||card.querySelector('.step-head'))return;
     const m=stepMeta(t);head.classList.add('inner');head.removeAttribute('role');
     const sh=document.createElement('div');sh.className='step-head';sh.setAttribute('role','button');sh.tabIndex=0;
@@ -1665,6 +1681,128 @@ function buildSteps(s){stepCleanup();
   const onRes=()=>{s.tools.forEach((_,i)=>paint(i));paintPath()};addEventListener('bcs-res',onRes);
   stepCleanup=()=>{removeEventListener('bcs-res',onRes);hosts.forEach(h=>h&&h._mo&&h._mo.disconnect())};
   const k=firstOpen();setOpen(k,false);paintPath()}
+
+
+/* ---------- full mock tests (data in mocks/*.js) ---------- */
+const MOCKS=window.MOCKS||{};
+// spread correct answers evenly across A–D (deterministic, so reviews always match)
+function balanceMock(m){let n=0;
+  for(const sec of ['L','R'])for(const p of (m[sec]||[]))for(const sc of (p.screens||[p]))for(const q of sc.qs){
+    if(q.fixed||q.o.every(o=>/^([A-E]|E \(not given\))$/.test(o))||q.o.every(o=>/^\$?\d[\d:,.]*$/.test(o)))continue;
+    const target=(n++*3+1)%q.o.length,shift=(q.a-target+q.o.length)%q.o.length;
+    q.o=q.o.slice(shift).concat(q.o.slice(0,shift));q.a=target}}
+Object.values(MOCKS).forEach(balanceMock);
+const MOCK_SEC={L:['Listening','46–55 min'],R:['Reading','43–56 min'],W:['Writing','53 min'],S:['Speaking','about 15 min']};
+const MOCK_ORDER=['L','R','W','S'];
+// register mock writing / speaking tasks so the existing Writer and Speaker tools can run them
+Object.entries(MOCKS).forEach(([id,m])=>{(m.W||[]).forEach((w,i)=>{WRITE[`M${id}W${i+1}`]=w});(m.S||[]).forEach((t,i)=>{SPEAK[`M${id}S${i+1}`]=t})});
+const mockKey=(id,sec)=>`mock:M${id}${sec}`;
+const mockSecTitle=t=>{const m=String(t).match(/^M(\d+)([LRWS])$/);return m?`Mock #${m[1]} · ${MOCK_SEC[m[2]][0]}`:null};
+function mockScreens(id,sec){const m=MOCKS[id];const out=[];
+  (m[sec]||[]).forEach((p,pi)=>(p.screens||[p]).forEach((sc,si)=>out.push({pi,si,part:p,sc})));return out}
+function mockSecResult(id,sec){const r=results();
+  if(sec==='L'||sec==='R')return r[mockKey(id,sec)]||null;
+  const keys=(MOCKS[id][sec]||[]).map((_,i)=>`mock:M${id}${sec}${i+1}`);const done=keys.filter(k=>r[k]);
+  return done.length===keys.length&&keys.length?{done:done.length,total:keys.length,at:Math.max(...done.map(k=>r[k].at||0))}:(done.length?{partial:done.length,total:keys.length}:null)}
+function mockSecLabel(id,sec){const v=mockSecResult(id,sec);if(!v)return '';
+  if(v.total&&v.score!=null)return `${v.score}/${v.total} correct`;if(v.partial)return `${v.partial}/${v.total} tasks`;return 'Done'}
+
+function MocksView(){const ids=Object.keys(MOCKS);
+  return `<div class="stack"><section class="hero2 slim"><div class="stack" style="gap:10px"><div class="eyebrow">Practise like test day</div><h1>Mock tests</h1>
+    <p class="lead">Full-length CELPIP-style tests: all four skills, real timers, audio plays once, and no going back. Answers appear only at the end of each section.</p></div></section>
+   ${ids.length?ids.map(id=>{const m=MOCKS[id];return `<section class="panel stack" style="gap:14px"><div class="row"><div><div class="eyebrow">${esc(m.when||'')}</div><h2>${esc(m.title)}</h2></div></div>
+     <div class="mock-secs">${MOCK_ORDER.map((k,i)=>{const lab=mockSecLabel(id,k);return `<a class="mock-sec" style="${skv(k)}" href="#mock-${id}-${k}"><span class="ic">${icon(k,22)}</span><div><b>${i+1}. ${MOCK_SEC[k][0]}</b><span class="muted">${MOCK_SEC[k][1]}</span></div><span class="spacer"></span>${lab?`<span class="chip good">${CHECK} ${esc(lab)}</span>`:'<span class="chip">Start →</span>'}</a>`}).join('')}</div>
+     <p class="muted" style="font-size:13px">On test day the four sections run in one sitting of about 3 hours. Here you can take each section separately, in order.</p></section>`}).join('')
+    :'<section class="panel"><p class="muted">Mock tests are not available yet.</p></section>'}</div>`}
+
+let mockRun=null;
+function renderMock(id,sec){const m=MOCKS[id];if(!m||!m[sec]){app.innerHTML='<div class="panel"><p>Mock test not found. <a href="#mocks">Back to mock tests</a></p></div>';return}
+  if(sec==='W'||sec==='S')return renderMockTasks(id,sec);
+  const SK='mockst:'+id+':'+sec;const st=store.get(SK,null);const screens=mockScreens(id,sec);
+  const total=screens.reduce((a,x)=>a+x.sc.qs.length,0);
+  const head=`<div class="row"><a href="#mocks" class="muted" style="font-size:14px">← Mock tests</a><span class="spacer"></span><span class="chip" style="${skv(sec)}">${icon(sec,15)} ${esc(m.title)} · ${MOCK_SEC[sec][0]}</span></div>`;
+  if(!st||st.reset){const prior=results()[mockKey(id,sec)];
+    app.innerHTML=`<div class="stack">${head}<section class="panel stack mock-intro" style="${skv(sec)};gap:12px"><div class="eyebrow">${esc(m.title)}</div><h1>${MOCK_SEC[sec][0]}</h1>
+      <ul class="si-list"><li>${m[sec].length} parts</li><li>${total} questions</li><li>${MOCK_SEC[sec][1]}</li>${sec==='L'?'<li>You need: headphones</li>':''}</ul>
+      <ul class="mock-rules"><li>${sec==='L'?'Each recording plays <b>once</b>. The questions appear after it ends.':'Each part has its own timer. When it reaches 0:00, the test moves on.'}</li><li>Once you press <b>Next</b>, you cannot go back.</li><li>There is no penalty for wrong answers. Answer every question.</li><li>Some questions on the real test are unscored. You cannot tell which, so try your best on all of them.</li></ul>
+      ${prior?`<p class="muted">Your last score: <b>${prior.score}/${prior.total}</b>. Starting again replaces it.</p>`:''}
+      <div class="row" style="gap:8px"><button class="btn primary" id="mk-start">Start ${MOCK_SEC[sec][0]} →</button>${sec==='L'?'<button class="btn" id="mk-sound">🔊 Sound check</button>':''}${prior?'<button class="btn" id="mk-review">Review last attempt</button>':''}</div></section></div>`;
+    const sb=document.getElementById('mk-sound');if(sb)sb.onclick=()=>TTS.test();
+    const rv=document.getElementById('mk-review');if(rv)rv.onclick=()=>mockReview(id,sec,(prior&&prior.ans)||{},head);
+    document.getElementById('mk-start').onclick=()=>{TTS.stopAll();store.set(SK,{i:0,ans:{},played:{},deadline:null});renderMock(id,sec)};return}
+  if(st.i>=screens.length)return mockFinish(id,sec,st,head);
+  const cur=screens[st.i],p=cur.part,sc=cur.sc,listen=sec==='L';
+  const qid=(qi)=>`${cur.pi}-${cur.si}-${qi}`;
+  const secs=listen?Math.max(60,sc.qs.length*40):Math.round((sc.minutes||p.minutes||10)*60);
+  const nScreensInPart=(p.screens||[p]).length;
+  app.innerHTML=`<div class="stack">${head}
+   <div class="mock-bar" style="${skv(sec)}"><b>${esc(p.name)}${nScreensInPart>1?` · ${cur.si+1} of ${nScreensInPart}`:''}</b><span class="muted">Screen ${st.i+1} of ${screens.length}</span><span class="spacer"></span><span class="timer" id="mk-timer"></span></div>
+   <section class="panel stack" style="gap:14px">
+    ${sc.ctx||p.ctx?`<p class="mock-ctx">${sc.ctx||p.ctx}</p>`:''}
+    ${listen?`<div class="player" id="mk-player"><button class="btn hub" id="mk-play">▶ Play (plays once)</button><div class="wave">${'<i></i>'.repeat(14)}</div><span class="muted" id="mk-pst" style="font-size:13px">The questions appear after the recording.</span></div>`:''}
+    <div class="${listen?'':'splitread'}">${listen?'':`<div class="passage">${sc.passage}</div>`}
+     <div class="stack" id="mk-qs" ${listen&&!st.played[st.i]?'hidden':''}>${sc.qs.map((x,qi)=>`<fieldset class="q" style="border:0;margin:0;padding-inline:0"><legend class="qt">${esc(x.n||'')}${x.n?' ':''}${esc(x.q)}</legend>
+       ${x.o.map((o,j)=>`<label class="opt"><input type="radio" name="mk-${qid(qi)}" value="${j}" ${st.ans[qid(qi)]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}</fieldset>`).join('')}</div></div>
+    <div class="row"><span class="muted" style="font-size:13px" id="mk-note"></span><span class="spacer"></span><button class="btn primary" id="mk-next" ${listen&&!st.played[st.i]?'hidden':''}>${st.i===screens.length-1?'Finish section':'Next →'}</button></div>
+   </section></div>`;
+  app.querySelectorAll('#mk-qs input').forEach(r=>r.addEventListener('change',()=>{const s2=store.get(SK);s2.ans[r.name.slice(3)]=+r.value;store.set(SK,s2)}));
+  const timerEl=document.getElementById('mk-timer');
+  let moved=false;const go=()=>{if(moved)return;moved=true;clearAll();const s2=store.get(SK);if(!s2||s2.i!==st.i)return renderMock(id,sec);s2.i++;s2.deadline=null;store.set(SK,s2);renderMock(id,sec);window.scrollTo(0,0)};
+  const startTimer=()=>{let s2=store.get(SK);if(!s2.deadline){s2.deadline=Date.now()+secs*1000;store.set(SK,s2)}
+    const tick=()=>{const cur2=store.get(SK);if(moved||!cur2||!cur2.deadline||cur2.i!==st.i){clearInterval(iv);return}const left=Math.max(0,Math.round((cur2.deadline-Date.now())/1000));timerEl.textContent=fmt(left);timerEl.classList.toggle('low',left<=30);if(left<=0){clearInterval(iv);go()}};const iv=every(tick,1000);tick()};
+  document.getElementById('mk-next').onclick=()=>{const unanswered=sc.qs.filter((_,qi)=>store.get(SK).ans[qid(qi)]==null).length;
+    if(unanswered&&!confirm(`${unanswered} question${unanswered>1?'s are':' is'} not answered. A guess cannot lose points. Go on anyway?`))return;go()};
+  if(!listen){startTimer();return}
+  timerEl.textContent=fmt(secs);
+  const reveal=()=>{const s2=store.get(SK);s2.played[st.i]=true;store.set(SK,s2);document.getElementById('mk-player').classList.remove('playing');document.getElementById('mk-pst').textContent='Recording finished. Answer the questions.';
+    document.getElementById('mk-qs').hidden=false;document.getElementById('mk-next').hidden=false;startTimer()};
+  if(st.played[st.i]){document.getElementById('mk-play').disabled=true;document.getElementById('mk-pst').textContent='This recording has already played.';startTimer();return}
+  document.getElementById('mk-play').onclick=e=>{e.currentTarget.disabled=true;document.getElementById('mk-player').classList.add('playing');document.getElementById('mk-pst').textContent='Playing… listen carefully.';
+    if(!TTS.OK){document.getElementById('mk-pst').textContent='Audio is not available in this browser.';reveal();return}
+    TTS.play(sc.audio,{onEnd:()=>reveal()})}}
+function mockFinish(id,sec,st,head){const screens=mockScreens(id,sec);let score=0,total=0;
+  screens.forEach(cur=>cur.sc.qs.forEach((x,qi)=>{total++;const a=st.ans[`${cur.pi}-${cur.si}-${qi}`];if(a===x.a)score++;
+    else addLog({session:'Mock '+id,skill:MOCK_SEC[sec][0],item:`${MOCKS[id].title} · ${cur.part.name}: ${x.q}`,yours:a!=null?x.o[a]:'(no answer)',correct:x.o[x.a]})}));
+  const r=results();r[mockKey(id,sec)]={score,total,pct:Math.round(score/total*100),at:Date.now(),ans:st.ans};store.set('res',r);
+  store.set('mockst:'+id+':'+sec,null);mockReview(id,sec,st.ans,head,true)}
+function mockReview(id,sec,ans,head,fresh){const screens=mockScreens(id,sec);const v=results()[mockKey(id,sec)]||{};
+  const byPart={};screens.forEach(cur=>{const k=cur.pi;byPart[k]=byPart[k]||{name:cur.part.name,ok:0,n:0};cur.sc.qs.forEach((x,qi)=>{byPart[k].n++;if(ans[`${cur.pi}-${cur.si}-${qi}`]===x.a)byPart[k].ok++})});
+  const nextSec=MOCK_ORDER[MOCK_ORDER.indexOf(sec)+1];
+  app.innerHTML=`<div class="stack">${head}
+   <section class="panel stack" style="${skv(sec)};gap:12px"><div class="eyebrow">${fresh?'Section complete':'Your last attempt'}</div><h1>${MOCK_SEC[sec][0]}: ${v.score}/${v.total}</h1>
+    <div class="mock-parts">${Object.values(byPart).map(b=>`<div><b>${esc(b.name)}</b><span class="rchip ${b.ok/b.n>=.75?'good':b.ok/b.n>=.5?'mid':'low'}">${b.ok}/${b.n}</span></div>`).join('')}</div>
+    <p class="muted" style="font-size:13.5px">This is a practice score, not an official CELPIP level. ${fresh?'Every missed question was added to your <a href="#log">Error Log</a>. Tag each one with a cause.':''}</p>
+    <div class="row" style="gap:8px">${nextSec?`<a class="btn primary" href="#mock-${id}-${nextSec}">Next: ${MOCK_SEC[nextSec][0]} →</a>`:''}<a class="btn" href="#mocks">All mock tests</a><button class="btn" id="mk-again">Take it again</button></div></section>
+   <section class="panel stack" style="gap:16px"><h2>Review your answers</h2>
+    ${screens.map(cur=>`<div class="mock-rev"><div class="eyebrow">${esc(cur.part.name)}</div>
+      ${sec==='L'?`<details><summary>Transcript</summary><div class="transcript">${cur.sc.audio.map(([w,t])=>`<p><b>${esc(w)}:</b> ${esc(t)}</p>`).join('')}</div></details>`:''}
+      ${cur.sc.qs.map((x,qi)=>{const a=ans[`${cur.pi}-${cur.si}-${qi}`];const ok=a===x.a;return `<div class="mock-q ${ok?'ok':'no'}"><b>${ok?'✓':'✗'} ${esc(x.n||'')}${x.n?' ':''}${esc(x.q)}</b>
+        <span>Your answer: ${a!=null?esc(x.o[a]):'<i>none</i>'}${ok?'':` · Correct: <b>${esc(x.o[x.a])}</b>`}</span>${x.why?`<span class="muted">${esc(x.why)}</span>`:''}</div>`}).join('')}</div>`).join('')}</section></div>`;
+  document.getElementById('mk-again').onclick=()=>{store.set('mockst:'+id+':'+sec,{reset:true});renderMock(id,sec);window.scrollTo(0,0)}}
+function renderMockTasks(id,sec){const m=MOCKS[id];const list=m[sec];const SK='mockst:'+id+':'+sec;let i=Math.min(store.get(SK,0)||0,list.length-1);
+  const head=`<div class="row"><a href="#mocks" class="muted" style="font-size:14px">← Mock tests</a><span class="spacer"></span><span class="chip" style="${skv(sec)}">${icon(sec,15)} ${esc(m.title)} · ${MOCK_SEC[sec][0]}</span></div>`;
+  const key=`M${id}${sec}${i+1}`,done=!!results()['mock:'+key];
+  app.innerHTML=`<div class="stack">${head}
+   <div class="mock-bar" style="${skv(sec)}"><b>${MOCK_SEC[sec][0]} · Task ${i+1} of ${list.length}</b><span class="muted">${sec==='W'?'Each task has its own timer.':'Preparation and speaking timers run like the real test.'}</span></div>
+   <div id="mk-task"></div>
+   <div class="row"><span class="muted" style="font-size:13px">${done?'Saved. ':''}${sec==='S'?'Record each answer on your phone, then score it with the checklist.':'Submit each task to save it.'}</span><span class="spacer"></span>
+    ${i<list.length-1?`<button class="btn primary" id="mk-tnext">Next task →</button>`:`${MOCK_ORDER.indexOf(sec)<3?`<a class="btn primary" href="#mock-${id}-${MOCK_ORDER[MOCK_ORDER.indexOf(sec)+1]}">Next: ${MOCK_SEC[MOCK_ORDER[MOCK_ORDER.indexOf(sec)+1]][0]} →</a>`:'<a class="btn primary" href="#mocks">Finish mock test</a>'}`}</div></div>`;
+  const host=document.getElementById('mk-task');const s={n:'mock'};
+  if(sec==='W')Writer(host,s,key);else Speaker(host,s,key);
+  const nb=document.getElementById('mk-tnext');if(nb)nb.onclick=()=>{if(!results()['mock:'+key]&&!confirm('This task is not saved yet. Move on anyway?'))return;clearAll();store.set(SK,i+1);renderMockTasks(id,sec);window.scrollTo(0,0)}}
+
+function mockStepTitle(t){const mm=String(t).match(/^MK(\d+)([LRWS]?)$/);if(!mm)return null;const m=MOCKS[mm[1]];return m?(mm[2]?`${m.title} · ${MOCK_SEC[mm[2]][0]}`:`${m.title} · all four skills`):null}
+function MockStep(host,t){const mm=t.match(/^MK(\d+)([LRWS]?)$/);const id=mm[1],secs=mm[2]?[mm[2]]:MOCK_ORDER;
+  host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">Mock test</span><h3>${esc(mockStepTitle(t)||'Mock test')}</h3></div><div class="tool-body">
+   <p class="muted">Real timers, audio plays once, no going back. Answers appear at the end of each section.</p>
+   <div class="mock-secs">${secs.map(k=>{const lab=MOCKS[id]?mockSecLabel(id,k):'';return `<a class="mock-sec" style="${skv(k)}" href="#mock-${id}-${k}"><span class="ic">${icon(k,20)}</span><div><b>${MOCK_SEC[k][0]}</b><span class="muted">${MOCK_SEC[k][1]}</span></div><span class="spacer"></span>${lab?`<span class="chip good">${CHECK} ${esc(lab)}</span>`:'<span class="chip">Start →</span>'}</a>`}).join('')}</div></div></div>`}
+function mockSync(){if(!Object.keys(MOCKS).length)return;const r=results();let changed=false;
+  SESSIONS.forEach(se=>se.tools.forEach(t=>{const mm=String(t).match(/^MK(\d+)([LRWS]?)$/);if(!mm||!MOCKS[mm[1]])return;const secs=mm[2]?[mm[2]]:MOCK_ORDER;
+    const vs=secs.map(k=>mockSecResult(mm[1],k));if(vs.some(v=>!v||v.partial))return;
+    const at=Math.max(...vs.map(v=>v.at||0));const k=se.n+':'+t;if(r[k]&&r[k].at===at)return;
+    const sc=vs.filter(v=>v.score!=null);r[k]={at,...(secs.length===1&&sc.length?{score:sc[0].score,total:sc[0].total,pct:sc[0].pct}:{})};changed=true}));
+  if(changed)store.set('res',r)}
+addEventListener('bcs-res',()=>mockSync());
 
 /* ---------- Quiz tool (listening / reading / mc) ---------- */
 function Quiz(host,s,key){
@@ -1822,8 +1960,8 @@ function Ready(host){const sc=skillScores();const tg=store.get('targets',{L:9,R:
 
 
 /* ---------- results helpers ---------- */
-function toolTitle(t){if(t==='DIAG')return 'Diagnostic baseline';return QUIZ[t]?QUIZ[t].title:WRITE[t]?WRITE[t].title:SPEAK[t]?SPEAK[t].task:t}
-function resultLabel(t,v){if(QUIZ[t])return v.total?`${v.score}/${v.total} correct`:'Done';
+function toolTitle(t){if(t==='DIAG')return 'Diagnostic baseline';{const mt=mockSecTitle(t)||mockStepTitle(t);if(mt)return mt}return QUIZ[t]?QUIZ[t].title:WRITE[t]?WRITE[t].title:SPEAK[t]?SPEAK[t].task:t}
+function resultLabel(t,v){if(/^(M\d+[LR]|MK\d+[LR])$/.test(t)&&v&&v.total)return `${v.score}/${v.total} correct`;if(/^(M\d+|MK\d+)/.test(t)&&!QUIZ[t]&&!WRITE[t]&&!SPEAK[t])return 'Done';if(QUIZ[t])return v.total?`${v.score}/${v.total} correct`:'Done';
   if(WRITE[t])return `${v.ai?`AI level ${clampL(v.ai.overall_level)} · `:''}${v.words||0} words${v.self?` · self ${(v.self/20).toFixed(1)}/5`:''}`;
   if(SPEAK[t])return v.self?`Self-score ${(v.self/20).toFixed(1)}/5`:'Done';return 'Done'}
 function resultTone(t,v){if(QUIZ[t]&&v.total){const p=v.score/v.total;return p>=.75?'good':p>=.5?'mid':'low'}return 'mid'}
@@ -2357,7 +2495,7 @@ function bindDeck(s){const on=(id,fn)=>{const el=document.getElementById(id);if(
 
 
 /* ---------- session schedule per batch + slide-deck library ---------- */
-const DECK_FILES={1:'decks/session-01.pptx',2:'decks/session-02.pptx',3:'decks/session-03.pptx',4:'decks/session-04.pptx',5:'decks/session-05.pptx',6:'decks/session-06.pptx'};
+const DECK_FILES={1:'decks/session-01.pptx',2:'decks/session-02.pptx',3:'decks/session-03.pptx',4:'decks/session-04.pptx',5:'decks/session-05.pptx',6:'decks/session-06.pptx',7:'decks/session-07.pptx',8:'decks/session-08.pptx',9:'decks/session-09.pptx',10:'decks/session-10.pptx',11:'decks/session-11.pptx',12:'decks/session-12.pptx'};
 const todayISO=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 function batchSchedule(batchId){try{return JSON.parse((cloud.settings||{})['open:'+batchId]||'{}')||{}}catch(e){return {}}}
 function sessionState(n){if(cloud.tpass||!cloud.code)return {open:true};const b=cloud.student&&cloud.student.batch;if(!b)return {open:true};
