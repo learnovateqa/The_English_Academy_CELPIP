@@ -778,6 +778,10 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 .mk-rq{display:flex;flex-direction:column;gap:6px}.mk-rq .qt{font-weight:600}
 hr.mock-sep{border:0;border-top:2px dashed var(--line);margin:14px 0}
 .mock-read .passage{max-height:72vh}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.tpl-card{background:var(--c)}.tpl-card .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--surface);color:var(--ci);flex:none}
+.tpl-tips{margin:0;padding-left:18px;font-size:13.5px}
+.tpl-link{align-self:flex-start;font-size:13px;font-weight:600;color:var(--ci,var(--hub));text-decoration:none;border:1.5px dashed var(--line);border-radius:999px;padding:4px 12px}.tpl-link:hover{border-color:currentColor}
 </style>
 </head>
 <body>
@@ -858,7 +862,7 @@ function renderNav(){const signed=!!(cloud.code||cloud.tpass);
   document.querySelector('nav.main').hidden=!signed;document.getElementById('nav-teacher').hidden=!cloud.tpass;
   document.getElementById('signout').hidden=!signed;document.getElementById('tp-btn').hidden=signed;document.getElementById('sync').hidden=!signed;document.getElementById('nav-msg').hidden=!cloud.code;
   const T=!!cloud.tpass&&!cloud.code;document.getElementById('nav-home').textContent=T?'Teaching':'My Dashboard';document.getElementById('nav-log').hidden=T;document.getElementById('nav-teacher').textContent=T?'Students & Batches':'Teacher Portal';updateSyncBadge();updateMsgBadge()}
-function curRoute(){const h=(location.hash||'#home').slice(1);return h.startsWith('session-')?'session':(['syllabus','log','teacher','messages','mocks'].includes(h)?h:h.startsWith('mock-')?'mocks':'home')}
+function curRoute(){const h=(location.hash||'#home').slice(1);return h.startsWith('session-')?'session':(['syllabus','log','teacher','messages','mocks','templates'].includes(h)?h:h.startsWith('mock-')?'mocks':'home')}
 let pendingRefresh=false;
 function refreshIf(rs){if(!rs.includes(curRoute()))return;const a=document.activeElement;
   if(a&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)&&app.contains(a)){pendingRefresh=true;return}view(true)}
@@ -1486,6 +1490,7 @@ function view(soft){clearAll();const h=(location.hash||'#home').slice(1);
   else if(h==='log'){mark('log');app.innerHTML=LogView();bindLog()}
   else if(h==='teacher'){mark('teacher');app.innerHTML=TeacherView();bindTeacher()}
   else if(h==='messages'){mark('messages');app.innerHTML=MessagesView();bindMessages()}
+  else if(h==='templates'){mark('home');app.innerHTML=TemplatesView()}
   else if(h==='mocks'){mark('mocks');app.innerHTML=MocksView();app.querySelectorAll('[data-full]').forEach(b=>b.onclick=()=>{const id=b.dataset.full;store.set('mockfull:'+id,true);MOCK_ORDER.forEach(k=>store.set('mockst:'+id+':'+k,k==='L'||k==='R'?{reset:true}:0));location.hash='#mock-'+id+'-L'})}
   else if((m=h.match(/^mock-(\d+)-([LRWS])$/))){mark('mocks');renderMock(m[1],m[2])}
   else if((m=h.match(/^session-(\d+)$/))&&SESSIONS[m[1]-1]){mark('syllabus');renderSession(SESSIONS[m[1]-1])}
@@ -1514,7 +1519,7 @@ const qicon=k=>`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stro
 function firstOpen(ns){const s=ns.map(n=>SESSIONS[n-1]).find(x=>sessionProgress(x).pct<100);return '#session-'+(s?s.n:ns[0])}
 function QuickTiles(){const log=store.get('log',[]);const unread=typeof unreadCount==='function'?unreadCount():0;
   const T=[['L','Listening','Sessions 2–3',firstOpen([2,3]),'L'],['R','Reading','Sessions 4–5',firstOpen([4,5]),'R'],['W','Writing','Sessions 6–8',firstOpen([6,7,8]),'W'],['S','Speaking','Sessions 9–11',firstOpen([9,10,11]),'S'],
-    ['O','Syllabus','12 sessions','#syllabus','map'],['R','Error Log',log.length?`${log.length} to review`:'No errors yet','#log','log'],
+    ['O','Templates','Email · Survey · Speaking','#templates','map'],['R','Error Log',log.length?`${log.length} to review`:'No errors yet','#log','log'],
     ['W','Messages',cloud.code?(unread?`${unread} new`:'Write to your teacher'):'Students only',cloud.code?'#messages':'#home','msg'],['T','Test Day','Session 12','#session-12','flag']];
   const PAS=['#D9F7E8','#DCEBFF','#FFF1BF','#ECE3FF','#FFE0E6','#D6F7F2','#FCE3F3','#F3E5FF'];
   return `<section class="qtiles" aria-label="Quick access">${T.map(([k,t,sub,href,ic],i)=>`<a class="qtile" href="${href}" style="${skv(k)};--qbg:${PAS[i]}"><span class="qic">${qicon(ic)}</span><b>${t}</b><small>${esc(sub)}</small></a>`).join('')}</section>`}
@@ -1837,6 +1842,20 @@ function mockSync(){if(!Object.keys(MOCKS).length)return;const r=results();let c
   if(changed)store.set('res',r)}
 addEventListener('bcs-res',()=>mockSync());
 
+
+/* ---------- downloadable templates ---------- */
+const TEMPLATES=[
+ {k:'W',title:'Writing Task 1 · The Email',file:'downloads/CELPIP-Templates-Email.pdf',pages:'1 page',what:'Fill-in templates for formal, semi-formal and friendly emails, phrases that score, and a model paragraph.',tips:['One paragraph for each bullet','Plan 3 · write 20 · proofread 4 minutes','Check the reader: formal or friendly?']},
+ {k:'W',title:'Writing Task 2 · The Survey Response',file:'downloads/CELPIP-Templates-Survey.pdf',pages:'1 page',what:'The 5-part template (position, 2 reasons, concession, conclusion), a full model answer and key phrases.',tips:['Choose the option you can support best','Reason + example + result','Admittedly…, however…']},
+ {k:'S',title:'Speaking · Tasks 1–8',file:'downloads/CELPIP-Templates-Speaking.pdf',pages:'2 pages',what:'A fill-in template for every speaking task, with prep and speaking times, and recovery phrases.',tips:['Prep notes: 3 key words','Keep talking until the clock stops','Close clearly in the last 10 seconds']}];
+function TemplatesView(){return `<div class="stack">
+  <section class="hero2 slim"><div class="stack" style="gap:10px"><div class="eyebrow">Study tools</div><h1>CELPIP templates</h1>
+   <p class="lead">Download, print and fill in. Use them to plan faster, but always change the words to fit each task. Raters reward answers that fit the prompt, not memorized speeches.</p>
+   <div class="row" style="gap:8px"><a class="btn primary" href="downloads/CELPIP-Templates-All.pdf" download>⬇ Download all templates (PDF, 4 pages)</a></div></div></section>
+  <div class="tpl-grid">${TEMPLATES.map(t=>`<article class="panel stack tpl-card" style="${skv(t.k)};gap:10px"><div class="row" style="gap:10px;flex-wrap:nowrap"><span class="ic">${icon(t.k,22)}</span><div style="min-width:0"><h3>${esc(t.title)}</h3><span class="muted" style="font-size:12.5px">PDF · ${esc(t.pages)}</span></div></div>
+    <p style="font-size:14px">${esc(t.what)}</p><ul class="tpl-tips">${t.tips.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+    <div class="row" style="gap:8px;margin-top:auto"><a class="btn primary sm" href="${t.file}" download>⬇ Download</a><a class="btn sm" href="${t.file}" target="_blank" rel="noopener">Open</a></div></article>`).join('')}</div>
+  <p class="muted" style="font-size:13px">Tip: print the templates and keep them next to you while you practise in the Study Hub and the mock tests.</p></div>`}
 /* ---------- Quiz tool (listening / reading / mc) ---------- */
 function Quiz(host,s,key){
   const q=QUIZ[key];const rk=s.n+':'+key;
@@ -1884,7 +1903,7 @@ function Writer(host,s,key){
   const w=WRITE[key];const dk='w:'+s.n+':'+key;const rk=s.n+':'+key;let remaining=w.minutes*60,tid=null,firstAt=0,timerOn=false;
   const prev=(results()[rk]||{}).ai;
   host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">Timed writing · AI scored</span><h3>${esc(w.title)}</h3><span class="spacer"></span><span class="timer" data-timer>${fmt(remaining)}</span></div>
-  <div class="tool-body"><div class="prompt">${w.prompt}</div>
+  <div class="tool-body"><div class="prompt">${w.prompt}</div><a class="tpl-link" href="downloads/CELPIP-Templates-${/survey/i.test(w.type||'')?'Survey':'Email'}.pdf" target="_blank" rel="noopener">📄 Stuck? Open the ${/survey/i.test(w.type||'')?'survey':'email'} template (PDF)</a>
    <div class="row"><button class="btn hub" data-start>Start ${w.minutes}-minute timer</button><span class="muted" style="font-size:13px">Pasting is turned off, as on the real test.</span><span class="spacer"></span><span class="wc" data-wc>0 words</span></div>
    <label for="ta-${rk}" class="eyebrow">Your response</label>
    <textarea class="write" id="ta-${rk}" spellcheck="false" placeholder="Start typing your response here…"></textarea>
@@ -1956,7 +1975,7 @@ function Speaker(host,s,key){
   const t=SPEAK[key];const rk=s.n+':'+key;
   const phases=[];if(t.choose)phases.push(['choose','Choose an option',t.choose]);phases.push(['prep','Preparation',t.prep]);phases.push(['speak','Speak now',t.speak]);
   host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">Timed speaking</span><h3>${esc(t.task)}</h3><span class="spacer"></span><span class="mono muted" style="font-size:13px">${t.choose?t.choose+'s choose · ':''}${t.prep}s prep · ${t.speak}s speak</span></div>
-  <div class="tool-body"><div class="prompt"><p>${esc(t.prompt)}</p>${t.opts?`<div class="opts2" style="margin-top:10px">${t.opts.map(o=>`<div>${o}</div>`).join('')}</div>`:''}</div>
+  <div class="tool-body"><a class="tpl-link" href="downloads/CELPIP-Templates-Speaking.pdf" target="_blank" rel="noopener">📄 Open the speaking templates (PDF)</a><div class="prompt"><p>${esc(t.prompt)}</p>${t.opts?`<div class="opts2" style="margin-top:10px">${t.opts.map(o=>`<div>${o}</div>`).join('')}</div>`:''}</div>
    ${t.img?t.img:''}
    <div class="notice"><b>Before you start:</b> open your phone’s voice recorder. Press record when the timer says <b>Speak now</b>. A beep marks the start and the end.</div>
    <div class="stage" data-stage><div class="clock" data-clock>${fmt(phases[0][2])}</div><div><div class="eyebrow" data-phase>Ready</div><div class="muted" data-hint style="font-size:14px">The timer runs exactly like the test. You cannot pause it.</div></div></div>
