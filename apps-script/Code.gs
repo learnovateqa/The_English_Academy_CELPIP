@@ -8,6 +8,10 @@
  *
  *   Messages · messages and email-writing tasks between you and students
  *   Settings · slide-deck links per session and each batch's session schedule
+ *   MockScores · your CELPIP-style Writing and Speaking ratings for each student's mock tests
+ *
+ * Speaking recordings from the mock tests are saved to your Google Drive,
+ * in a folder called "CELPIP Course Recordings" (one sub-folder per student).
  *
  * AI scoring: CELPIP Course > Turn on AI scoring stores a Claude API key (never in this code).
  * Setup: see README.md. After pasting, reload the Sheet and use the
@@ -19,7 +23,8 @@ const SHEET_HEADERS = {
   Progress: ['code', 'updatedAt', 'p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8'],
   Feedback: ['code', 'text', 'updatedAt'],
   Messages: ['id', 'code', 'batch', 'from', 'kind', 'subject', 'body', 'createdAt', 'readS', 'readT', 'emailed', 'replyTo'],
-  Settings: ['key', 'value', 'updatedAt']
+  Settings: ['key', 'value', 'updatedAt'],
+  MockScores: ['code', 'data', 'updatedAt']
 };
 const SETTING_RE = /^(deck:([1-9]|1[0-2])|open:[A-Za-z0-9]{1,20})$/;
 const EMBED_HOSTS = /^https:\/\/(www\.canva\.com|canva\.link|docs\.google\.com|onedrive\.live\.com|view\.officeapps\.live\.com|pitch\.com|gamma\.app)\//;
@@ -118,7 +123,7 @@ function route_(q) {
     if (a === 'student.save') { saveProgress_(st.code, q.progress); return { savedAt: Date.now() }; }
     if (a === 'student.messages') {
       const fb0 = find_('Feedback', 'code', st.code);
-      return { messages: studentMsgs_(st), feedback: fb0 ? { text: String(fb0.text), updatedAt: Number(fb0.updatedAt) || 0 } : null, settings: readSettings_() };
+      return { messages: studentMsgs_(st), feedback: fb0 ? { text: String(fb0.text), updatedAt: Number(fb0.updatedAt) || 0 } : null, settings: readSettings_(), mockScores: mockScores_(st.code) };
     }
     if (a === 'student.send') {
       const body = clean_(q.body, 6000);
@@ -130,11 +135,13 @@ function route_(q) {
       notifyTeacher_(st, row);
       return { message: pubMsg_(row) };
     }
+    if (a === 'student.audio') return saveRecording_(st, q);
     if (a === 'student.read') { markRead_('readS', q.ids, function (r) { return String(r.code) === st.code; }); return {}; }
     if (a !== 'student.login') fail_('bad_request', 'Unknown action');
     const b = st.batch ? find_('Batches', 'id', st.batch) : null;
     const fb = find_('Feedback', 'code', st.code);
     return {
+      mockScores: mockScores_(st.code),
       student: pubStudent_(st),
       batch: b ? pubBatch_(b) : null,
       progress: readProgress_(find_('Progress', 'code', st.code)),
@@ -186,7 +193,7 @@ function route_(q) {
         };
         write_('Students', row, existing && existing._row);
         if (existing && orig !== code) {
-          ['Progress', 'Feedback'].forEach(function (n) {
+          ['Progress', 'Feedback', 'MockScores'].forEach(function (n) {
             const r = find_(n, 'code', orig);
             if (r) sheet_(n).getRange(r._row, 1).setValue(code);
           });
@@ -198,7 +205,7 @@ function route_(q) {
 
       case 'teacher.student.delete': {
         const code = normCode_(q.code);
-        ['Students', 'Progress', 'Feedback'].forEach(function (n) { del_(n, 'code', code); });
+        ['Students', 'Progress', 'Feedback', 'MockScores'].forEach(function (n) { del_(n, 'code', code); });
         rows_('Messages').filter(function (r) { return String(r.code) === code; }).reverse()
           .forEach(function (r) { sheet_('Messages').deleteRow(r._row); });
         return {};
@@ -255,6 +262,19 @@ function route_(q) {
         markRead_('readT', q.ids, function () { return true; });
         return {};
 
+      case 'teacher.mockscore': {
+        const code = normCode_(q.code);
+        if (!find_('Students', 'code', code)) fail_('bad_code', 'Student not found');
+        const mock = String(q.mock || '');
+        if (!/^\d{1,2}$/.test(mock)) fail_('bad_request', 'Unknown mock test');
+        const all = mockScores_(code);
+        all[mock] = cleanRating_(q.data);
+        all[mock].at = Date.now();
+        const existing = find_('MockScores', 'code', code);
+        write_('MockScores', { code: code, data: JSON.stringify(all), updatedAt: Date.now() }, existing && existing._row);
+        return { mockScores: all };
+      }
+
       case 'teacher.feedback': {
         const code = normCode_(q.code);
         if (!find_('Students', 'code', code)) fail_('bad_code', 'Student not found');
@@ -267,15 +287,61 @@ function route_(q) {
   fail_('bad_request', 'Unknown action');
 }
 
+/* ---------- mock test ratings and recordings ---------- */
+function mockScores_(code) {
+  const r = find_('MockScores', 'code', code);
+  if (!r) return {};
+  try { return JSON.parse(String(r.data || '{}')) || {}; } catch (e) { return {}; }
+}
+// keep only levels 0–12 for the four CELPIP criteria of each Writing / Speaking task
+function cleanRating_(d) {
+  const out = { W: {}, S: {}, note: clean_(d && d.note, 2000) };
+  ['W', 'S'].forEach(function (sec) {
+    const src = (d && d[sec]) || {};
+    Object.keys(src).slice(0, 12).forEach(function (task) {
+      if (!/^\d{1,2}$/.test(task)) return;
+      const c = src[task] || {};
+      const row = {};
+      ['cc', 'voc', 'rl', 'tf'].forEach(function (k) {
+        const v = Number(c[k]);
+        if (c[k] !== '' && c[k] !== null && c[k] !== undefined && v >= 0 && v <= 12) row[k] = Math.round(v);
+      });
+      out[sec][task] = row;
+    });
+  });
+  return out;
+}
+function saveRecording_(st, q) {
+  const key = clean_(q.key, 40);
+  if (!/^[A-Za-z0-9:._-]+$/.test(key)) fail_('bad_request', 'Bad recording name');
+  const data = String(q.data || '');
+  if (!data) fail_('bad_request', 'Recording is empty');
+  if (data.length > 8000000) fail_('too_large', 'Recording is too large');
+  const mime = String(q.mime || '').split(';')[0];
+  const type = /^audio\/[a-z0-9.+-]+$/.test(mime) ? mime : 'audio/webm';
+  const ext = { 'audio/mp4': 'm4a', 'audio/aac': 'm4a', 'audio/ogg': 'ogg', 'audio/mpeg': 'mp3', 'audio/wav': 'wav' }[type] || 'webm';
+  const stamp = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HHmm');
+  const name = st.code + ' · ' + key.replace(/:/g, ' ') + ' · ' + stamp + '.' + ext;
+  const file = folder_(folder_(DriveApp.getRootFolder(), 'CELPIP Course Recordings'), st.code + ' ' + String(st.name || ''))
+    .createFile(Utilities.newBlob(Utilities.base64Decode(data), type, name));
+  return { url: file.getUrl(), id: file.getId() };
+}
+function folder_(parent, name) {
+  const it = parent.getFoldersByName(name);
+  return it.hasNext() ? it.next() : parent.createFolder(name);
+}
+
 function teacherData_() {
   const progress = {};
   rows_('Progress').forEach(function (r) { const p = readProgress_(r); if (p) progress[String(r.code)] = p; });
   const feedback = {};
   rows_('Feedback').forEach(function (r) { feedback[String(r.code)] = { text: String(r.text), updatedAt: Number(r.updatedAt) || 0 }; });
+  const mockScores = {};
+  rows_('MockScores').forEach(function (r) { try { mockScores[String(r.code)] = JSON.parse(String(r.data || '{}')); } catch (e) {} });
   return {
     batches: rows_('Batches').map(pubBatch_),
     students: rows_('Students').map(pubStudent_),
-    progress: progress, feedback: feedback,
+    progress: progress, feedback: feedback, mockScores: mockScores,
     messages: rows_('Messages').map(pubMsg_),
     settings: readSettings_()
   };

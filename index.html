@@ -812,6 +812,16 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 .sp-bar{height:10px;border-radius:6px;background:var(--surface);overflow:hidden}.sp-bar i{display:block;height:100%;width:0;background:var(--live);transition:width 1s linear}
 .sp-box.rec .sp-ic{color:var(--live)}.sp-box.rec .sp-label{color:var(--live)}.sp-box.rec .sp-ic svg{animation:pulse 1s infinite}
 .sp-note{text-align:center;font-size:13.5px}
+.rep-table th,.rep-table td{vertical-align:middle}.rep-table tbody th{text-align:left;font-weight:600;white-space:nowrap}
+.rep-sk{display:inline-flex;align-items:center;gap:6px}.rep-lv{text-align:center;width:120px}.rep-lv b{font-size:30px;line-height:1;color:var(--fg)}
+.rep-sub{font-size:12.5px;margin-top:2px}.rep-note{white-space:pre-wrap;background:var(--surface-2);border-radius:10px;padding:12px 14px;margin:0}
+.rep-how h3{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:16px}.rep-how p{font-size:14px}.rep-list{font-size:14px;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.rep-chart td,.rep-chart th{padding:5px 10px;font-size:13px}.rep-crit td{font-size:13.5px}
+.ms-task{border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px;background:var(--surface)}
+.ms-crit{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}.ms-crit label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--muted)}
+.ms-crit select{font:inherit;font-size:14px;padding:5px 6px;border:1.5px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg)}
+@media (max-width:760px){.ms-crit{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media print{header.bar,footer,.noprint,nav{display:none!important}body{background:#fff}.panel{box-shadow:none;border:1px solid #ccc;break-inside:avoid}}
 hr.mock-sep{border:0;border-top:2px dashed var(--line);margin:14px 0}
 .mock-read .passage{max-height:72vh}
 .tpl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
@@ -907,14 +917,14 @@ function refreshIf(rs){if(!rs.includes(curRoute()))return;const a=document.activ
   if(a&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)&&app.contains(a)){pendingRefresh=true;return}view(true)}
 document.addEventListener('focusout',()=>{if(!pendingRefresh)return;setTimeout(()=>{const a=document.activeElement;if(pendingRefresh&&!(a&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName))){pendingRefresh=false;view(true)}},700)});
 
-function applyStudent(j){cloud.code=j.student.code;PREFIX='bcs:'+cloud.code+':';cloud.student=j.student;cloud.batch=j.batch;cloud.feedback=j.feedback;cloud.messages=j.messages||[];cloud.settings=j.settings||cloud.settings||{};
-  writeSession({code:cloud.code,student:j.student,batch:j.batch,feedback:j.feedback,settings:cloud.settings});
+function applyStudent(j){cloud.code=j.student.code;PREFIX='bcs:'+cloud.code+':';cloud.student=j.student;cloud.batch=j.batch;cloud.feedback=j.feedback;cloud.messages=j.messages||[];cloud.settings=j.settings||cloud.settings||{};if(j.mockScores)cloud.mockScores=j.mockScores;
+  writeSession({code:cloud.code,student:j.student,batch:j.batch,feedback:j.feedback,settings:cloud.settings,mockScores:cloud.mockScores||{}});
   const r=j.progress;const localT=store.get('updatedAt',0);
   if(r&&(r.updatedAt||0)>localT){SYNC_KEYS.forEach(k=>{if(r[k]!==undefined)_set(k,r[k])});_set('updatedAt',r.updatedAt)}
   else if(localT>((r&&r.updatedAt)||0))schedulePush();
   if(cloud.state!=='saving'||!pushPending)cloud.state='synced';renderNav()}
 async function initCloud(){const s=readSession();cloud.tpass=readTPass();
-  if(s&&s.code){cloud.code=s.code;PREFIX='bcs:'+s.code+':';cloud.student=s.student;cloud.batch=s.batch;cloud.feedback=s.feedback;cloud.settings=s.settings||{};cloud.state='saving'}
+  if(s&&s.code){cloud.code=s.code;PREFIX='bcs:'+s.code+':';cloud.student=s.student;cloud.batch=s.batch;cloud.feedback=s.feedback;cloud.settings=s.settings||{};cloud.mockScores=s.mockScores||{};cloud.state='saving'}
   else if(cloud.tpass)PREFIX='bcs:teacher:';
   renderNav();view();
   if(cloud.code){try{const before=JSON.stringify(cloud.settings);applyStudent(await api('student.login',{code:cloud.code}));refreshIf(['home','syllabus','log'].concat(before!==JSON.stringify(cloud.settings)?['session']:[]))}
@@ -1531,6 +1541,7 @@ function view(soft){clearAll();const h=(location.hash||'#home').slice(1);
   else if(h==='messages'){mark('messages');app.innerHTML=MessagesView();bindMessages()}
   else if(h==='templates'){mark('home');app.innerHTML=TemplatesView()}
   else if(h==='mocks'){mark('mocks');app.innerHTML=MocksView();app.querySelectorAll('[data-full]').forEach(b=>b.onclick=()=>{const id=b.dataset.full;store.set('mockfull:'+id,true);MOCK_ORDER.forEach(k=>store.set('mockst:'+id+':'+k,k==='L'||k==='R'?{reset:true}:0));location.hash='#mock-'+id+'-L'})}
+  else if((m=h.match(/^mock-(\d+)-report$/))){mark('mocks');app.innerHTML=MockReport(m[1]);const pb=document.getElementById('rep-print');if(pb)pb.onclick=()=>window.print()}
   else if((m=h.match(/^mock-(\d+)-([LRWS])$/))){mark('mocks');renderMock(m[1],m[2])}
   else if((m=h.match(/^session-(\d+)$/))&&SESSIONS[m[1]-1]){mark('syllabus');renderSession(SESSIONS[m[1]-1])}
   else if(cloud.tpass&&!cloud.code){mark('home');app.innerHTML=TeacherHome();bindTeacherHome()}
@@ -1767,6 +1778,66 @@ const MOCK_ORDER=['L','R','W','S'];
 Object.entries(MOCKS).forEach(([id,m])=>{(m.W||[]).forEach((w,i)=>{WRITE[`M${id}W${i+1}`]=w});(m.S||[]).forEach((t,i)=>{SPEAK[`M${id}S${i+1}`]=t})});
 const mockKey=(id,sec)=>`mock:M${id}${sec}`;
 const mockSecTitle=t=>{const m=String(t).match(/^M(\d+)([LRWS])$/);return m?`Mock #${m[1]} · ${MOCK_SEC[m[2]][0]}`:null};
+/* ---------- CELPIP-style scoring ----------
+   Listening and Reading: 1 point per correct answer, no penalty; the raw score is converted to a level
+   with the approximate chart CELPIP publishes (it varies slightly between test forms).
+   Writing and Speaking: rated on four criteria per task, like CELPIP raters; the section level combines them. */
+const CELPIP_CHART={L:[[35,10],[33,9],[30,8],[27,7],[22,6],[17,5],[11,4],[7,3]],R:[[33,10],[31,9],[28,8],[24,7],[19,6],[15,5],[10,4],[8,3]]};
+const CELPIP_BAND={L:'0–6',R:'0–7'};
+function lrLevel(sec,raw,total){if(total&&total!==38)raw=Math.round(raw/total*38);
+  if(sec==='L'){if(raw>=38)return 12;if(raw>=37)return 11}else{if(raw>=37)return 12;if(raw>=35)return 11}
+  for(const [min,l] of CELPIP_CHART[sec])if(raw>=min)return l;return 0}
+const lvTxt=l=>l==null?'–':l>=3?String(l):'M';
+const LEVEL_DESC={12:'Advanced proficiency in workplace and community contexts',11:'Advanced proficiency in workplace and community contexts',10:'Highly effective proficiency in workplace and community contexts',
+  9:'Effective proficiency in workplace and community contexts',8:'Good proficiency in workplace and community contexts',7:'Adequate proficiency in workplace and community contexts',
+  6:'Developing proficiency in workplace and community contexts',5:'Acquiring proficiency in workplace and community contexts',4:'Adequate proficiency for daily life activities',
+  3:'Some proficiency in limited contexts',0:'Minimal proficiency or insufficient information'};
+const lvDesc=l=>LEVEL_DESC[l>=3?l:0];
+const RATE_CRIT={W:[['cc','Content / Coherence'],['voc','Vocabulary'],['rl','Readability'],['tf','Task Fulfillment']],
+  S:[['cc','Content / Coherence'],['voc','Vocabulary'],['rl','Listenability'],['tf','Task Fulfillment']]};
+// real (scored) tasks of a mock's Writing / Speaking section: [{no, key, task}]
+function mockRealTasks(id,sec){return (MOCKS[id][sec]||[]).map((task,i)=>({task,key:`M${id}${sec}${i+1}`})).filter(x=>!x.task.practice).map((x,n)=>Object.assign(x,{no:n+1}))}
+// section level from the teacher's ratings: every criterion of every task must be rated
+function ratedLevel(id,sec,ratings){const tasks=mockRealTasks(id,sec);const src=(ratings&&ratings[sec])||{};const vals=[];let rated=0;
+  tasks.forEach(x=>{const r=src[x.no]||{};const v=RATE_CRIT[sec].map(([k])=>r[k]).filter(n=>n!=null&&n!=='');if(v.length===4)rated++;vals.push(...v.map(Number))});
+  if(!tasks.length||rated<tasks.length)return {level:null,rated,total:tasks.length};
+  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;const level=avg<3?0:Math.min(12,Math.round(avg));return {level,avg,rated,total:tasks.length}}
+function mockLevels(id,res,ratings){const out={};
+  ['L','R'].forEach(k=>{const v=res[mockKey(id,k)];out[k]=v&&v.total?{level:lrLevel(k,v.score,v.total),raw:v.score,total:v.total,at:v.at}:null});
+  ['W','S'].forEach(k=>{const done=mockRealTasks(id,k).filter(x=>res['mock:'+x.key]).length;const rl=ratedLevel(id,k,ratings);out[k]=Object.assign(rl,{done})});
+  return out}
+function MockReport(id){const m=MOCKS[id];if(!m)return '<div class="panel"><p>Mock test not found. <a href="#mocks">Back to mock tests</a></p></div>';
+  const ratings=(cloud.mockScores||{})[id]||null;const res=results();const lv=mockLevels(id,res,ratings);const st=cloud.student||{};
+  const when=Math.max(0,...['L','R'].map(k=>lv[k]&&lv[k].at||0),...['W','S'].flatMap(k=>mockRealTasks(id,k).map(x=>(res['mock:'+x.key]||{}).at||0)));
+  const row=k=>{const v=lv[k];let level=null,detail='',status='';
+    if(k==='L'||k==='R'){if(v){level=v.level;detail=`${v.raw}/${v.total} correct`}else status='Not taken yet'}
+    else{if(v.level!=null){level=v.level;detail=`Rated by your teacher · ${v.total} task${v.total>1?'s':''}`}
+      else if(!v.done)status='Not taken yet';
+      else status=v.rated?`Your teacher has rated ${v.rated} of ${v.total} tasks`:`Waiting for your teacher’s rating (${v.done}/${v.total} tasks done)`}
+    return `<tr><th scope="row"><span class="rep-sk" style="${skv(k)}">${icon(k,16)} ${MOCK_SEC[k][0]}</span></th>
+      <td class="rep-lv">${level!=null?`<b>${lvTxt(level)}</b>`:'<span class="muted">–</span>'}</td>
+      <td>${level!=null?`${esc(lvDesc(level))}<div class="muted rep-sub">${esc(detail)}${level>=3?` · CLB ${level}`:''}</div>`:`<span class="muted">${esc(status)}</span>`}</td></tr>`};
+  const crit=k=>{const tasks=mockRealTasks(id,k);const src=(ratings&&ratings[k])||{};if(!tasks.some(x=>src[x.no]&&Object.keys(src[x.no]).length))return '';
+    return `<div class="stack" style="gap:8px"><h3>${MOCK_SEC[k][0]}: ratings by task</h3><div class="tablewrap"><table class="log rep-crit"><thead><tr><th>Task</th>${RATE_CRIT[k].map(([,n])=>`<th>${n}</th>`).join('')}</tr></thead><tbody>
+      ${tasks.map(x=>{const r=src[x.no]||{};return `<tr><td>${esc(String(x.task.task||x.task.title||'').replace(/^Mock #\d+ · /,''))}</td>${RATE_CRIT[k].map(([c])=>`<td class="mono">${r[c]!=null?lvTxt(r[c]):'–'}</td>`).join('')}</tr>`}).join('')}</tbody></table></div></div>`};
+  return `<div class="stack"><div class="row noprint"><a href="#mocks" class="muted" style="font-size:14px">← Mock tests</a><span class="spacer"></span><button class="btn" id="rep-print">🖨 Print or save as PDF</button></div>
+   <section class="panel stack rep" style="gap:16px">
+    <div class="row" style="align-items:flex-start"><div class="stack" style="gap:4px;flex:1"><div class="eyebrow">Practice score report · estimated</div><h1>${esc(m.title)}</h1>
+      <p class="muted" style="margin:0">${esc(st.name||'')}${when?` · ${new Date(when).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})}`:''}</p></div></div>
+    <div class="tablewrap"><table class="log rep-table"><thead><tr><th>Test component</th><th>CELPIP level</th><th>Level descriptor</th></tr></thead><tbody>${MOCK_ORDER.map(row).join('')}</tbody></table></div>
+    <p class="muted" style="font-size:13px;margin:0">Like the real CELPIP report, there is no overall score: each skill gets its own level. CELPIP levels match Canadian Language Benchmark (CLB) levels. M means minimal proficiency or not enough to rate.</p>
+    ${crit('W')}${crit('S')}
+    ${ratings&&ratings.note?`<div class="stack" style="gap:6px"><h3>Comments from your teacher</h3><p class="rep-note">${esc(ratings.note)}</p></div>`:''}
+   </section>
+   <section class="panel stack" style="gap:10px"><h2>How CELPIP scores the test</h2>
+    <div class="grid g2 rep-how">
+     <div><h3>${icon('L',16)} Listening and ${icon('R',16)} Reading</h3><p>A computer scores these. Each correct answer is 1 point, and wrong answers lose nothing. Your raw score (out of 38) is converted to a level from M to 12. CELPIP says the conversion changes slightly between test forms, so this mock uses its approximate chart. Some questions on the real test are unscored, and you cannot tell which.</p>
+      <div class="tablewrap"><table class="log rep-chart"><thead><tr><th>Level</th><th>Listening /38</th><th>Reading /38</th></tr></thead><tbody>
+       ${[['10–12','35–38','33–38'],['9','33–34','31–32'],['8','30–32','28–30'],['7','27–29','24–27'],['6','22–26','19–23'],['5','17–21','15–18'],['4','11–16','10–14'],['3','7–10','8–9'],['M','0–6','0–7']].map(r=>`<tr>${r.map((c,i)=>i?`<td class="mono">${c}</td>`:`<td><b>${c}</b></td>`).join('')}</tr>`).join('')}</tbody></table></div></div>
+     <div><h3>${icon('W',16)} Writing and ${icon('S',16)} Speaking</h3><p>Trained raters score every response on four criteria. On this mock, your teacher rates each task the same way, and the section level combines all the ratings.</p>
+      <ul class="rep-list"><li><b>Content / Coherence:</b> ideas, details, and how well they are organised</li><li><b>Vocabulary:</b> range and precision of words and phrases</li><li><b>Readability</b> (Writing) / <b>Listenability</b> (Speaking): grammar, sentence variety, flow${''}, pronunciation and rhythm for Speaking</li><li><b>Task Fulfillment:</b> answering every part of the task, the right tone, the right length</li></ul></div>
+    </div>
+    <p class="muted" style="font-size:12.5px;margin:0">This report is a practice estimate from an independent course. It is not an official CELPIP score.</p></section></div>`}
 function mockScreens(id,sec){const m=MOCKS[id];const out=[];
   (m[sec]||[]).forEach((p,pi)=>(p.screens||[p]).forEach((sc,si)=>out.push({pi,si,part:p,sc})));return out}
 function mockSecResult(id,sec){const r=results();
@@ -1774,14 +1845,14 @@ function mockSecResult(id,sec){const r=results();
   const keys=(MOCKS[id][sec]||[]).map((t,i)=>t.practice?null:`mock:M${id}${sec}${i+1}`).filter(Boolean);const done=keys.filter(k=>r[k]);
   return done.length===keys.length&&keys.length?{done:done.length,total:keys.length,at:Math.max(...done.map(k=>r[k].at||0))}:(done.length?{partial:done.length,total:keys.length}:null)}
 function mockSecLabel(id,sec){const v=mockSecResult(id,sec);if(!v)return '';
-  if(v.total&&v.score!=null)return `${v.score}/${v.total} correct`;if(v.partial)return `${v.partial}/${v.total} tasks`;return 'Done'}
+  if(v.total&&v.score!=null)return `Level ${lvTxt(lrLevel(sec,v.score,v.total))} · ${v.score}/${v.total}`;if(v.partial)return `${v.partial}/${v.total} tasks`;{const rl=ratedLevel(id,sec,(cloud.mockScores||{})[id]);if(rl.level!=null)return `Level ${lvTxt(rl.level)}`}return 'Done · awaiting rating'}
 
 function MocksView(){const ids=Object.keys(MOCKS);
   return `<div class="stack"><section class="hero2 slim"><div class="stack" style="gap:10px"><div class="eyebrow">Practise like test day</div><h1>Mock tests</h1>
     <p class="lead">Full-length CELPIP-style tests: all four skills, real timers, audio plays once, and no going back. Answers appear only at the end of each section.</p></div></section>
    ${ids.length?ids.map(id=>{const m=MOCKS[id];return `<section class="panel stack" style="gap:14px"><div class="row"><div><div class="eyebrow">${esc(m.when||'')}</div><h2>${esc(m.title)}</h2></div></div>
      <div class="mock-secs">${MOCK_ORDER.map((k,i)=>{const lab=mockSecLabel(id,k);return `<a class="mock-sec" style="${skv(k)}" href="#mock-${id}-${k}"><span class="ic">${icon(k,22)}</span><div><b>${i+1}. ${MOCK_SEC[k][0]}</b><span class="muted">${MOCK_SEC[k][1]}</span></div><span class="spacer"></span>${lab?`<span class="chip good">${CHECK} ${esc(lab)}</span>`:'<span class="chip">Start →</span>'}</a>`}).join('')}</div>
-     <div class="row" style="gap:10px"><button class="btn primary" data-full="${id}">Take the full test in one sitting →</button><span class="muted" style="font-size:13px">About 3 hours, Listening → Reading → Writing → Speaking, like test day. Or open one section at a time above.</span></div></section>`}).join('')
+     <div class="row" style="gap:10px"><button class="btn primary" data-full="${id}">Take the full test in one sitting →</button><a class="btn" href="#mock-${id}-report">📄 Score report</a><span class="muted" style="font-size:13px">About 3 hours, Listening → Reading → Writing → Speaking, like test day. Or open one section at a time above.</span></div></section>`}).join('')
     :'<section class="panel"><p class="muted">Mock tests are not available yet.</p></section>'}</div>`}
 
 let mockRun=null;
@@ -1863,10 +1934,10 @@ function mockReview(id,sec,ans,head,fresh){const screens=mockScreens(id,sec);con
   const byPart={};screens.filter(cur=>!cur.part.practice).forEach(cur=>{const k=cur.pi;byPart[k]=byPart[k]||{name:cur.part.name,ok:0,n:0};cur.sc.qs.forEach((x,qi)=>{byPart[k].n++;if(ans[`${cur.pi}-${cur.si}-${qi}`]===x.a)byPart[k].ok++})});
   const nextSec=MOCK_ORDER[MOCK_ORDER.indexOf(sec)+1];
   app.innerHTML=`<div class="stack">${head}
-   <section class="panel stack" style="${skv(sec)};gap:12px"><div class="eyebrow">${fresh?'Section complete':'Your last attempt'}</div><h1>${MOCK_SEC[sec][0]}: ${v.score}/${v.total}</h1>
+   <section class="panel stack" style="${skv(sec)};gap:12px"><div class="eyebrow">${fresh?'Section complete':'Your last attempt'}</div><h1>${MOCK_SEC[sec][0]}: estimated CELPIP level ${lvTxt(lrLevel(sec,v.score,v.total))}</h1><p class="lead" style="margin:0">${v.score}/${v.total} correct · ${esc(lvDesc(lrLevel(sec,v.score,v.total)))}</p>
     <div class="mock-parts">${Object.values(byPart).map(b=>`<div><b>${esc(b.name)}</b><span class="rchip ${b.ok/b.n>=.75?'good':b.ok/b.n>=.5?'mid':'low'}">${b.ok}/${b.n}</span></div>`).join('')}</div>
-    <p class="muted" style="font-size:13.5px">This is a practice score, not an official CELPIP level. ${fresh?'Every missed question was added to your <a href="#log">Error Log</a>. Tag each one with a cause.':''}</p>
-    <div class="row" style="gap:8px">${nextSec?`<a class="btn primary" href="#mock-${id}-${nextSec}">Next: ${MOCK_SEC[nextSec][0]} →</a>`:''}<a class="btn" href="#mocks">All mock tests</a><button class="btn" id="mk-again">Take it again</button></div></section>
+    <p class="muted" style="font-size:13.5px">The level uses CELPIP’s approximate raw-score chart, so it is an estimate, not an official score. ${fresh?'Every missed question was added to your <a href="#log">Error Log</a>. Tag each one with a cause.':''}</p>
+    <div class="row" style="gap:8px">${nextSec?`<a class="btn primary" href="#mock-${id}-${nextSec}">Next: ${MOCK_SEC[nextSec][0]} →</a>`:''}<a class="btn" href="#mock-${id}-report">Score report</a><a class="btn" href="#mocks">All mock tests</a><button class="btn" id="mk-again">Take it again</button></div></section>
    <section class="panel stack" style="gap:16px"><h2>Review your answers</h2>
     ${screens.filter(cur=>!cur.part.practice).map(cur=>`<div class="mock-rev"><div class="eyebrow">${esc(cur.part.name)}</div>
       ${sec==='L'?`<details><summary>Transcript</summary><div class="transcript">${cur.sc.audio.map(([w,t])=>`<p><b>${esc(w)}:</b> ${esc(t)}</p>`).join('')}</div></details>`:''}
@@ -1880,7 +1951,7 @@ function renderMockTasks(id,sec){const m=MOCKS[id];const list=m[sec];const SK='m
    <div class="mock-bar" style="${skv(sec)}"><b>${MOCK_SEC[sec][0]} · ${list[i].practice?'Practice task (not scored)':`Task ${list.slice(0,i+1).filter(t=>!t.practice).length} of ${list.filter(t=>!t.practice).length}`}</b><span class="muted">${sec==='W'?'Each task has its own timer.':'Preparation and speaking timers run like the real test.'}</span></div>
    <div id="mk-task"></div>
    <div class="row"><span class="muted" style="font-size:13px">${done?'Saved. ':''}${sec==='S'?'Each answer is recorded. Listen back, then score it with the checklist.':'Submit each task to save it.'}</span><span class="spacer"></span>
-    ${i<list.length-1?`<button class="btn primary" id="mk-tnext">Next task →</button>`:`${MOCK_ORDER.indexOf(sec)<3?`<a class="btn primary" href="#mock-${id}-${MOCK_ORDER[MOCK_ORDER.indexOf(sec)+1]}">Next: ${MOCK_SEC[MOCK_ORDER[MOCK_ORDER.indexOf(sec)+1]][0]} →</a>`:'<a class="btn primary" href="#mocks" data-finish>Finish mock test</a>'}`}</div></div>`;
+    ${i<list.length-1?`<button class="btn primary" id="mk-tnext">Next task →</button>`:`${MOCK_ORDER.indexOf(sec)<3?`<a class="btn primary" href="#mock-${id}-${MOCK_ORDER[MOCK_ORDER.indexOf(sec)+1]}">Next: ${MOCK_SEC[MOCK_ORDER[MOCK_ORDER.indexOf(sec)+1]][0]} →</a>`:`<a class="btn primary" href="#mock-${id}-report" data-finish>Finish and see my score report</a>`}`}</div></div>`;
   const fb=app.querySelector('[data-finish]');if(fb)fb.onclick=()=>store.set('mockfull:'+id,false);
   const host=document.getElementById('mk-task');const s={n:'mock'};
   if(sec==='W')Writer(host,s,key);else Speaker(host,s,key);
@@ -2063,7 +2134,7 @@ function Speaker(host,s,key){
     <p class="muted sp-note" data-hint>${MIC_OK?'Press <b>START</b>. Your browser will ask to use the microphone. Allow it. Recording starts by itself when preparation time ends, and stops by itself when time is up, like the real test.':'This browser cannot record. Use your phone’s voice recorder: press record when you see <b>Recording…</b>.'}</p>
     <div data-after hidden class="stack">
      <div class="sp-play stack" data-playwrap hidden><h3 style="margin:0">Listen to your answer</h3><audio controls data-audio style="width:100%"></audio>
-      <div class="row" style="gap:8px"><a class="btn" data-dl download>⬇ Download recording</a><span class="muted" style="font-size:13px">Your recording stays on this device. Download it to keep it or to send it to your teacher.</span></div></div>
+      <div class="row" style="gap:8px"><a class="btn" data-dl download>⬇ Download recording</a>${cloud.code?'<button class="btn" data-send>📤 Send to my teacher</button>':''}<span class="muted" data-sendmsg style="font-size:13px">${cloud.code?(s.n==='mock'?'Mock test recordings go to your teacher automatically, so they can rate them.':'Send it so your teacher can listen and give feedback.'):'Your recording stays on this device. Download it to keep it.'}</span></div></div>
      <div class="row" data-upwrap><label class="btn" for="up-${rk}">Upload a phone recording</label><input type="file" id="up-${rk}" accept="audio/*" hidden><span class="muted" data-upmsg style="font-size:13px">Audio stays on this device.</span></div>
      <a class="tpl-link" href="downloads/CELPIP-Templates-Speaking.pdf" target="_blank" rel="noopener">📄 Compare with the speaking templates (PDF)</a>
      <div><h3 style="margin-bottom:8px">Score yourself as you listen back</h3><div class="rubric">${['Content & coherence','Vocabulary','Listenability','Task fulfillment'].map((c,i)=>`<label>${c}<select data-rub="${i}"><option value="">–</option>${[1,2,3,4,5].map(v=>`<option>${v}</option>`).join('')}</select></label>`).join('')}</div></div>
@@ -2072,10 +2143,17 @@ function Speaker(host,s,key){
   const $=q=>host.querySelector(q);
   const clock=$('[data-clock]'),ph=$('[data-phase]'),hint=$('[data-hint]'),stage=$('[data-stage]'),bar=$('[data-bar]');
   const hints={choose:'Click the option you prefer. You can argue best for it.',prep:'Plan your answer. Note 2–3 key points.',speak:''};
+  let lastBlob=null;
+  const send=async()=>{const b=$('[data-send]'),m=$('[data-sendmsg]');if(!lastBlob||!cloud.code||!b)return;b.disabled=true;m.innerHTML=wait('Sending to your teacher');
+    try{const data=await new Promise((ok,no)=>{const fr=new FileReader();fr.onload=()=>ok(String(fr.result).split(',')[1]||'');fr.onerror=no;fr.readAsDataURL(lastBlob)});
+      const j=await api('student.audio',{code:cloud.code,key:rk,mime:lastBlob.type||'audio/webm',data});
+      const r=results();r[rk]=Object.assign(r[rk]||{},{audio:j.url,sentAt:Date.now(),at:(r[rk]&&r[rk].at)||Date.now()});store.set('res',r);
+      b.textContent='✓ Sent';m.textContent='Your teacher has your recording.'}
+    catch(e){b.disabled=false;m.textContent=e&&e.message==='Unknown action'?'Sending is not set up yet. Download the recording and send it to your teacher.':errMsg(e)}};
   const showAudio=(url,ext)=>{const a=$('[data-audio]');a.src=url;$('[data-playwrap]').hidden=false;const d=$('[data-dl]');d.href=url;d.download=`${String(t.task).replace(/[^\w]+/g,'-').replace(/^-|-$/g,'')}.${ext}`};
   const finish=()=>{stage.classList.remove('rec');ph.textContent='Time is up';clock.textContent='0';$('[data-barwrap]').hidden=true;beep(520);$('[data-after]').hidden=false;
     if(micRec&&micRec.rec){const r=micRec;r.rec.onstop=()=>{const type=r.rec.mimeType||'audio/webm';const blob=new Blob(r.chunks,{type});r.stream.getTracks().forEach(x=>x.stop());
-        if(blob.size){showAudio(URL.createObjectURL(blob),/mp4|aac/.test(type)?'m4a':/ogg/.test(type)?'ogg':'webm');$('[data-upwrap]').hidden=true;hint.textContent='Your answer was recorded. Listen back, then score yourself.'}
+        if(blob.size){lastBlob=blob;if(s.n==='mock')setTimeout(send,0);showAudio(URL.createObjectURL(blob),/mp4|aac/.test(type)?'m4a':/ogg/.test(type)?'ogg':'webm');$('[data-upwrap]').hidden=true;hint.textContent='Your answer was recorded. Listen back, then score yourself.'}
         else hint.textContent='Nothing was recorded. Check your microphone, or upload a phone recording.'};
       try{r.rec.stop()}catch(e){}micRec=null}
     else hint.textContent='Stop your phone recording, then upload it below to listen back.'};
@@ -2099,7 +2177,8 @@ function Speaker(host,s,key){
     if(!host.isConnected){stopMic();return}
     btn.hidden=true;run(0)});
   $('[data-reset]').addEventListener('click',()=>{clearAll();Speaker(host,s,key)});
-  $('input[type=file]').addEventListener('change',ev=>{const f=ev.target.files[0];if(!f)return;showAudio(URL.createObjectURL(f),(f.name.split('.').pop()||'m4a'));$('[data-upmsg]').textContent=f.name});
+  {const sb=$('[data-send]');if(sb)sb.addEventListener('click',send)}
+  $('input[type=file]').addEventListener('change',ev=>{const f=ev.target.files[0];if(!f)return;lastBlob=f;if(s.n==='mock')setTimeout(send,0);showAudio(URL.createObjectURL(f),(f.name.split('.').pop()||'m4a'));$('[data-upmsg]').textContent=f.name});
   $('[data-save]').addEventListener('click',()=>{const v=[...host.querySelectorAll('[data-rub]')].map(x=>+x.value).filter(Boolean);
     if(v.length<4){$('[data-msg]').textContent='Score all four criteria.';return}
     const r=results();r[rk]={self:Math.round(v.reduce((a,b)=>a+b)/4*20),at:Date.now()};store.set('res',r);$('[data-msg]').textContent='Saved. It counts toward your speaking average on the Dashboard.'});
@@ -2171,6 +2250,7 @@ function unreadCount(){if(!cloud.code)return 0;const seen=seenSet();return (clou
 function updateMsgBadge(){const b=document.getElementById('msg-badge');if(!b)return;const n=unreadCount();b.textContent=n;b.hidden=!n}
 async function refreshMessages(){if(!cloud.code)return;try{const j=await api('student.messages',{code:cloud.code});
   const before=JSON.stringify([(cloud.messages||[]).length,cloud.feedback&&cloud.feedback.updatedAt]);cloud.messages=j.messages||[];cloud.feedback=j.feedback;if(j.settings)cloud.settings=j.settings;
+  if(j.mockScores&&JSON.stringify(j.mockScores)!==JSON.stringify(cloud.mockScores||{})){cloud.mockScores=j.mockScores;const s0=readSession();if(s0){s0.mockScores=j.mockScores;writeSession(s0)}if(/^#(mocks|mock-\d+-report)$/.test(location.hash))refreshIf(['mocks'])}
   updateMsgBadge();if(before!==JSON.stringify([cloud.messages.length,cloud.feedback&&cloud.feedback.updatedAt]))refreshIf(['home','messages'])}catch(e){}}
 setInterval(()=>{if(cloud.code&&document.visibilityState==='visible')refreshMessages()},90000);
 const KIND={message:'Message',task:'Email-writing task',invite:'Welcome','task-reply':'Task reply'};
@@ -2774,7 +2854,7 @@ const siteURL=()=>location.href.split('#')[0];
 const inviteText=st=>`Hi ${st.name}, welcome to the Learnovate Qatar CELPIP Prep Course!\n\nOpen: ${siteURL()}\nYour access code: ${st.code}\n\nKeep this code private. It opens your dashboard and saves your practice.`;
 const tcall=(action,payload)=>api(action,Object.assign({pass:cloud.tpass},payload||{}));
 async function loadTeacher(){if(cloud.t.loading)return;cloud.t.loading=true;cloud.t.error=null;refreshIf(['teacher']);
-  try{const j=await tcall('teacher.data');Object.assign(cloud.t,{batches:j.batches||[],students:j.students||[],progress:j.progress||{},feedback:j.feedback||{},messages:j.messages||[],loaded:true,at:Date.now()});cloud.settings=j.settings||{}}
+  try{const j=await tcall('teacher.data');Object.assign(cloud.t,{batches:j.batches||[],students:j.students||[],progress:j.progress||{},feedback:j.feedback||{},mockScores:j.mockScores||{},messages:j.messages||[],loaded:true,at:Date.now()});cloud.settings=j.settings||{}}
   catch(e){if(e.code==='bad_password'){writeTPass(null);cloud.tpass=null;renderNav()}cloud.t.error=errMsg(e)}
   finally{cloud.t.loading=false;refreshIf(['teacher','session','home'])}}
 function tRoster(){return cloud.t.students.map(st=>Object.assign({},cloud.t.progress[st.code]||{},{id:st.code,code:st.code,profile:{name:st.name,email:st.email,phone:st.phone},batch:st.batch}))}
@@ -2856,6 +2936,30 @@ function StudentForm(){if(!tForm)return '';const d=tForm.data;const bopts=cloud.
     ${tForm.mode==='new'?'<label class="chk" for="sf-invite"><input type="checkbox" id="sf-invite" checked> Email the access code to the student now (needs an email address)</label>':''}
     <div class="row"><button class="btn primary" id="sf-save">${tForm.mode==='new'?'Create student':'Save changes'}</button><button class="btn" id="sf-cancel">Cancel</button><span class="err" id="sf-msg" style="min-height:0"></span></div></section>`}
 
+// teacher rates mock Writing / Speaking like CELPIP raters: four criteria per task, levels M–12
+let msDraft={};
+function TMockPanel(r){const res=r.res||{};const saved=(cloud.t.mockScores||{})[r.code]||{};
+  const ids=Object.keys(MOCKS).filter(id=>MOCK_ORDER.some(k=>k==='L'||k==='R'?res[mockKey(id,k)]:mockRealTasks(id,k).some(x=>res['mock:'+x.key])));
+  if(!ids.length)return `<div class="stack" style="gap:8px"><div class="eyebrow">Mock tests</div><p class="muted" style="margin:0">No mock test taken yet.</p></div>`;
+  const opt=(v)=>`<option value=""></option>${[12,11,10,9,8,7,6,5,4,3].map(n=>`<option value="${n}" ${String(v)===String(n)?'selected':''}>${n}</option>`).join('')}<option value="2" ${v!==''&&v!=null&&Number(v)<3?'selected':''}>M</option>`;
+  return `<div class="stack" style="gap:10px"><div class="eyebrow">Mock tests · rate Writing and Speaking like CELPIP raters</div>
+   ${ids.map(id=>{const dk=r.code+'|'+id;const d=msDraft[dk]||saved[id]||{};const lv=mockLevels(id,res,saved[id]);
+     const sum=MOCK_ORDER.map(k=>`${k} ${lv[k]&&lv[k].level!=null?lvTxt(lv[k].level):'–'}`).join(' · ');
+     const task=(k,x)=>{const v=res['mock:'+x.key]||{};const rr=(d[k]||{})[x.no]||{};const name=String(x.task.task||x.task.title||'').replace(/^Mock #\d+ · /,'');
+       return `<div class="ms-task"><div class="row" style="gap:8px"><b>${esc(name)}</b><span class="spacer"></span>
+         ${k==='W'?(v.text?`<span class="muted" style="font-size:12.5px">${v.words||0} words</span>`:'<span class="muted" style="font-size:12.5px">Not submitted</span>'):(v.audio?`<a class="btn sm" href="${esc(v.audio)}" target="_blank" rel="noopener">▶ Listen (Google Drive)</a>`:`<span class="muted" style="font-size:12.5px">${v.at?'Done · recording not sent':'Not done'}</span>`)}
+         ${v.self?`<span class="chip">Self ${(v.self/20).toFixed(1)}/5</span>`:''}</div>
+         ${k==='W'&&v.text?`<details><summary>Read the response</summary><pre>${esc(v.text)}</pre></details>`:''}
+         <div class="ms-crit">${RATE_CRIT[k].map(([c,n])=>`<label>${n}<select data-ms="${id}|${k}|${x.no}|${c}">${opt(rr[c])}</select></label>`).join('')}</div></div>`};
+     return `<details class="subm ms" ${msDraft[dk]?'open':''}><summary>${esc(MOCKS[id].title)} · ${sum}</summary><div class="stack" style="gap:12px;margin-top:10px">
+       <p class="muted" style="font-size:13px;margin:0">Listening ${lv.L?`${lv.L.raw}/${lv.L.total} → level ${lvTxt(lv.L.level)}`:'not taken'} · Reading ${lv.R?`${lv.R.raw}/${lv.R.total} → level ${lvTxt(lv.R.level)}`:'not taken'} (scored automatically).</p>
+       <h4 style="margin:0">Writing</h4>${mockRealTasks(id,'W').map(x=>task('W',x)).join('')}
+       <h4 style="margin:0">Speaking</h4>${mockRealTasks(id,'S').map(x=>task('S',x)).join('')}
+       <label class="field">Comments for the student (shown on their score report)<textarea data-ms-note="${id}" placeholder="Strengths, what to fix, and one goal for the next mock.">${esc(d.note||'')}</textarea></label>
+       <div class="row"><button class="btn primary" data-ms-save="${id}">Save ratings</button><span class="muted" data-ms-msg="${id}" style="font-size:13px">${saved[id]&&saved[id].at?'Saved '+ago(saved[id].at)+'. The student sees the levels on their score report.':'Each criterion: choose a level from M to 12. The section level is the average, like the real test.'}</span></div>
+     </div></details>`}).join('')}</div>`}
+function msCollect(id){const d={W:{},S:{},note:''};app.querySelectorAll(`[data-ms^="${id}|"]`).forEach(el=>{const [,k,no,c]=el.dataset.ms.split('|');d[k][no]=d[k][no]||{};if(el.value!=='')d[k][no][c]=+el.value});
+  const n=app.querySelector(`[data-ms-note="${id}"]`);d.note=n?n.value:'';return d}
 function StudentDetail(){const r=tRoster().find(x=>x.id===tStudent);if(!r)return '';const pr=r.profile;const s=stuStats(r);const tasks=r.tasks||{};
   const b=cloud.t.batches.find(x=>x.id===r.batch);
   const subs=Object.entries(r.res||{}).filter(([k,v])=>v&&v.text).map(([k,v])=>{const [n,t]=k.split(':');return {n:n==='msg'?'–':n,t,v}});
@@ -2871,6 +2975,7 @@ function StudentDetail(){const r=tRoster().find(x=>x.id===tStudent);if(!r)return
       <div class="threadbox">${Thread(msgsFor(r),'teacher')}</div>
       ${Composer('sm','Write to '+esc(pr.name),!!pr.email,pr.email?'Email goes to '+esc(pr.email)+'. Their reply arrives here.':'Add an email address to also send by email.')}</div>
     <div><div class="eyebrow" style="margin-bottom:8px">Hub progress by session</div><div class="mini12">${SESSIONS.map(x=>{const d=x.tasks.filter((_,i)=>tasks[x.n+':'+i]).length;return `<div style="--ci:var(--sk${x.k}i)" title="Session ${x.n}: ${d}/${x.tasks.length}"><i style="height:${d/x.tasks.length*100}%"></i><span style="position:relative">${x.n}</span></div>`}).join('')}</div></div>
+    ${TMockPanel(r)}
     <div class="grid g2">
       <div class="stack" style="gap:10px"><div class="eyebrow">Writing submissions</div>${subs.length?subs.map(x=>`<details class="subm"><summary>Session ${esc(x.n)} · ${esc(WRITE[x.t]?WRITE[x.t].title:(x.v.task?'Email task reply: '+x.v.task:x.t))} · ${x.v.words||0} words${x.v.ai?` · <b>AI level ${clampL(x.v.ai.overall_level)}</b>`:''}${x.v.self?` · self ${(x.v.self/20).toFixed(1)}/5`:''}</summary><pre>${esc(x.v.text)}</pre>${x.v.ai?AIFeedback(x.v.ai,WRITE[x.t]):''}</details>`).join(''):'<p class="muted">No writing submitted yet.</p>'}</div>
       <div class="stack" style="gap:10px"><div class="eyebrow">Error causes</div>${s.log.length?`<div class="cause-bars">${causes.map(([c,n])=>`<div><span style="text-transform:capitalize">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${n/max*100}%"></div></div><span class="mono">${n}</span></div>`).join('')}</div><p class="muted" style="font-size:13px">${s.log.length} logged · ${s.untagged} not tagged yet</p>`:'<p class="muted">No errors logged yet.</p>'}</div>
@@ -2941,6 +3046,12 @@ function bindTeacher(){document.querySelectorAll('#sched,#decks').forEach(d=>{if
   app.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',async ev=>{ev.stopPropagation();const t=b.dataset.copy;const old=b.textContent;
     try{await navigator.clipboard.writeText(t);b.textContent='Copied'}catch(e){b.textContent='Copy failed · select and copy manually'}setTimeout(()=>{b.textContent=old},1600)}));
   const fb=document.getElementById('t-fb');if(fb)fb.addEventListener('input',()=>{fbDraft[tStudent]=fb.value});
+  app.querySelectorAll('[data-ms],[data-ms-note]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',()=>{const id=el.dataset.ms?el.dataset.ms.split('|')[0]:el.dataset.msNote;msDraft[tStudent+'|'+id]=msCollect(id)}));
+  app.querySelectorAll('[data-ms-save]').forEach(b=>b.addEventListener('click',async()=>{const id=b.dataset.msSave,code=tStudent;const msg=app.querySelector(`[data-ms-msg="${id}"]`);b.disabled=true;msg.innerHTML=wait('Saving');
+    try{const j=await tcall('teacher.mockscore',{code,mock:id,data:msCollect(id)});cloud.t.mockScores=cloud.t.mockScores||{};cloud.t.mockScores[code]=j.mockScores||{};delete msDraft[code+'|'+id];
+      const lv=mockLevels(id,(tRoster().find(x=>x.id===code)||{}).res||{},cloud.t.mockScores[code][id]);
+      msg.textContent=`Saved. Writing ${lvTxt(lv.W.level)} · Speaking ${lvTxt(lv.S.level)}${lv.W.level==null||lv.S.level==null?' (a section shows a level once every task is rated)':''}. The student sees this on their score report.`}
+    catch(err){msg.textContent=err&&err.message==='Unknown action'?'Update your Apps Script first (README: “Updating to a new version of Code.gs”).':errMsg(err)}b.disabled=false}));
   on('t-fb-send','click',async e=>{const text=fb.value.trim();const msg=document.getElementById('t-fb-msg');if(!text){msg.textContent='Write some feedback first.';return}
     e.target.disabled=true;msg.innerHTML=wait('Sending');const code=tStudent;
     try{await tcall('teacher.feedback',{code,text});cloud.t.feedback[code]={text,updatedAt:Date.now()};delete fbDraft[code];msg.textContent='Sent. The student sees it on their dashboard.'}
