@@ -782,6 +782,9 @@ hr.mock-sep{border:0;border-top:2px dashed var(--line);margin:14px 0}
 .tpl-card{background:var(--c)}.tpl-card .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--surface);color:var(--ci);flex:none}
 .tpl-tips{margin:0;padding-left:18px;font-size:13.5px}
 .tpl-link{align-self:flex-start;font-size:13px;font-weight:600;color:var(--ci,var(--hub));text-decoration:none;border:1.5px dashed var(--line);border-radius:999px;padding:4px 12px}.tpl-link:hover{border-color:currentColor}
+.hello .wave-hand{display:inline-block;transform-origin:70% 70%;animation:wave 1.6s ease-in-out 2}
+@keyframes wave{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(14deg)}20%,40%{transform:rotate(-8deg)}}
+@media (prefers-reduced-motion:reduce){.hello .wave-hand{animation:none}}
 </style>
 </head>
 <body>
@@ -1533,9 +1536,13 @@ function Dashboard(){
   return `<div class="stack" style="gap:28px">
   <section class="hero2">
     <div class="stack" style="gap:16px;min-width:0">
-      <div class="eyebrow">${cloud.student&&cloud.student.name?'Welcome, '+esc(cloud.student.name.split(' ')[0]):'CELPIP-General · 12 sessions · 2 hours each'}</div>
+      ${(()=>{const first=cloud.student&&cloud.student.name?String(cloud.student.name).trim().split(/\s+/)[0]:'';const hr=new Date().getHours();const part=hr<12?'Good morning':hr<17?'Good afternoon':'Good evening';
+        return first?`<div class="eyebrow">${part} · CELPIP-General · 12 sessions</div>
+      <h1 class="hello">Hello, ${esc(first)}! <span class="wave-hand" aria-hidden="true">👋</span></h1>
+      <p class="lead">Welcome back to your CELPIP prep. Your next step is ready below: open your Study Hub, practise, and every result is saved to your class.</p>`
+      :`<div class="eyebrow">CELPIP-General · 12 sessions · 2 hours each</div>
       <h1>Class time is for teaching. Practice happens in the Hub.</h1>
-      <p class="lead">Each session has two halves. In the live half, your instructor teaches. In the Study Hub half, you practise on your own before the next class.</p>
+      <p class="lead">Each session has two halves. In the live half, your instructor teaches. In the Study Hub half, you practise on your own before the next class.</p>`})()}
       <div class="upnext" style="${skv(nx.k)}"><span class="ic">${icon(nx.k)}</span><div style="min-width:0;flex:1"><div class="eyebrow" style="color:var(--ci)">Up next · Session ${nx.n}</div><b>${esc(nx.title)}</b><div class="muted" style="font-size:13px">${np.done} of ${np.total} Hub tasks done</div></div><a class="btn primary" href="#session-${nx.n}">Open</a></div>
     </div>
     <figure class="ladder">
