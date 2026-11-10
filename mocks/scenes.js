@@ -20,3 +20,19 @@ window.MOCK_SVG_BIKE = `<svg class="scene" viewBox="0 0 260 210" role="img" aria
 <rect x="20" y="104" width="44" height="28" rx="4" fill="#c68b59"/><line x1="20" y1="112" x2="64" y2="112" stroke="#8b5a2b" stroke-width="2"/>
 <line x1="122" y1="96" x2="122" y2="40" stroke="#666" stroke-width="3"/><path d="M82 44 Q122 0 162 44 Z" fill="#e4572e"/>
 <rect x="196" y="120" width="26" height="18" rx="3" fill="#f4d03f"/></svg>`;
+window.MOCK_SVG_STATION = `<svg class="scene" viewBox="0 0 400 240" role="img" aria-label="A busy train platform with a train arriving and people waiting">
+<rect width="400" height="240" fill="#dde7f0"/><rect x="0" y="20" width="400" height="12" fill="#7d899a"/><rect x="40" y="32" width="6" height="110" fill="#7d899a"/><rect x="354" y="32" width="6" height="110" fill="#7d899a"/>
+<rect x="150" y="40" width="100" height="26" rx="4" fill="#264653"/><text x="200" y="58" font-size="12" fill="#f4d03f" text-anchor="middle" font-family="sans-serif">8:15 · DELAYED</text>
+<rect x="0" y="142" width="400" height="18" fill="#bdbdbd"/><rect x="0" y="160" width="400" height="8" fill="#f4d03f"/><rect x="0" y="168" width="400" height="72" fill="#8a8a8a"/>
+<rect x="250" y="100" width="150" height="56" rx="10" fill="#e4572e"/><rect x="262" y="110" width="26" height="20" fill="#cfe8f7"/><rect x="298" y="110" width="26" height="20" fill="#cfe8f7"/><rect x="334" y="110" width="26" height="20" fill="#cfe8f7"/><circle cx="256" cy="140" r="4" fill="#f4d03f"/>
+<circle cx="70" cy="122" r="7" fill="#c68b59"/><rect x="64" y="129" width="13" height="24" rx="3" fill="#3d5a99"/><rect x="78" y="134" width="14" height="16" rx="2" fill="#6a4fb3"/>
+<circle cx="115" cy="120" r="7" fill="#f1c27d"/><rect x="109" y="127" width="13" height="26" rx="3" fill="#2a9d8f"/><rect x="104" y="112" width="4" height="10" fill="#333"/>
+<circle cx="160" cy="124" r="7" fill="#8d5524"/><rect x="154" y="131" width="13" height="22" rx="3" fill="#e63946"/><circle cx="175" cy="134" r="5" fill="#f1c27d"/><rect x="171" y="139" width="9" height="13" rx="2" fill="#f4a261"/>
+<circle cx="205" cy="126" r="7" fill="#c68b59"/><rect x="199" y="133" width="13" height="20" rx="3" fill="#264653"/><rect x="214" y="138" width="10" height="14" fill="#a0703c"/>
+<circle cx="190" cy="152" r="4" fill="#e4572e"/><line x1="186" y1="156" x2="194" y2="156" stroke="#333" stroke-width="1"/></svg>`;
+window.MOCK_SVG_UMBRELLA = `<svg class="scene" viewBox="0 0 260 210" role="img" aria-label="An unusual umbrella with a clear dome, a light inside and a handle that is also a small stool">
+<rect width="260" height="210" fill="#f3eefb"/>
+<path d="M40 100 Q130 -10 220 100 Z" fill="#cfe8f7" stroke="#5b6782" stroke-width="3"/><line x1="130" y1="30" x2="130" y2="100" stroke="#5b6782" stroke-width="2"/><line x1="85" y1="52" x2="100" y2="100" stroke="#5b6782" stroke-width="2"/><line x1="175" y1="52" x2="160" y2="100" stroke="#5b6782" stroke-width="2"/>
+<circle cx="130" cy="70" r="8" fill="#f4d03f"/><line x1="130" y1="100" x2="130" y2="160" stroke="#333" stroke-width="6"/>
+<rect x="100" y="160" width="60" height="10" rx="5" fill="#a8723a"/><line x1="108" y1="170" x2="96" y2="200" stroke="#5e3c1c" stroke-width="5"/><line x1="152" y1="170" x2="164" y2="200" stroke="#5e3c1c" stroke-width="5"/>
+<circle cx="130" cy="20" r="5" fill="#e4572e"/></svg>`;
