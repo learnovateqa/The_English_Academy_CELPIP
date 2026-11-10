@@ -822,6 +822,8 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 .ms-crit select{font:inherit;font-size:14px;padding:5px 6px;border:1.5px solid var(--line);border-radius:6px;background:var(--surface);color:var(--fg)}
 @media (max-width:760px){.ms-crit{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media print{header.bar,footer,.noprint,nav{display:none!important}body{background:#fff}.panel{box-shadow:none;border:1px solid #ccc;break-inside:avoid}}
+.sprog{background:var(--surface);border-radius:14px;padding:12px 14px;max-width:640px}.sprog-in{display:flex;flex-direction:column;gap:8px}.sprog .ring{width:48px;height:48px;flex:none}.sprog .pbar{margin-top:6px}
+.srow-sc{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}.srow-sc .rchip{font-size:11px}
 hr.mock-sep{border:0;border-top:2px dashed var(--line);margin:14px 0}
 .mock-read .passage{max-height:72vh}
 .tpl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
@@ -1469,7 +1471,29 @@ DS2:{task:'Diagnostic · Task 7 · Expressing Opinions',prep:30,speak:90,prompt:
 /* ---------- state helpers ---------- */
 const tasksDone=()=>store.get('tasks',{});
 const results=()=>store.get('res',{});
-function sessionProgress(s){const t=tasksDone();const done=s.tasks.filter((_,i)=>t[s.n+':'+i]).length;return {done,total:s.tasks.length,pct:Math.round(done/s.tasks.length*100)}}
+const stepTools=s=>s.tools.filter(t=>t!=='READY');
+function sessionProgress(s,res){res=res||results();const tl=stepTools(s);const done=tl.filter(t=>res[s.n+':'+t]).length;return {done,total:tl.length,pct:tl.length?Math.round(done/tl.length*100):0}}
+function checklistProgress(s){const t=tasksDone();const done=s.tasks.filter((_,i)=>t[s.n+':'+i]).length;return {done,total:s.tasks.length,pct:Math.round(done/s.tasks.length*100)}}
+// score summary for one session: practice accuracy, writing / speaking scores, mock levels
+function sessionScores(s,res){res=res||results();const acc=[],wAI=[],wSelf=[],sSelf=[],mocks=[];
+  stepTools(s).forEach(t=>{const v=res[s.n+':'+t];if(!v)return;const mm=String(t).match(/^MK(\d+)([LRWS]?)$/);
+    if(mm){if(!mocks.includes(mm[1]))mocks.push(mm[1]);return}
+    if(v.total)acc.push(v.score/v.total*100);
+    if(WRITE[t]){if(v.ai)wAI.push(clampL(v.ai.overall_level));else if(v.self)wSelf.push(v.self)}
+    if(SPEAK[t]&&v.self)sSelf.push(v.self)});
+  const avg=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+  return {acc:acc.length?Math.round(avg(acc)):null,accN:acc.length,wAI:wAI.length?Math.round(avg(wAI)):null,wSelf:avg(wSelf),sSelf:avg(sSelf),mocks}}
+function scoreChips(s,res){const sc=sessionScores(s,res);const out=[];const tone=p=>p>=75?'good':p>=50?'mid':'low';
+  if(sc.acc!=null)out.push([`Score ${sc.acc}%${sc.accN>1?` · ${sc.accN} sets`:''}`,tone(sc.acc)]);
+  if(sc.wAI!=null)out.push([`Writing level ${sc.wAI}`,'mid']);else if(sc.wSelf!=null)out.push([`Writing self ${(sc.wSelf/20).toFixed(1)}/5`,'mid']);
+  if(sc.sSelf!=null)out.push([`Speaking self ${(sc.sSelf/20).toFixed(1)}/5`,'mid']);
+  sc.mocks.forEach(id=>{if(!MOCKS[id])return;const lv=mockLevels(id,res||results(),((cloud.mockScores||{})[id])||null);const parts=MOCK_ORDER.filter(k=>lv[k]&&lv[k].level!=null).map(k=>`${k} ${lvTxt(lv[k].level)}`);
+    out.push([`Mock #${id}${parts.length?': '+parts.join(' · '):''}`,'mid'])});
+  return out}
+const chipsHTML=c=>c.map(([x,tn])=>`<span class="rchip ${tn}">${esc(x)}</span>`).join('');
+function SessProgress(s){const p=sessionProgress(s);const c=scoreChips(s);
+  return `<div class="sprog-in"><div class="row" style="gap:10px;flex-wrap:nowrap"><div class="ring" style="--p:${p.pct}"><span>${p.done}/${p.total}</span></div><div style="min-width:0;flex:1"><b>My progress · ${p.pct===100?'Session complete':p.done?`${p.done} of ${p.total} practice steps done`:'Not started yet'}</b>
+    <div class="pbar"><i style="width:${p.pct}%"></i></div></div></div>${c.length?`<div class="row" style="gap:6px">${chipsHTML(c)}</div>`:'<span class="muted" style="font-size:13px">Your scores appear here as you finish each practice step.</span>'}</div>`}
 function nextSession(){const open=SESSIONS.filter(s=>typeof sessionState!=='function'||sessionState(s.n).open);return open.find(s=>sessionProgress(s).pct<100)||open[open.length-1]||SESSIONS[0]}
 function skillScores(r){r=r||results();const out={L:[],R:[],W:[],S:[]};
   for(const [k,v] of Object.entries(r)){const tool=k.split(':')[1];const q=QUIZ[tool];
@@ -1573,10 +1597,14 @@ function QuickTiles(){const log=store.get('log',[]);const unread=typeof unreadCo
     ['W','Messages',cloud.code?(unread?`${unread} new`:'Write to your teacher'):'Students only',cloud.code?'#messages':'#home','msg'],['T','Test Day','Session 12','#session-12','flag']];
   const PAS=['#D9F7E8','#DCEBFF','#FFF1BF','#ECE3FF','#FFE0E6','#D6F7F2','#FCE3F3','#F3E5FF'];
   return `<section class="qtiles" aria-label="Quick access">${T.map(([k,t,sub,href,ic],i)=>`<a class="qtile" href="${href}" style="${skv(k)};--qbg:${PAS[i]}"><span class="qic">${qicon(ic)}</span><b>${t}</b><small>${esc(sub)}</small></a>`).join('')}</section>`}
+function latestMockLevel(k){const res=results();let best=null;
+  Object.keys(MOCKS).forEach(id=>{const lv=mockLevels(id,res,(cloud.mockScores||{})[id]||null)[k];if(!lv||lv.level==null)return;
+    const at=k==='L'||k==='R'?lv.at||0:Math.max(0,...mockRealTasks(id,k).map(x=>(res['mock:'+x.key]||{}).at||0));
+    if(!best||at>best.at)best={level:lv.level,at,title:MOCKS[id].title}});return best}
 function Dashboard(){
   const nx=nextSession();const targets=store.get('targets',{L:9,R:9,W:9,S:9});const sc=skillScores();
   const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
-  const log=store.get('log',[]);const totalTasks=SESSIONS.reduce((a,s)=>a+s.tasks.length,0);const doneTasks=SESSIONS.reduce((a,s)=>a+sessionProgress(s).done,0);
+  const log=store.get('log',[]);const totalTasks=SESSIONS.reduce((a,s)=>a+sessionProgress(s).total,0);const doneTasks=SESSIONS.reduce((a,s)=>a+sessionProgress(s).done,0);
   const tavg=Math.round((+targets.L + +targets.R + +targets.W + +targets.S)/4);
   const scoreLine=k=>{const v=avg(sc[k]);if(v==null)return '<span class="muted">No attempts yet</span>';return (k==='L'||k==='R')?`Practice accuracy <b>${v}%</b>`:`Self-score average <b>${(v/20).toFixed(1)}/5</b>`};
   const np=sessionProgress(nx);
@@ -1590,7 +1618,7 @@ function Dashboard(){
       :`<div class="eyebrow">CELPIP-General · 12 sessions · 2 hours each</div>
       <h1>Class time is for teaching. Practice happens in the Hub.</h1>
       <p class="lead">Each session has two halves. In the live half, your instructor teaches. In the Study Hub half, you practise on your own before the next class.</p>`})()}
-      <div class="upnext" style="${skv(nx.k)}"><span class="ic">${icon(nx.k)}</span><div style="min-width:0;flex:1"><div class="eyebrow" style="color:var(--ci)">Up next · Session ${nx.n}</div><b>${esc(nx.title)}</b><div class="muted" style="font-size:13px">${np.done} of ${np.total} Hub tasks done</div></div><a class="btn primary" href="#session-${nx.n}">Open</a></div>
+      <div class="upnext" style="${skv(nx.k)}"><span class="ic">${icon(nx.k)}</span><div style="min-width:0;flex:1"><div class="eyebrow" style="color:var(--ci)">Up next · Session ${nx.n}</div><b>${esc(nx.title)}</b><div class="muted" style="font-size:13px">${np.done} of ${np.total} practice steps done${(()=>{const c=scoreChips(nx);return c.length?' · '+esc(c[0][0]):''})()}</div></div><a class="btn primary" href="#session-${nx.n}">Open</a></div>
     </div>
     <figure class="ladder">
       <figcaption><span class="eyebrow">Your CLB ladder</span><span>Average target <b>CLB ${tavg}</b></span></figcaption>
@@ -1601,12 +1629,12 @@ function Dashboard(){
   ${QuickTiles()}
   <section>
     <div class="secthead"><h2>Your four skills</h2><span class="muted" style="font-size:13px">Pick the CLB level your application requires</span></div>
-    <div class="skills4">${['L','R','W','S'].map(k=>{const ss=SKSESS[k].map(n=>SESSIONS[n-1]);const d=ss.reduce((a,x)=>a+sessionProgress(x).done,0),t=ss.reduce((a,x)=>a+x.tasks.length,0);
+    <div class="skills4">${['L','R','W','S'].map(k=>{const ss=SKSESS[k].map(n=>SESSIONS[n-1]);const d=ss.reduce((a,x)=>a+sessionProgress(x).done,0),t=ss.reduce((a,x)=>a+sessionProgress(x).total,0);
       return `<div class="skcard" style="${skv(k)}">
         <div class="row" style="flex-wrap:nowrap"><span class="ic">${icon(k)}</span><div style="min-width:0"><h3>${SKILL[k]}</h3><div class="muted" style="font-size:12.5px">Sessions ${SKSESS[k][0]}–${SKSESS[k][SKSESS[k].length-1]}</div></div></div>
         <label class="tsel" for="tg-${k}">Target CLB<select id="tg-${k}" data-target="${k}">${[4,5,6,7,8,9,10,11,12].map(v=>`<option ${targets[k]==v?'selected':''}>${v}</option>`).join('')}</select></label>
-        <div class="score">${scoreLine(k)}</div>
-        <div><div class="row" style="justify-content:space-between;font-size:12px;margin-bottom:4px"><span class="muted">Hub tasks</span><span>${d}/${t}</span></div><div class="bar-track" style="background:var(--surface)"><div class="bar-fill" style="width:${t?d/t*100:0}%;background:var(--ci)"></div></div></div>
+        <div class="score">${scoreLine(k)}${(()=>{const ml=latestMockLevel(k);return ml?`<div style="font-size:12.5px;margin-top:2px">Latest mock: <b>Level ${lvTxt(ml.level)}</b> <span class="muted">(${esc(ml.title)})</span></div>`:''})()}</div>
+        <div><div class="row" style="justify-content:space-between;font-size:12px;margin-bottom:4px"><span class="muted">Practice steps</span><span>${d}/${t}</span></div><div class="bar-track" style="background:var(--surface)"><div class="bar-fill" style="width:${t?d/t*100:0}%;background:var(--ci)"></div></div></div>
       </div>`}).join('')}</div>
   </section>
   ${ClassCard()}
@@ -1644,7 +1672,7 @@ function Syllabus(){
     <p class="lead">Twelve two-hour live sessions, each paired with a Study Hub module. Open a session to see the live teaching plan and its Hub work.</p>
     <div class="legend">${phases.map(([k])=>`<span style="${skv(k)}">${icon(k,15)} ${SKILL[k]}</span>`).join('')}</div></div></section>
   ${phases.map(([k,ns])=>`<section class="phase" style="${skv(k)}"><div class="phase-head"><span class="ic">${icon(k)}</span><div><h2>${SKILL[k]}</h2><div class="muted" style="font-size:13px">Session${ns.length>1?'s':''} ${ns[0]}${ns.length>1?'–'+ns[ns.length-1]:''}</div></div></div>
-   ${ns.map(n=>{const s=SESSIONS[n-1];const p=sessionProgress(s);const ls=sessionState(n);return `<a class="srow ${ls.open?'':'locked'}" href="#session-${n}"><span class="num">${ls.open?(p.pct===100?CHECK:String(n).padStart(2,'0')):'🔒'}</span><div style="min-width:0"><h3>${esc(s.title)}</h3><p>${ls.open?esc(s.obj):(ls.date?'Opens on '+esc(fmtDate(ls.date)):'Not open yet')}</p></div><div class="prog"><div class="row" style="justify-content:space-between;font-size:12px;margin-bottom:4px"><span class="muted">Hub</span><span>${p.done}/${p.total}</span></div><div class="bar-track"><div class="bar-fill" style="width:${p.pct}%;background:var(--ci)"></div></div></div></a>`}).join('')}</section>`).join('')}</div>`}
+   ${ns.map(n=>{const s=SESSIONS[n-1];const p=sessionProgress(s);const ls=sessionState(n);return `<a class="srow ${ls.open?'':'locked'}" href="#session-${n}"><span class="num">${ls.open?(p.pct===100?CHECK:String(n).padStart(2,'0')):'🔒'}</span><div style="min-width:0"><h3>${esc(s.title)}</h3><p>${ls.open?esc(s.obj):(ls.date?'Opens on '+esc(fmtDate(ls.date)):'Not open yet')}</p></div><div class="prog"><div class="row" style="justify-content:space-between;font-size:12px;margin-bottom:4px"><span class="muted">Practice</span><span>${p.done}/${p.total}</span></div><div class="bar-track"><div class="bar-fill" style="width:${p.pct}%;background:var(--ci)"></div></div>${ls.open?(()=>{const c=scoreChips(s);return c.length?`<div class="srow-sc">${chipsHTML(c.slice(0,2))}</div>`:''})():''}</div></a>`}).join('')}</section>`).join('')}</div>`}
 
 function renderSession(s){
   const lockSt=sessionState(s.n);if(!lockSt.open){app.innerHTML=LockedSession(s,lockSt);return}
@@ -1653,7 +1681,7 @@ function renderSession(s){
   app.innerHTML=`<div class="stack">
   <div class="row"><a href="#syllabus" class="muted" style="font-size:14px">← Syllabus</a><span class="spacer"></span>
     ${s.n>1?`<a class="btn" href="#session-${s.n-1}">← S${s.n-1}</a>`:''}${s.n<12?`<a class="btn" href="#session-${s.n+1}">S${s.n+1} →</a>`:''}</div>
-  <section class="sband" style="${skv(s.k)}"><span class="bignum">${String(s.n).padStart(2,'0')}</span><div class="stack" style="gap:12px;min-width:0"><div class="row" style="gap:10px"><span class="chip">${icon(s.k,15)} ${SKILL[s.k]}</span><span class="eyebrow" style="color:var(--ci)">Session ${s.n} of 12</span></div><h1>${esc(s.title)}</h1><p style="font-size:16px;max-width:64ch"><b>Core lesson objective:</b> ${esc(s.obj)}</p></div></section>
+  <section class="sband" style="${skv(s.k)}"><span class="bignum">${String(s.n).padStart(2,'0')}</span><div class="stack" style="gap:12px;min-width:0"><div class="row" style="gap:10px"><span class="chip">${icon(s.k,15)} ${SKILL[s.k]}</span><span class="eyebrow" style="color:var(--ci)">Session ${s.n} of 12</span></div><h1>${esc(s.title)}</h1><p style="font-size:16px;max-width:64ch"><b>Core lesson objective:</b> ${esc(s.obj)}</p>${cloud.tpass&&!cloud.code?'':`<div class="sprog" id="sprog">${SessProgress(s)}</div>`}</div></section>
   <div class="tabs" role="tablist">
     <button class="tab t-live" role="tab" id="tab-live" aria-selected="${tab==='live'}" data-tab="live">${icon('T',17)}In class · 2 hours</button>
     <button class="tab t-hub" role="tab" id="tab-hub" aria-selected="${tab==='hub'}" data-tab="hub">${icon('W',17)}Study Hub · on your own</button>
@@ -1670,7 +1698,7 @@ function renderSession(s){
   </section>
   <section id="pane-hub" ${tab==='hub'?'':'hidden'} class="stack">
     <div class="boundary hubb">${icon('W',20)}<p><b>Do this on your own before ${s.n<12?'Session '+(s.n+1):'your test'}.</b> Work through the steps in order. Your instructor opens the next class with your results.</p></div>
-    ${gated?`<div class="notice" id="gate">Finish the Session ${prev.n} module first. You have done ${sessionProgress(prev).done} of ${prev.tasks.length} tasks. <a href="#session-${prev.n}">Go to Session ${prev.n}</a> · <button class="btn" id="gate-open" style="margin-left:6px">Preview anyway</button></div>`:''}
+    ${gated?`<div class="notice" id="gate">Finish the Session ${prev.n} module first. You have done ${sessionProgress(prev).done} of ${sessionProgress(prev).total} practice steps. <a href="#session-${prev.n}">Go to Session ${prev.n}</a> · <button class="btn" id="gate-open" style="margin-left:6px">Preview anyway</button></div>`:''}
     <div id="hub-body" class="stack" ${gated?'hidden':''}>
       <div class="panel pathcard" id="pathcard"></div>
       <div class="steplist">${s.tools.map(t=>`<div id="tool-${t}" class="stephost"></div>`).join('')}</div>
@@ -1680,7 +1708,7 @@ function renderSession(s){
   </section></div>`;
   bindDeck(s);if(cloud.tpass&&!cloud.t.loaded&&!cloud.t.loading&&!cloud.t.error)loadTeacher();
   {const pl=document.getElementById('pane-live');bindWidgets(pl);}
-  const setProg=()=>{const p=sessionProgress(s);const el=document.getElementById('hubprog');if(el)el.textContent=`${p.done}/${p.total}`;const r=document.getElementById('hubring');if(r)r.style.setProperty('--p',p.pct)};setProg();
+  const setProg=()=>{const p=checklistProgress(s);const el=document.getElementById('hubprog');if(el)el.textContent=`${p.done}/${p.total}`;const r=document.getElementById('hubring');if(r)r.style.setProperty('--p',p.pct)};setProg();
   app.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{store.set(TK,b.dataset.tab);
     app.querySelectorAll('[data-tab]').forEach(x=>x.setAttribute('aria-selected',x===b));
     document.getElementById('pane-live').hidden=b.dataset.tab!=='live';document.getElementById('pane-hub').hidden=b.dataset.tab!=='hub'}));
@@ -1704,7 +1732,7 @@ function stepMeta(t){
 let stepCleanup=()=>{};
 function buildSteps(s){stepCleanup();
   const hosts=s.tools.map(t=>document.getElementById('tool-'+t));const started={};let openIdx=-1;
-  const isDone=t=>!!results()[s.n+':'+t];
+  const isDone=t=>t==='READY'?stepTools(s).every(x=>results()[s.n+':'+x]):!!results()[s.n+':'+t];
   const firstOpen=()=>{const k=s.tools.findIndex(t=>!isDone(t));return k};
   const render=i=>{const t=s.tools[i],host=hosts[i];started[t]=false;
     if(QUIZ[t])Quiz(host,s,t);else if(WRITE[t])Writer(host,s,t);else if(SPEAK[t])Speaker(host,s,t);else if(t==='READY')Ready(host);else if(t==='DIAG')Diag(host);else if(/^MK\d+/.test(t))MockStep(host,t)};
@@ -1735,7 +1763,7 @@ function buildSteps(s){stepCleanup();
     const nx=card.querySelector('.step-next');const nextI=s.tools.findIndex((x,k)=>k>i&&!isDone(x));
     nx.innerHTML=done&&started[t]?`<span>${CHECK} Step ${i+1} done.</span><span class="spacer"></span>${nextI>=0?`<button class="btn primary sm" data-next>Next: Step ${nextI+1} →</button>`:'<b>All steps done. Great work!</b>'}`:'';
     const nb=nx.querySelector('[data-next]');if(nb)nb.addEventListener('click',()=>setOpen(nextI,true))};
-  const paintPath=()=>{const el=document.getElementById('pathcard');if(!el)return;const n=s.tools.filter(isDone).length,tot=s.tools.length,k=firstOpen();
+  const paintPath=()=>{const el=document.getElementById('pathcard');if(!el)return;const pp=sessionProgress(s),n=pp.done,tot=pp.total,k=firstOpen();
     el.innerHTML=`<div class="row" style="flex-wrap:nowrap;gap:14px"><div class="ring" style="--p:${Math.round(n/tot*100)}"><span>${n}/${tot}</span></div><div style="min-width:0;flex:1"><h3>Your practice path</h3>
       <p class="muted" style="font-size:13.5px">${k<0?'Every step is done. Review your <a href="#log">Error Log</a> before the next class.':`Do the steps in order. Next: <b>Step ${k+1} · ${esc(toolTitle(s.tools[k]))}</b>`}</p>
       <div class="pbar"><i style="width:${Math.round(n/tot*100)}%"></i></div></div>${k>=0?`<button class="btn primary" id="path-go">${n?'Continue':'Start'} →</button>`:''}</div>`;
@@ -1746,7 +1774,7 @@ function buildSteps(s){stepCleanup();
   hosts.forEach((host,i)=>{render(i);decorate(i);
     const mo=new MutationObserver(()=>{if(!host.querySelector('.step-head')){const t=s.tools[i];decorate(i);started[t]=true;paint(i)}});mo.observe(host,{childList:true});
     host._mo=mo});
-  const onRes=()=>{s.tools.forEach((_,i)=>paint(i));paintPath()};addEventListener('bcs-res',onRes);
+  const onRes=()=>{s.tools.forEach((_,i)=>paint(i));paintPath();const sp=document.getElementById('sprog');if(sp)sp.innerHTML=SessProgress(s)};addEventListener('bcs-res',onRes);
   stepCleanup=()=>{removeEventListener('bcs-res',onRes);hosts.forEach(h=>h&&h._mo&&h._mo.disconnect())};
   const k=firstOpen();setOpen(k,false);paintPath()}
 
@@ -2198,24 +2226,24 @@ function Ready(host){const sc=skillScores();const tg=store.get('targets',{L:9,R:
 
 /* ---------- results helpers ---------- */
 function toolTitle(t){if(t==='DIAG')return 'Diagnostic baseline';{const mt=mockSecTitle(t)||mockStepTitle(t);if(mt)return mt}return QUIZ[t]?QUIZ[t].title:WRITE[t]?WRITE[t].title:SPEAK[t]?SPEAK[t].task:t}
-function resultLabel(t,v){if(/^(M\d+[LR]|MK\d+[LR])$/.test(t)&&v&&v.total)return `${v.score}/${v.total} correct`;if(/^(M\d+|MK\d+)/.test(t)&&!QUIZ[t]&&!WRITE[t]&&!SPEAK[t])return 'Done';if(QUIZ[t])return v.total?`${v.score}/${v.total} correct`:'Done';
+function resultLabel(t,v){if(/^(M\d+[LR]|MK\d+[LR])$/.test(t)&&v&&v.total)return `Level ${lvTxt(lrLevel(t.slice(-1),v.score,v.total))} · ${v.score}/${v.total}`;if(/^(M\d+|MK\d+)/.test(t)&&!QUIZ[t]&&!WRITE[t]&&!SPEAK[t])return 'Done';if(QUIZ[t])return v.total?`${v.score}/${v.total} correct`:'Done';
   if(WRITE[t])return `${v.ai?`AI level ${clampL(v.ai.overall_level)} · `:''}${v.words||0} words${v.self?` · self ${(v.self/20).toFixed(1)}/5`:''}`;
   if(SPEAK[t])return v.self?`Self-score ${(v.self/20).toFixed(1)}/5`:'Done';return 'Done'}
 function resultTone(t,v){if(QUIZ[t]&&v.total){const p=v.score/v.total;return p>=.75?'good':p>=.5?'mid':'low'}return 'mid'}
 
 /* ---------- dashboard: progress ---------- */
 function ProgressSection(){
-  const res=results();const keys=Object.keys(res);const totalTasks=SESSIONS.reduce((a,s)=>a+s.tasks.length,0);
+  const res=results();const keys=Object.keys(res);const totalTasks=SESSIONS.reduce((a,s)=>a+sessionProgress(s).total,0);
   const doneTasks=SESSIONS.reduce((a,s)=>a+sessionProgress(s).done,0);const doneSess=SESSIONS.filter(s=>sessionProgress(s).pct===100).length;
   const writing=keys.filter(k=>WRITE[k.split(':')[1]]&&res[k].text).length;const speaking=keys.filter(k=>SPEAK[k.split(':')[1]]).length;
   const quizzes=keys.filter(k=>QUIZ[k.split(':')[1]]).length;const nx=nextSession();
-  const recent=keys.map(k=>({k,t:k.split(':')[1],n:k.split(':')[0],v:res[k]})).filter(x=>x.v&&x.v.at).sort((a,b)=>b.v.at-a.v.at).slice(0,6);
+  const recent=keys.map(k=>({k,t:k.split(':')[1],n:k.split(':')[0],v:res[k]})).filter(x=>x.v&&x.v.at&&!/^MK\d/.test(x.t)).sort((a,b)=>b.v.at-a.v.at).slice(0,6);
   const status=s=>{const p=sessionProgress(s);const anyRes=s.tools.some(t=>res[s.n+':'+t]);
     return p.pct===100?['Complete','good']:(p.done||anyRes)?['In progress','mid']:['Not started','']};
   return `<section class="panel stack" style="gap:18px" id="progress">
     <div class="row"><div><div class="eyebrow">My progress</div><h2>${doneSess} of 12 sessions complete</h2></div><span class="spacer"></span><a class="btn primary" href="#session-${nx.n}">Continue: Session ${nx.n}</a></div>
     <div class="tiles">
-      <div class="tile" style="--c:var(--skO);--ci:var(--skOi)"><b>${Math.round(doneTasks/totalTasks*100)}%</b><span>Hub tasks · ${doneTasks}/${totalTasks}</span></div>
+      <div class="tile" style="--c:var(--skO);--ci:var(--skOi)"><b>${Math.round(doneTasks/totalTasks*100)}%</b><span>Practice steps · ${doneTasks}/${totalTasks}</span></div>
       <div class="tile" style="--c:var(--skL);--ci:var(--skLi)"><b>${quizzes}</b><span>Practice sets graded</span></div>
       <div class="tile" style="--c:var(--skW);--ci:var(--skWi)"><b>${writing}</b><span>Writing responses</span></div>
       <div class="tile" style="--c:var(--skS);--ci:var(--skSi)"><b>${speaking}</b><span>Speaking answers</span></div>
@@ -2223,11 +2251,11 @@ function ProgressSection(){
     </div>
     <div class="strip">${SESSIONS.map(s=>{const p=sessionProgress(s);return `<a href="#session-${s.n}" style="${skv(s.k)}" class="${s===nx?'next':''}" title="Session ${s.n}: ${esc(s.title)}">${p.pct===100?`<span class="ck">${CHECK}</span>`:''}<span class="n">S${String(s.n).padStart(2,'0')}</span><span class="muted" style="font-size:11px">${SKILL[s.k]}</span><div class="bar-track"><div class="bar-fill" style="width:${p.pct}%"></div></div></a>`}).join('')}</div>
     <div class="grid" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px" id="prog-grid">
-      <div class="stack" style="gap:8px;min-width:0"><h3>Session by session</h3><div class="tablewrap"><table class="log sess"><thead><tr><th>Session</th><th>Status</th><th>Tasks</th><th>Results</th></tr></thead><tbody>
-        ${SESSIONS.map(s=>{const p=sessionProgress(s);const [st,tone]=status(s);const rs=s.tools.filter(t=>res[s.n+':'+t]&&t!=='READY').map(t=>`<span class="rchip ${resultTone(t,res[s.n+':'+t])}">${esc(resultLabel(t,res[s.n+':'+t]))}</span>`).join('');
-          return `<tr><td><a href="#session-${s.n}" class="slink" style="${skv(s.k)}"><span class="sn">${s.n}</span><span>${esc(s.title)}</span></a></td><td><span class="stat ${tone}">${st}</span></td><td class="mono">${p.done}/${p.total}</td><td>${rs||'<span class="muted">–</span>'}</td></tr>`}).join('')}
+      <div class="stack" style="gap:8px;min-width:0"><h3>Session by session</h3><div class="tablewrap"><table class="log sess"><thead><tr><th>Session</th><th>Status</th><th>Steps</th><th>Scores</th></tr></thead><tbody>
+        ${SESSIONS.map(s=>{const p=sessionProgress(s);const [st,tone]=status(s);
+          return `<tr><td><a href="#session-${s.n}" class="slink" style="${skv(s.k)}"><span class="sn">${s.n}</span><span>${esc(s.title)}</span></a></td><td><span class="stat ${tone}">${st}</span></td><td class="mono">${p.done}/${p.total}</td><td>${(()=>{const c=scoreChips(s,res);return c.length?`<div class="row" style="gap:4px">${chipsHTML(c)}</div>`:'<span class="muted">–</span>'})()}</td></tr>`}).join('')}
       </tbody></table></div></div>
-      <div class="stack" style="gap:8px;min-width:0"><h3>Recent results</h3>${recent.length?`<ul class="recent">${recent.map(x=>`<li><div><b>${esc(toolTitle(x.t))}</b><span class="muted">Session ${esc(x.n)} · ${ago(x.v.at)}</span></div><span class="rchip ${resultTone(x.t,x.v)}">${esc(resultLabel(x.t,x.v))}</span></li>`).join('')}</ul>`:'<p class="muted">Your scores appear here after your first practice set.</p>'}</div>
+      <div class="stack" style="gap:8px;min-width:0"><h3>Recent results</h3>${recent.length?`<ul class="recent">${recent.map(x=>`<li><div><b>${esc(toolTitle(x.t))}</b><span class="muted">${x.n==='mock'?'Mock test':x.n==='msg'?'Email task':'Session '+esc(x.n)} · ${ago(x.v.at)}</span></div><span class="rchip ${resultTone(x.t,x.v)}">${esc(resultLabel(x.t,x.v))}</span></li>`).join('')}</ul>`:'<p class="muted">Your scores appear here after your first practice set.</p>'}</div>
     </div>
   </section>`}
 
@@ -2848,7 +2876,7 @@ function bindComposer(px,to,after){const on=(id,ev,fn)=>{const el=document.getEl
       tFlash=email?`Sent. Emailed ${em.sent||0} student${em.sent===1?'':'s'}${em.skipped?` · ${em.skipped} had no email address`:''}${em.failed?` · ${em.failed} email${em.failed>1?'s':''} failed (check that you ran testEmail in Apps Script)`:''}.`:'Sent. The student sees it under Messages.';
       if(after)after();view(true)}
     catch(err){e.target.disabled=false;msg.textContent=errMsg(err)}})}
-const TOTAL_TASKS=SESSIONS.reduce((a,s)=>a+s.tasks.length,0);
+const TOTAL_TASKS=SESSIONS.reduce((a,s)=>a+stepTools(s).length,0);
 const genCode=()=>{const A='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let c='CEL-';const r=crypto.getRandomValues(new Uint32Array(6));for(const x of r)c+=A[x%A.length];return c};
 const siteURL=()=>location.href.split('#')[0];
 const inviteText=st=>`Hi ${st.name}, welcome to the Learnovate Qatar CELPIP Prep Course!\n\nOpen: ${siteURL()}\nYour access code: ${st.code}\n\nKeep this code private. It opens your dashboard and saves your practice.`;
@@ -2858,8 +2886,8 @@ async function loadTeacher(){if(cloud.t.loading)return;cloud.t.loading=true;clou
   catch(e){if(e.code==='bad_password'){writeTPass(null);cloud.tpass=null;renderNav()}cloud.t.error=errMsg(e)}
   finally{cloud.t.loading=false;refreshIf(['teacher','session','home'])}}
 function tRoster(){return cloud.t.students.map(st=>Object.assign({},cloud.t.progress[st.code]||{},{id:st.code,code:st.code,profile:{name:st.name,email:st.email,phone:st.phone},batch:st.batch}))}
-function stuStats(r){const tasks=r.tasks||{};const done=Object.values(tasks).filter(Boolean).length;
-  const cur=SESSIONS.find(s=>s.tasks.some((_,i)=>!tasks[s.n+':'+i]))||SESSIONS[11];
+function stuStats(r){const res=r.res||{};const done=SESSIONS.reduce((a,s)=>a+sessionProgress(s,res).done,0);
+  const cur=SESSIONS.find(s=>sessionProgress(s,res).pct<100)||SESSIONS[11];
   const sc=skillScores(r.res||{});const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
   const log=r.log||[];return {done,cur,L:avg(sc.L),R:avg(sc.R),W:avg(sc.W),S:avg(sc.S),log,untagged:log.filter(e=>!e.cause).length}}
 
@@ -2909,7 +2937,7 @@ function TeacherView(){
   const share=tShare?(()=>{const s=t.students.find(x=>x.code===tShare);if(!s)return '';const txt=inviteText(s);
     return `<section class="sharebox"><div class="row"><h3>Send ${esc(s.name)} their access code</h3><span class="spacer"></span><button class="btn sm" id="t-share-close">Done</button></div>
       <pre id="t-share-text">${esc(txt)}</pre><div class="row"><button class="btn primary sm" data-copy="${esc(txt)}">Copy message</button><span class="muted" style="font-size:13px">Paste it into an email, text or WhatsApp.</span></div></section>`})():'';
-  const roster=list.length?`<div class="tablewrap"><table class="roster"><thead><tr><th>Student</th><th>Access code</th><th>Contact</th><th>Now on</th><th>Hub tasks</th><th>Listening</th><th>Reading</th><th>Writing</th><th>Speaking</th><th>Last active</th></tr></thead><tbody>
+  const roster=list.length?`<div class="tablewrap"><table class="roster"><thead><tr><th>Student</th><th>Access code</th><th>Contact</th><th>Now on</th><th>Practice steps</th><th>Listening</th><th>Reading</th><th>Writing</th><th>Speaking</th><th>Last active</th></tr></thead><tbody>
     ${st.map(({r,s})=>`<tr class="pick ${r.id===tStudent?'on':''}" data-stu="${esc(r.id)}"><td><b>${esc(r.profile.name)}</b>${unreadFrom(r.code).length?` <span class="badge">${unreadFrom(r.code).length}</span>`:''}</td><td><span class="codechip">${esc(r.code)}</span></td>
       <td style="font-size:13px;min-width:160px">${r.profile.email?esc(r.profile.email):'<span class="muted">No email</span>'}${r.profile.phone?`<br><span class="muted">${esc(r.profile.phone)}</span>`:''}</td>
       <td><span class="chip" style="background:var(--sk${s.cur.k});color:var(--sk${s.cur.k}i)">S${s.cur.n}</span></td>
@@ -2974,7 +3002,7 @@ function StudentDetail(){const r=tRoster().find(x=>x.id===tStudent);if(!r)return
     <div class="stack" style="gap:12px" id="t-msgs"><div class="row"><div class="eyebrow">Messages with ${esc(pr.name)}</div><span class="spacer"></span><span class="muted" style="font-size:12.5px">${msgsFor(r).length} total</span></div>
       <div class="threadbox">${Thread(msgsFor(r),'teacher')}</div>
       ${Composer('sm','Write to '+esc(pr.name),!!pr.email,pr.email?'Email goes to '+esc(pr.email)+'. Their reply arrives here.':'Add an email address to also send by email.')}</div>
-    <div><div class="eyebrow" style="margin-bottom:8px">Hub progress by session</div><div class="mini12">${SESSIONS.map(x=>{const d=x.tasks.filter((_,i)=>tasks[x.n+':'+i]).length;return `<div style="--ci:var(--sk${x.k}i)" title="Session ${x.n}: ${d}/${x.tasks.length}"><i style="height:${d/x.tasks.length*100}%"></i><span style="position:relative">${x.n}</span></div>`}).join('')}</div></div>
+    <div><div class="eyebrow" style="margin-bottom:8px">Hub progress by session</div><div class="mini12">${SESSIONS.map(x=>{const pp=sessionProgress(x,r.res||{});const d=pp.done;return `<div style="--ci:var(--sk${x.k}i)" title="Session ${x.n}: ${d}/${pp.total} practice steps"><i style="height:${pp.pct}%"></i><span style="position:relative">${x.n}</span></div>`}).join('')}</div></div>
     ${TMockPanel(r)}
     <div class="grid g2">
       <div class="stack" style="gap:10px"><div class="eyebrow">Writing submissions</div>${subs.length?subs.map(x=>`<details class="subm"><summary>Session ${esc(x.n)} · ${esc(WRITE[x.t]?WRITE[x.t].title:(x.v.task?'Email task reply: '+x.v.task:x.t))} · ${x.v.words||0} words${x.v.ai?` · <b>AI level ${clampL(x.v.ai.overall_level)}</b>`:''}${x.v.self?` · self ${(x.v.self/20).toFixed(1)}/5`:''}</summary><pre>${esc(x.v.text)}</pre>${x.v.ai?AIFeedback(x.v.ai,WRITE[x.t]):''}</details>`).join(''):'<p class="muted">No writing submitted yet.</p>'}</div>
