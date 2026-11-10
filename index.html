@@ -751,6 +751,7 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 .tool .tool-head.inner h3{display:none}
 .tool.closed .tool-head.inner,.tool.closed .step-intro,.tool.closed .step-next{display:none}
 .tool.fresh .tool-head.inner,.tool.fresh .tool-body{display:none}
+.tool.closed .mock-bar.inner,.tool.fresh .mock-bar.inner{display:none}.tool .mock-bar.inner{margin:0}
 .tool:not(.fresh) .step-intro{display:none}
 .step-intro{padding:18px}
 .si-box{background:var(--c);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
@@ -791,7 +792,9 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 .mk-sel{font:inherit;font-size:14px;padding:4px 6px;border:1.5px solid #9AA5B8;border-radius:4px;background:var(--surface);color:var(--fg);max-width:100%}
 .mk-rq{display:flex;flex-direction:column;gap:6px}.mk-rq .qt{font-weight:600}
 .sp-tool .mock-bar{position:static;border-radius:0;border:0;border-bottom:1px solid var(--line)}
-.sp-head{display:flex;flex-direction:column;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--line)}.sp-head .sp-prompt{border:0;padding:0}
+.sp-head{display:flex;flex-direction:column;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--line)}.sp-head .mk-rowq{display:flex;flex-direction:column;gap:4px}.mk-rowq .why{font-size:13px}
+.mk-sel.ok{border-color:var(--good);background:var(--hub-soft)}.mk-sel.no{border-color:var(--bad)}
+.sp-prompt{border:0;padding:0}
 .sp-q{margin:0 0 0 26px;font-size:16.5px;line-height:1.55}
 .sp-instr{padding:6px 4px;font-size:16px}.sp-instr p,.sp-instr ol{margin:0 0 10px 26px}
 .sp-split{display:grid;grid-template-columns:1.25fr 1fr;gap:18px;align-items:start}.sp-split .sp-box{width:100%;margin:0}
@@ -1694,7 +1697,7 @@ function buildSteps(s){stepCleanup();
   const firstOpen=()=>{const k=s.tools.findIndex(t=>!isDone(t));return k};
   const render=i=>{const t=s.tools[i],host=hosts[i];started[t]=false;
     if(QUIZ[t])Quiz(host,s,t);else if(WRITE[t])Writer(host,s,t);else if(SPEAK[t])Speaker(host,s,t);else if(t==='READY')Ready(host);else if(t==='DIAG')Diag(host);else if(/^MK\d+/.test(t))MockStep(host,t)};
-  const decorate=i=>{const t=s.tools[i],host=hosts[i],card=host.querySelector('.tool'),head=host.querySelector('.tool-head');if(!card||!head||card.querySelector('.step-head'))return;
+  const decorate=i=>{const t=s.tools[i],host=hosts[i],card=host.querySelector('.tool'),head=host.querySelector('.tool-head')||host.querySelector('.tool > .mock-bar');if(!card||!head||card.querySelector('.step-head'))return;
     const m=stepMeta(t);head.classList.add('inner');head.removeAttribute('role');
     const sh=document.createElement('div');sh.className='step-head';sh.setAttribute('role','button');sh.tabIndex=0;
     card.prepend(sh);
@@ -1916,19 +1919,25 @@ function Quiz(host,s,key){
   const prior=results()[rk];
   let remaining=q.minutes*60,timerId=null,submitted=false,played=false;
   const kindLabel={listen:'Single-play listening',read:'Timed reading',mc:'Self-grading drill'}[q.kind];
-  host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">${kindLabel}</span><h3>${esc(q.title)}</h3><span class="spacer"></span>
-   ${prior?`<span class="chip good">Last score ${prior.score}/${prior.total}</span>`:''}${q.minutes?`<span class="timer" data-timer>${fmt(remaining)}</span>`:''}</div>
+  const testLook=q.kind==='read'||q.kind==='listen';const tfmt=s=>testLook?fmtLeft(s):fmt(s);
+  host.innerHTML=`<div class="tool${testLook?' sp-tool':''}">${testLook
+   ?`<div class="mock-bar test"><div class="mb-t"><b>${esc(q.title)}</b><span>${kindLabel}${prior?` · Last score ${prior.score}/${prior.total}`:''}</span></div><span class="spacer"></span>${q.minutes?`<span class="mb-time">Time remaining: <span class="timer" data-timer>${tfmt(remaining)}</span></span>`:''}</div>`
+   :`<div class="tool-head"><span class="chip hub">${kindLabel}</span><h3>${esc(q.title)}</h3><span class="spacer"></span>
+   ${prior?`<span class="chip good">Last score ${prior.score}/${prior.total}</span>`:''}${q.minutes?`<span class="timer" data-timer>${fmt(remaining)}</span>`:''}</div>`}
    <div class="tool-body">
-   ${q.kind==='listen'?`<p class="muted">${esc(q.context)}</p><div class="player" data-player><button class="btn hub" data-play>▶ Play audio (plays once)</button><div class="wave">${'<i></i>'.repeat(14)}</div><span class="muted" data-pstatus style="font-size:13px">Questions unlock after the audio ends.</span></div>`:''}
-   ${q.kind==='read'?`<div class="splitread"><div class="passage">${q.passage}</div><div class="stack" data-qs></div></div>`:''}
+   ${q.kind==='listen'?`<p class="mk-info sp-prompt"><span class="i" aria-hidden="true">i</span><span>${esc(q.context)}</span></p><div class="player" data-player><button class="btn hub" data-play>▶ Play audio (plays once)</button><div class="wave">${'<i></i>'.repeat(14)}</div><span class="muted" data-pstatus style="font-size:13px">Questions unlock after the audio ends.</span></div>`:''}
+   ${q.kind==='read'?`<div class="mk-panes"><div class="mk-left"><p class="mk-info"><span class="i" aria-hidden="true">i</span><span>Read the following passage.</span></p><div class="mk-text">${q.passage}</div></div>
+     <div class="mk-right"><p class="mk-info"><span class="i" aria-hidden="true">i</span><span>Using the drop-down menu (▾), choose the best option according to the information given.</span></p><div class="mk-box" data-qs></div></div></div>`:''}
    ${q.kind==='mc'?`<p class="muted">${esc(q.context)}</p>`:''}
    ${q.kind!=='read'?`<div class="stack" data-qs ${q.kind==='listen'?'hidden':''}></div>`:''}
    <div class="row"><button class="btn primary" data-submit ${q.kind==='listen'?'hidden':''}>Submit answers</button><span class="spacer"></span><button class="btn" data-retake hidden>Retake</button></div>
    <div data-out></div></div></div>`;
   const qsEl=host.querySelector('[data-qs]');
-  qsEl.innerHTML=q.qs.map((x,i)=>`<fieldset class="q" style="border:0;margin:0;padding-inline:0"><legend class="qt">${i+1}. ${esc(x.q)}</legend>${x.o.map((o,j)=>`<label class="opt" data-opt="${i}-${j}"><input type="radio" name="${rk}-q${i}" value="${j}"><span>${esc(o)}</span></label>`).join('')}<div class="why" data-why="${i}" hidden></div></fieldset>`).join('');
+  const selName=i=>CSS.escape(rk+'-q'+i);
+  if(q.kind==='read')qsEl.innerHTML=q.qs.map((x,i)=>`<div class="mk-rowq"><label class="mk-row">${i+1}. ${esc(x.q)} <select class="mk-sel" name="${esc(rk+'-q'+i)}"><option value=""></option>${x.o.map((o,j)=>`<option value="${j}">${esc(o)}</option>`).join('')}</select></label><div class="why" data-why="${i}" hidden></div></div>`).join('');
+  else qsEl.innerHTML=q.qs.map((x,i)=>`<fieldset class="q" style="border:0;margin:0;padding-inline:0"><legend class="qt">${i+1}. ${esc(x.q)}</legend>${x.o.map((o,j)=>`<label class="opt" data-opt="${i}-${j}"><input type="radio" name="${rk}-q${i}" value="${j}"><span>${esc(o)}</span></label>`).join('')}<div class="why" data-why="${i}" hidden></div></fieldset>`).join('');
   const timerEl=host.querySelector('[data-timer]');
-  const startTimer=()=>{if(!q.minutes||timerId)return;timerId=every(()=>{remaining--;if(timerEl){timerEl.textContent=fmt(Math.max(0,remaining));timerEl.classList.toggle('low',remaining<=60)}if(remaining<=0){clearInterval(timerId);grade(true)}},1000)};
+  const startTimer=()=>{if(!q.minutes||timerId)return;timerId=every(()=>{remaining--;if(timerEl){timerEl.textContent=tfmt(Math.max(0,remaining));timerEl.classList.toggle('low',remaining<=60)}if(remaining<=0){clearInterval(timerId);grade(true)}},1000)};
   if(q.kind==='read'){if(host.querySelector('.step-head')||host.dataset.retake)startTimer();else host.addEventListener('stepstart',startTimer,{once:true})}
   if(q.kind==='mc'){}
   const play=host.querySelector('[data-play]');
@@ -1940,11 +1949,13 @@ function Quiz(host,s,key){
   function showTranscript(){if(host.querySelector('[data-transcript]'))return;const d=document.createElement('div');d.className='transcript';d.dataset.transcript='';d.innerHTML='<div class="eyebrow" style="margin-bottom:6px">Transcript</div>'+q.audio.map(([w,t])=>`<p><b>${esc(w)}:</b> ${esc(t)}</p>`).join('');host.querySelector('[data-out]').before(d)}
   host.querySelector('[data-submit]').addEventListener('click',()=>grade(false));
   function grade(auto){if(submitted)return;submitted=true;if(timerId)clearInterval(timerId);let score=0;
-    q.qs.forEach((x,i)=>{const sel=host.querySelector(`input[name="${CSS.escape(rk+'-q'+i)}"]:checked`);const v=sel?+sel.value:-1;
-      host.querySelectorAll(`input[name="${CSS.escape(rk+'-q'+i)}"]`).forEach(r=>r.disabled=true);
-      host.querySelector(`[data-opt="${i}-${x.a}"]`).classList.add('right');if(v===x.a)score++;else{if(v>=0)host.querySelector(`[data-opt="${i}-${v}"]`).classList.add('wrong');
+    q.qs.forEach((x,i)=>{let v=-1;
+      if(q.kind==='read'){const el=host.querySelector(`select[name="${selName(i)}"]`);v=el.value===''?-1:+el.value;el.disabled=true;el.classList.add(v===x.a?'ok':'no')}
+      else{const sel=host.querySelector(`input[name="${selName(i)}"]:checked`);v=sel?+sel.value:-1;host.querySelectorAll(`input[name="${selName(i)}"]`).forEach(r=>r.disabled=true);
+        host.querySelector(`[data-opt="${i}-${x.a}"]`).classList.add('right');if(v!==x.a&&v>=0)host.querySelector(`[data-opt="${i}-${v}"]`).classList.add('wrong')}
+      if(v===x.a)score++;else{
         addLog({session:s.n,skill:q.kind==='read'?'Reading':q.kind==='listen'?'Listening':'Drill',item:`${q.title}: Q${i+1} ${x.q}`,yours:v>=0?x.o[v]:'(no answer)',correct:x.o[x.a]})}
-      const w=host.querySelector(`[data-why="${i}"]`);w.textContent=x.why;w.hidden=false});
+      const w=host.querySelector(`[data-why="${i}"]`);w.textContent=(q.kind==='read'?(v===x.a?'✓ Correct. ':`✗ Answer: ${x.o[x.a].replace(/[.!?]$/,'')}. `):'')+x.why;w.hidden=false});
     const pct=Math.round(score/q.qs.length*100);const r=results();r[rk]={score,total:q.qs.length,pct,at:Date.now()};store.set('res',r);
     if(q.kind==='listen')showTranscript();
     host.querySelector('[data-submit]').hidden=true;host.querySelector('[data-retake]').hidden=false;
