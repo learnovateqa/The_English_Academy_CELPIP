@@ -833,18 +833,72 @@ hr.mock-sep{border:0;border-top:2px dashed var(--line);margin:14px 0}
 .hello .wave-hand{display:inline-block;transform-origin:70% 70%;animation:wave 1.6s ease-in-out 2}
 @keyframes wave{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(14deg)}20%,40%{transform:rotate(-8deg)}}
 @media (prefers-reduced-motion:reduce){.hello .wave-hand{animation:none}}
+
+/* ===== motion + interface polish ===== */
+@property --p{syntax:'<number>';inherits:true;initial-value:0}
+.ring{transition:--p 1s cubic-bezier(.2,.8,.2,1)}
+.nic{display:none;flex:none}
+nav.main a{display:inline-flex;align-items:center;gap:6px;transition:background .2s,color .2s,box-shadow .2s}
+nav.main a:not([aria-current="page"]):hover{background:color-mix(in srgb,var(--surface) 70%,transparent);color:var(--fg)}
+.page-in>.stack>*,.page-in>.tlogin>*,.page-in>div>section{animation:rise .55s cubic-bezier(.2,.8,.2,1) both}
+.page-in>.stack>*:nth-child(2){animation-delay:.05s}.page-in>.stack>*:nth-child(3){animation-delay:.1s}.page-in>.stack>*:nth-child(4){animation-delay:.15s}
+.page-in>.stack>*:nth-child(5){animation-delay:.2s}.page-in>.stack>*:nth-child(n+6){animation-delay:.24s}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.8,.2,1);transition-delay:var(--d,0s)}
+.rv.in{opacity:1;transform:none}
+.grow .bar-fill,.grow .pbar i,.grow .mini12 i{animation:grow 1s cubic-bezier(.2,.8,.2,1) both;transform-origin:left}
+.grow .mini12 i{transform-origin:bottom;animation-name:growy}
+@keyframes grow{from{transform:scaleX(0)}}@keyframes growy{from{transform:scaleY(0)}}
+.grow .rung{animation:rungup .8s cubic-bezier(.3,1.4,.5,1) both;transform-origin:bottom;animation-delay:calc(var(--i,0)*70ms + .2s)}
+@keyframes rungup{from{transform:scaleY(0);opacity:0}}
+.grow .rung.on{animation-name:rungup,glow;animation-duration:.8s,2.4s;animation-delay:calc(var(--i,0)*70ms + .2s),1.4s;animation-iteration-count:1,3}
+@keyframes glow{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--live) 22%,transparent)}}
+.hero-art .scene,.hero2 .scene{animation:float 6s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-6px)}}
+.chip.good,.rchip.good{animation:pop .45s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+.btn:active{transform:translateY(0) scale(.97)}
+.tool .step-head{transition:background .2s}.tool .step-head:hover{background:color-mix(in srgb,var(--surface-2) 60%,transparent)}
+.tool:not(.closed) .tool-body{animation:rise .4s cubic-bezier(.2,.8,.2,1) both}
+.mock-sec{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px}.mock-sec b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mock-sec .spacer{display:none}
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);opacity:0;z-index:60;background:#14213D;color:#fff;padding:12px 20px;border-radius:999px;font-weight:600;box-shadow:0 12px 32px rgba(0,0,0,.25);transition:.4s cubic-bezier(.2,.8,.2,1);pointer-events:none;max-width:calc(100vw - 32px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:59;overflow:hidden}
+.confetti i{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:fall var(--t,1.8s) cubic-bezier(.25,.6,.4,1) forwards}
+@keyframes fall{to{transform:translate(var(--x,0),105vh) rotate(var(--r,540deg));opacity:.9}}
+@media (max-width:760px){
+  header.bar{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--surface)!important}
+  header.bar .wrap{flex-wrap:nowrap;gap:10px}
+  #signout{margin-left:auto}
+  header.bar .brand-t small{display:none}
+  .sync{font-size:0;padding:6px;gap:0}.sync::before{width:9px;height:9px}
+  nav.main:not([hidden]){position:fixed;left:0;right:0;bottom:0;z-index:30;margin:0;border-radius:18px 18px 0 0;display:flex;flex-wrap:nowrap;justify-content:space-around;gap:0;
+    padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px));background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 -6px 24px rgba(20,33,61,.12);border-top:1px solid var(--line)}
+  nav.main a{flex:1 1 0;min-width:0;flex-direction:column;gap:2px;padding:6px 2px;border-radius:12px;font-size:10.5px;line-height:1.1;text-align:center;position:relative;color:var(--muted)!important;background:none!important;box-shadow:none!important}
+  nav.main a span:not(.badge){white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  nav.main a[aria-current="page"]{color:var(--fg)!important}
+  nav.main a[aria-current="page"] .nic{background:#14213D;color:#fff;border-radius:999px;padding:3px 14px;width:auto;box-sizing:content-box}
+  nav.main .nic{display:block}
+  nav.main .d-only{display:none}
+  nav.main .badge{position:absolute;top:2px;left:calc(50% + 6px)}
+  body:has(nav.main:not([hidden])) main,body:has(nav.main:not([hidden])) footer{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+  body:has(nav.main:not([hidden])) .toast{bottom:96px}
+  .upnext{flex-wrap:wrap}.upnext .btn{flex:1 1 100%;justify-content:center}
+}
+@media print{.rv{opacity:1!important;transform:none!important}.toast,.confetti{display:none}nav.main{display:none!important}}
+@media (prefers-reduced-motion:reduce){.page-in *,.rv,.grow *,.toast,.confetti i,.hero-art .scene,.hero2 .scene,.chip.good,.rchip.good,.tool .tool-body{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.ring{transition:none}}
 </style>
 </head>
 <body>
 <header class="bar"><div class="wrap">
   <a class="brand" href="#home"><span class="logo" aria-hidden="true"><svg width="26" height="26" viewBox="0 0 32 32"><rect x="5" y="20" width="4" height="7" rx="1" fill="#00B4B4"/><rect x="11" y="16" width="4" height="11" rx="1" fill="#FF5A36"/><rect x="17" y="12" width="4" height="15" rx="1" fill="#8338EC"/><rect x="23" y="7" width="4" height="20" rx="1" fill="#1F7BFF"/><circle cx="25" cy="4" r="2.4" fill="#FFC300"/></svg></span><span class="brand-t"><b>CELPIP Prep Course</b><small>Elevate with Ms. Maria</small></span></a>
   <nav class="main" aria-label="Main" hidden>
-    <a href="#home" data-nav="home" id="nav-home">My Dashboard</a>
-    <a href="#syllabus" data-nav="syllabus">Syllabus</a>
-    <a href="#mocks" data-nav="mocks">Mock Tests</a>
-    <a href="#log" data-nav="log" id="nav-log">Error Log</a>
-    <a href="#messages" data-nav="messages" id="nav-msg" hidden>Messages <span class="badge" id="msg-badge" hidden></span></a>
-    <a href="#teacher" data-nav="teacher" id="nav-teacher" hidden>Teacher Portal</a>
+    <a href="#home" data-nav="home"><svg class="nic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span id="nav-home">My Dashboard</span></a>
+    <a href="#syllabus" data-nav="syllabus"><svg class="nic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span>Syllabus</span></a>
+    <a href="#mocks" data-nav="mocks"><svg class="nic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 11l2 2 4-4M9 17h6"/></svg><span>Mock Tests</span></a>
+    <a href="#log" data-nav="log" id="nav-log"><svg class="nic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span>Error Log</span></a>
+    <a href="#messages" data-nav="messages" id="nav-msg" hidden><svg class="nic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v11H8l-4 4z"/></svg><span>Messages</span> <span class="badge" id="msg-badge" hidden></span></a>
+    <a href="#teacher" data-nav="teacher" id="nav-teacher-a" hidden><svg class="nic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5c1.6.8 2.6 2.6 3 5.5"/></svg><span id="nav-teacher">Teacher Portal</span></a>
   </nav>
   <span id="sync" class="sync" hidden></span>
   <a class="ibtn" href="#teacher" id="tp-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg><span>Teacher portal</span></a>
@@ -910,9 +964,9 @@ function updateSyncBadge(){const el=document.getElementById('sync');if(!el)retur
     offline:['Offline · saved on this device','warn'],revoked:['Access code no longer active','warn']};
   const [t,c]=M[cloud.code?cloud.state:(cloud.tpass?'teacher':'local')]||M.local;el.textContent=t;el.className='sync '+c}
 function renderNav(){const signed=!!(cloud.code||cloud.tpass);
-  document.querySelector('nav.main').hidden=!signed;document.getElementById('nav-teacher').hidden=!cloud.tpass;
+  document.querySelector('nav.main').hidden=!signed;document.getElementById('nav-teacher-a').hidden=!cloud.tpass;
   document.getElementById('signout').hidden=!signed;document.getElementById('tp-btn').hidden=signed;document.getElementById('sync').hidden=!signed;document.getElementById('nav-msg').hidden=!cloud.code;
-  const T=!!cloud.tpass&&!cloud.code;document.getElementById('nav-home').textContent=T?'Teaching':'My Dashboard';document.getElementById('nav-log').hidden=T;document.getElementById('nav-teacher').textContent=T?'Students & Batches':'Teacher Portal';updateSyncBadge();updateMsgBadge()}
+  const T=!!cloud.tpass&&!cloud.code;document.getElementById('nav-home').innerHTML=T?'Teaching':'<span class="d-only">My </span>Dashboard';document.getElementById('nav-log').hidden=T;document.getElementById('nav-teacher').innerHTML=T?'Students<span class="d-only"> &amp; Batches</span>':'Teacher<span class="d-only"> Portal</span>';updateSyncBadge();updateMsgBadge()}
 function curRoute(){const h=(location.hash||'#home').slice(1);return h.startsWith('session-')?'session':(['syllabus','log','teacher','messages','mocks','templates'].includes(h)?h:h.startsWith('mock-')?'mocks':'home')}
 let pendingRefresh=false;
 function refreshIf(rs){if(!rs.includes(curRoute()))return;const a=document.activeElement;
@@ -1774,7 +1828,9 @@ function buildSteps(s){stepCleanup();
   hosts.forEach((host,i)=>{render(i);decorate(i);
     const mo=new MutationObserver(()=>{if(!host.querySelector('.step-head')){const t=s.tools[i];decorate(i);started[t]=true;paint(i)}});mo.observe(host,{childList:true});
     host._mo=mo});
-  const onRes=()=>{s.tools.forEach((_,i)=>paint(i));paintPath();const sp=document.getElementById('sprog');if(sp)sp.innerHTML=SessProgress(s)};addEventListener('bcs-res',onRes);
+  let lastDone=sessionProgress(s).done;
+  const onRes=()=>{s.tools.forEach((_,i)=>paint(i));paintPath();const sp=document.getElementById('sprog');if(sp){sp.innerHTML=SessProgress(s);sp.querySelectorAll('.ring').forEach(fillRing)}
+    const p=sessionProgress(s);if(p.done>lastDone&&typeof celebrate==='function'){if(p.pct===100)celebrate(`Session ${s.n} complete! Great work 🎉`);else toast(`Step done · ${p.done} of ${p.total} ✓`)}lastDone=p.done};addEventListener('bcs-res',onRes);
   stepCleanup=()=>{removeEventListener('bcs-res',onRes);hosts.forEach(h=>h&&h._mo&&h._mo.disconnect())};
   const k=firstOpen();setOpen(k,false);paintPath()}
 
@@ -3100,6 +3156,34 @@ function bindLog(){app.querySelectorAll('select[data-id]').forEach(sel=>sel.addE
   const c=app.querySelector('[data-clear]');if(c){const box=app.querySelector('[data-confirm]');c.addEventListener('click',()=>box.hidden=false);
     app.querySelector('[data-no]').addEventListener('click',()=>box.hidden=true);app.querySelector('[data-yes]').addEventListener('click',()=>{store.set('log',[]);view()})}}
 
+
+/* ---------- motion: page entrance, scroll reveal, growing bars, counters, celebrations ---------- */
+const RMOTION=matchMedia('(prefers-reduced-motion: reduce)');
+let revealIO=null;
+function countUp(el){const m=String(el.textContent).match(/^(\D*)(\d+)(.*)$/);if(!m||el.dataset.counted)return;el.dataset.counted='1';const to=+m[2];if(!to)return;const t0=performance.now(),dur=900;
+  const step=now=>{const k=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-k,3);el.textContent=m[1]+Math.round(to*e)+m[3];if(k<1)requestAnimationFrame(step)};el.textContent=m[1]+'0'+m[3];requestAnimationFrame(step)}
+function fillRing(r){const v=getComputedStyle(r).getPropertyValue('--p');r.style.setProperty('--p','0');void r.offsetWidth;requestAnimationFrame(()=>r.style.setProperty('--p',String(parseFloat(v)||0)))}
+function motion(root){if(RMOTION.matches||!root)return;
+  root.classList.remove('page-in','grow');void root.offsetWidth;root.classList.add('page-in','grow');
+  root.querySelectorAll('.rung').forEach((r,i)=>r.style.setProperty('--i',i));
+  if(revealIO)revealIO.disconnect();
+  const live=el=>{el.querySelectorAll('.ring').forEach(fillRing);if(el.matches('.tile b,.rep-lv b'))countUp(el);el.querySelectorAll('.tile b,.rep-lv b').forEach(countUp)};
+  revealIO=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;e.target.classList.add('in');live(e.target);revealIO.unobserve(e.target)}),{rootMargin:'0px 0px -8% 0px'});
+  const H=innerHeight;
+  root.querySelectorAll('.panel,.skcard,.qtile,.srow,.tile,.mock-sec,.tpl-card,.phase-head,.strip a,.stephost,.recent li,.sess tbody tr').forEach(el=>{
+    if(el.closest('.rv')&&el.closest('.rv')!==el)return;const top=el.getBoundingClientRect().top;
+    if(top>H*.92){el.classList.add('rv');const sib=[...el.parentElement.children].indexOf(el);el.style.setProperty('--d',(sib%6)*60+'ms');revealIO.observe(el)}
+    else live(el)});
+  root.querySelectorAll('.tile b,.rep-lv b').forEach(b=>{if(!b.closest('.rv'))countUp(b)})}
+addEventListener('beforeprint',()=>document.querySelectorAll('.rv').forEach(e=>e.classList.add('in')));
+{const v0=view;view=function(soft){v0(soft);if(!soft)motion(app)}}
+function toast(msg){let t=document.querySelector('.toast');if(!t){t=document.createElement('div');t.className='toast';t.setAttribute('role','status');document.body.appendChild(t)}
+  t.textContent=msg;requestAnimationFrame(()=>t.classList.add('show'));clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),3200)}
+function celebrate(msg){if(msg)toast(msg);if(RMOTION.matches)return;const box=document.createElement('div');box.className='confetti';box.setAttribute('aria-hidden','true');
+  const cols=['#00B4B4','#FF5A36','#8338EC','#1F7BFF','#FFC300','#17803D'];
+  for(let i=0;i<70;i++){const c=document.createElement('i');c.style.left=Math.random()*100+'vw';c.style.background=cols[i%cols.length];
+    c.style.setProperty('--x',(Math.random()*160-80)+'px');c.style.setProperty('--r',(Math.random()*900-450)+'deg');c.style.setProperty('--t',(1.4+Math.random()*1.2)+'s');c.style.animationDelay=Math.random()*.35+'s';box.appendChild(c)}
+  document.body.appendChild(box);setTimeout(()=>box.remove(),3200)}
 window.addEventListener('hashchange',()=>view());
 try{speechSynthesis.getVoices()}catch(e){}
 initCloud();
