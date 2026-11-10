@@ -93,11 +93,21 @@ After a student submits a writing task, Claude (Anthropic's AI model) scores it 
 - **Email access code:** when you add a student with an email address, you can email their code right away. The same button is also on each student's page.
 - **Get emailed about student messages (optional):** use **CELPIP Course → Email me when students write: on/off**.
 
+## Mock test scoring (like the real CELPIP)
+
+- **Listening and Reading** are scored automatically. The raw score out of 38 is converted to an estimated CELPIP level with CELPIP's approximate chart (it varies slightly between real test forms).
+- **Writing and Speaking** are rated by you. Open **Students & Batches**, pick a student, and open **Mock tests**. For each task, choose a level (M–12) for the four CELPIP criteria: Content/Coherence, Vocabulary, Readability (Writing) or Listenability (Speaking), and Task Fulfillment. The section level is the average, shown once every task is rated.
+- Mock test Speaking recordings are uploaded automatically to your Google Drive, in **CELPIP Course Recordings**, with one folder per student. The **Listen** button in the rating panel opens each one. Students can also send practice recordings with **Send to my teacher**.
+- Students see a printable **Score report** for each mock: four separate levels with descriptors and CLB equivalents, your ratings by task, and your comments. Like the real report, there is no overall score.
+
+These features need the latest `Code.gs` (see below). The first time, Google asks you to allow **Google Drive** access for the recordings.
+
 ## Updating to a new version of Code.gs
 
 1. In Apps Script, select all of the old code and replace it with the new `apps-script/Code.gs`. Save.
 2. Reload the Sheet and use **CELPIP Course → Set up sheets** to add any new tabs.
 3. Go to **Deploy → Manage deployments → ✏️ Edit**. Set Version to **New version**, then click **Deploy**. The URL stays the same, so the website needs no change.
+4. If the new version uses a new Google service (for example Google Drive for Speaking recordings), choose the `setup` function in the editor toolbar and click **Run** once. Google asks you to review and allow the new permission.
 
 ## Good to know
 
