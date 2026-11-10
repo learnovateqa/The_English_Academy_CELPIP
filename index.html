@@ -769,12 +769,26 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 .mock-ctx{background:var(--surface-2);border-radius:12px;padding:10px 14px;font-size:14.5px}
 .mock-parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}.mock-parts div{display:flex;justify-content:space-between;gap:8px;align-items:center;background:var(--surface);border-radius:10px;padding:8px 12px;font-size:13.5px}
 .mock-rev{display:flex;flex-direction:column;gap:8px}.mock-q{display:flex;flex-direction:column;gap:2px;padding:8px 12px;border-radius:10px;font-size:14px;border-left:4px solid var(--good);background:var(--surface-2)}.mock-q.no{border-left-color:var(--bad)}
-.mock-bar.test{background:#14213D;color:#fff;border-radius:12px;padding:10px 14px}.mock-bar.test .muted{color:#cbd3e6}
-.mb-t{display:flex;flex-direction:column;line-height:1.3}.mb-t span{font-size:12px;color:#cbd3e6}
-.mb-time{font-size:12.5px;color:#cbd3e6;display:flex;align-items:center;gap:8px}.mb-time .timer{background:#fff;color:#14213D;border:0}
-.btn.mb-next{background:#fff;color:#14213D;border-color:#fff;font-weight:700;letter-spacing:.06em}
-.mk-blank{display:inline-flex;align-items:center;gap:4px;margin:0 2px}.mk-blank select{max-width:230px}
-.mk-sel{font:inherit;font-size:14px;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg);max-width:100%}
+:root{--mk-bar:#E4E8EE;--mk-left:#F1F3F6;--mk-right:#E2F1F3;--mk-box:#FFFFFF;--mk-info:#1F5FA8;--mk-next:#1F6FC5}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--mk-bar:#1d2a4d;--mk-left:#16213f;--mk-right:#143340;--mk-box:#0e1730;--mk-info:#8DBBF0;--mk-next:#2F7FD4}}
+:root[data-theme="dark"]{--mk-bar:#1d2a4d;--mk-left:#16213f;--mk-right:#143340;--mk-box:#0e1730;--mk-info:#8DBBF0;--mk-next:#2F7FD4}
+.mock-bar.test{background:var(--mk-bar);color:var(--fg);border-radius:10px;padding:10px 14px;border:1px solid var(--line)}
+.mb-t{display:flex;flex-direction:column;line-height:1.3}.mb-t b{font-weight:600}.mb-t span{font-size:12px;color:var(--muted)}
+.mb-time{font-size:14px;display:flex;align-items:center;gap:6px}.mb-time .timer{background:none;border:0;padding:0;font-weight:700;color:var(--fg)}.mb-time .timer.low{color:var(--bad)}
+.btn.mb-next{background:var(--mk-next);color:#fff;border-color:var(--mk-next);font-weight:700;letter-spacing:.06em;border-radius:6px;padding:8px 22px}
+.mk-panes{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+@media (max-width:760px){.mk-panes{grid-template-columns:1fr}}
+.mk-left,.mk-right{padding:16px 18px;max-height:74vh;overflow:auto;display:flex;flex-direction:column;gap:12px}
+.mk-left{background:var(--mk-left);border-right:1px solid var(--line)}.mk-right{background:var(--mk-right)}
+.mk-left table{width:100%}.mk-text p{margin:0 0 10px}.mk-text p:last-child{margin:0}
+.mk-info{display:flex;gap:8px;align-items:flex-start;color:var(--mk-info);font-size:14.5px;margin:0}
+.mk-info .i{flex:none;width:18px;height:18px;border-radius:50%;background:var(--mk-info);color:var(--mk-box);font:700 12px/18px Georgia,serif;text-align:center;margin-top:2px}
+.mk-box{background:var(--mk-box);border:1px solid var(--line);border-radius:4px;padding:12px 14px;display:flex;flex-direction:column;gap:12px}
+.mk-row{line-height:1.9}.mk-row .mk-sel{margin-left:4px}
+.mk-row.p3{display:flex;gap:8px;align-items:flex-start;line-height:1.5}.mk-row.p3 .mk-sel{margin:0;flex:none;width:64px}
+.mk-reply p{margin:0 0 10px;line-height:2}.mk-reply p:last-child{margin:0}
+.mk-blank{display:inline-flex;align-items:center;gap:4px;margin:0 2px}.mk-blank select{max-width:240px;min-width:110px}
+.mk-sel{font:inherit;font-size:14px;padding:4px 6px;border:1.5px solid #9AA5B8;border-radius:4px;background:var(--surface);color:var(--fg);max-width:100%}
 .mk-rq{display:flex;flex-direction:column;gap:6px}.mk-rq .qt{font-weight:600}
 hr.mock-sep{border:0;border-top:2px dashed var(--line);margin:14px 0}
 .mock-read .passage{max-height:72vh}
@@ -1718,11 +1732,12 @@ const MOCK_PRACTICE={
  L:{name:'Practice Task (not scored)',practice:true,ctx:'This practice task is not scored. It shows you how the Listening test works. You will hear a short conversation once.',
   audio:[['Woman','Excuse me, is this the line for the number nine bus?'],['Man','No, this is the line for the eleven. The nine stops across the street, in front of the bank.']],
   qs:[{q:'Where does the woman need to go?',o:['To the bank','Across the street','To the end of this line','Inside the station'],a:1,why:'"The nine stops across the street."'}]},
- R:{name:'Practice Task (not scored)',practice:true,minutes:2,passage:'<p>This practice task is not scored. It shows you how the Reading test works.</p><p><b>Notice:</b> The staff kitchen will be closed on Friday for cleaning. Please take your food out of the fridge by Thursday at 5 p.m.</p>',
-  qs:[{q:'What should staff do by Thursday?',o:['Clean the kitchen','Remove their food from the fridge','Bring lunch on Friday','Close the kitchen'],a:1,why:'"Please take your food out of the fridge by Thursday at 5 p.m."'}]},
+ R:{name:'Practice Task (not scored)',practice:true,minutes:2,passage:'<p><b>Notice:</b> The staff kitchen will be closed on Friday for cleaning. Please take your food out of the fridge by Thursday at 5 p.m.</p>',
+  qs:[{q:'By Thursday at 5 p.m., staff should',o:['clean the kitchen.','take their food out of the fridge.','bring lunch for Friday.','close the kitchen.'],a:1,why:'"Please take your food out of the fridge by Thursday at 5 p.m."'}]},
  S:{task:'Practice Task (not scored)',practice:true,prep:30,speak:60,prompt:'This practice task is not scored. Talk about something you enjoy doing in your free time. Why do you enjoy it?'}};
 Object.values(MOCKS).forEach(m=>{
-  (m.R||[]).forEach(p=>{if(p.screens){p.passage=p.screens.map(x=>x.passage).join('<hr class="mock-sep">');p.qs=p.screens.flatMap(x=>x.qs);delete p.screens}});
+  (m.R||[]).forEach(p=>{if(p.screens){p.passage=p.screens[0].passage;p.reply=p.screens.slice(1).map(x=>x.passage).join('');p.qs=p.screens.flatMap(x=>x.qs);delete p.screens}
+    else if(p.passage&&p.passage.includes('<p><b>Email:</b>')){const k=p.passage.indexOf('<p><b>Email:</b>');p.reply=p.passage.slice(k).replace('<b>Email:</b> ','');p.passage=p.passage.slice(0,k)}});
   if(m.L&&!m.L[0].practice)m.L.unshift(MOCK_PRACTICE.L);if(m.R&&!m.R[0].practice)m.R.unshift(MOCK_PRACTICE.R);if(m.S&&!m.S[0].practice)m.S.unshift(MOCK_PRACTICE.S)});
 const MOCK_SEC={L:['Listening','46–55 min'],R:['Reading','43–56 min'],W:['Writing','53 min'],S:['Speaking','about 15 min']};
 const MOCK_ORDER=['L','R','W','S'];
@@ -1748,6 +1763,7 @@ function MocksView(){const ids=Object.keys(MOCKS);
     :'<section class="panel"><p class="muted">Mock tests are not available yet.</p></section>'}</div>`}
 
 let mockRun=null;
+const fmtLeft=s=>s>60?`${Math.ceil(s/60)} minutes`:s>0?`${s} second${s===1?'':'s'}`:'0 seconds';
 function renderMock(id,sec){const m=MOCKS[id];if(!m||!m[sec]){app.innerHTML='<div class="panel"><p>Mock test not found. <a href="#mocks">Back to mock tests</a></p></div>';return}
   if(sec==='W'||sec==='S')return renderMockTasks(id,sec);
   const SK='mockst:'+id+':'+sec;const st=store.get(SK,null);const screens=mockScreens(id,sec);
@@ -1767,32 +1783,44 @@ function renderMock(id,sec){const m=MOCKS[id];if(!m||!m[sec]){app.innerHTML='<di
   const qid=(qi)=>`${cur.pi}-${cur.si}-${qi}`;
   const secs=listen?Math.max(60,sc.qs.length*40):Math.round((sc.minutes||p.minutes||10)*60);
   const nScreensInPart=(p.screens||[p]).length;const realN=screens.filter(x=>!x.part.practice).length,realI=screens.slice(0,st.i+1).filter(x=>!x.part.practice).length;
-  const opts=(x,qi)=>`<option value="">Select…</option>${x.o.map((o,j)=>`<option value="${j}" ${st.ans[qid(qi)]===j?'selected':''}>${esc(o)}</option>`).join('')}`;
-  let passage=sc.passage||'';const blanks=new Set();
-  if(!listen)sc.qs.forEach((x,qi)=>{if(x.n&&passage.includes(`<b>${x.n}</b>`)){blanks.add(qi);passage=passage.replace(`<b>${x.n}</b>`,`<span class="mk-blank"><b>${x.n}</b><select class="mk-sel" data-qi="${qi}" aria-label="Blank ${x.n}">${opts(x,qi)}</select></span>`)}});
-  let qn=0;
+  const kind=listen||p.practice?0:/Correspondence/.test(p.name)?1:/Diagram/.test(p.name)?2:/Information/.test(p.name)?3:/Viewpoints/.test(p.name)?4:0;
+  const opts=(x,qi,ph='Select…')=>`<option value="">${ph}</option>${x.o.map((o,j)=>`<option value="${j}" ${st.ans[qid(qi)]===j?'selected':''}>${esc(kind===3?o.charAt(0):o)}</option>`).join('')}`;
+  // Reading follows the official screen: the text on the left; instructions, questions and the reply/comment with blanks on the right
+  let readL='',readR='';
+  if(!listen){const doc=['notice','message','information','passage','article'][kind];
+    const info=s=>`<p class="mk-info"><span class="i" aria-hidden="true">i</span><span>${s}</span></p>`;
+    let reply=p.reply||'';const blanks=new Set();
+    sc.qs.forEach((x,qi)=>{if(x.n&&reply.includes(`<b>${x.n}</b>`)){blanks.add(qi);reply=reply.replace(`<b>${x.n}</b>`,`<span class="mk-blank"><select class="mk-sel" data-qi="${qi}" aria-label="Blank ${x.n}">${opts(x,qi,'')}</select></span>`)}});
+    const rows=sc.qs.map((x,qi)=>blanks.has(qi)?'':kind===3
+      ?`<label class="mk-row p3"><select class="mk-sel" data-qi="${qi}" aria-label="Statement ${qi+1}">${opts(x,qi,'')}</select><span>– ${qi+1}. ${esc(x.q)}</span></label>`
+      :`<label class="mk-row">${qi+1}. ${esc(x.q)} <select class="mk-sel" data-qi="${qi}">${opts(x,qi,'')}</select></label>`).join('');
+    const qBox=info(kind===3?'Decide which paragraph, A to D, has the information given in each statement below. Select E if the information is not given in any of the paragraphs.'
+      :`Using the drop-down menu (▾), choose the best option${kind===2?'.':` according to the information given in the ${doc}.`}`)+`<div class="mk-box">${rows}</div>`;
+    const rBox=reply?info(kind===1?'Here is a response to the message. Complete the response by choosing the best option to fill in the blanks.'
+      :kind===2?'Read the following email message about the information on the left. Complete the email by choosing the best option to fill in each blank.'
+      :'The following is a comment by a visitor to the website page. Complete the comment by choosing the best option to fill in each blank.')+`<div class="mk-box mk-reply">${reply}</div>`:'';
+    readL=info(kind===4?'Read the following article from a website.':`Read the following ${doc}.`)+`<div class="mk-text">${sc.passage||''}</div>`;
+    readR=blanks.has(0)?rBox+qBox:qBox+rBox}
+  const barTitle=p.practice?`${esc(m.title)} - ${MOCK_SEC[sec][0]} Practice Task`:`${esc(m.title)} - ${MOCK_SEC[sec][0]} ${esc(p.name.replace(' · ',': '))}`;
   app.innerHTML=`<div class="stack">${head}
-   <div class="mock-bar test" style="${skv(sec)}"><div class="mb-t"><b>${MOCK_SEC[sec][0]}${p.practice?'':''} · ${esc(p.name)}${nScreensInPart>1?` · Section ${cur.si+1} of ${nScreensInPart}`:''}</b><span>${p.practice?'Practice (not scored)':`Screen ${realI} of ${realN}`}</span></div><span class="spacer"></span><span class="mb-time">Time remaining <span class="timer" id="mk-timer"></span></span><button class="btn mb-next" id="mk-next" ${listen&&!st.played[st.i]?'hidden':''}>NEXT</button></div>
-   <section class="panel stack" style="gap:14px">
+   <div class="mock-bar test" style="${skv(sec)}"><div class="mb-t"><b>${barTitle}</b><span>${p.practice?'Practice (not scored)':`Screen ${realI} of ${realN}`}</span></div><span class="spacer"></span><span class="mb-time">Time remaining: <span class="timer" id="mk-timer"></span></span><button class="btn mb-next" id="mk-next" ${listen&&!st.played[st.i]?'hidden':''}>NEXT</button></div>
+   ${listen?`<section class="panel stack" style="gap:14px">
     ${sc.ctx||p.ctx?`<p class="mock-ctx">${sc.ctx||p.ctx}</p>`:''}
-    ${listen?`<div class="player" id="mk-player"><button class="btn hub" id="mk-play">▶ Play (plays once)</button><div class="wave">${'<i></i>'.repeat(14)}</div><span class="muted" id="mk-pst" style="font-size:13px">The questions appear after the recording.</span></div>`:''}
-    <div class="${listen?'':'splitread mock-read'}">${listen?'':`<div class="passage">${passage}</div>`}
-     <div class="stack" id="mk-qs" ${listen&&!st.played[st.i]?'hidden':''}>${sc.qs.map((x,qi)=>{if(blanks.has(qi))return '';qn++;
-       return listen?`<fieldset class="q" style="border:0;margin:0;padding-inline:0"><legend class="qt">${esc(x.q)}</legend>
-       ${x.o.map((o,j)=>`<label class="opt"><input type="radio" name="mk-${qid(qi)}" value="${j}" ${st.ans[qid(qi)]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}</fieldset>`
-       :`<label class="mk-rq"><span class="qt">${qn}. ${esc(x.q)}</span><select class="mk-sel" data-qi="${qi}">${opts(x,qi)}</select></label>`}).join('')}
-       ${!listen&&blanks.size?`<p class="muted" style="font-size:12.5px">Complete the blanks ${[...blanks].map(b=>sc.qs[b].n).join(' ')} in the text on the left.</p>`:''}</div></div>
-   </section></div>`;
+    <div class="player" id="mk-player"><button class="btn hub" id="mk-play">▶ Play (plays once)</button><div class="wave">${'<i></i>'.repeat(14)}</div><span class="muted" id="mk-pst" style="font-size:13px">The questions appear after the recording.</span></div>
+     <div class="stack" id="mk-qs" ${!st.played[st.i]?'hidden':''}>${sc.qs.map((x,qi)=>`<fieldset class="q" style="border:0;margin:0;padding-inline:0"><legend class="qt">${esc(x.q)}</legend>
+       ${x.o.map((o,j)=>`<label class="opt"><input type="radio" name="mk-${qid(qi)}" value="${j}" ${st.ans[qid(qi)]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}</fieldset>`).join('')}</div>
+   </section>`
+   :`${sc.ctx||p.ctx?`<p class="mock-ctx">${sc.ctx||p.ctx}</p>`:''}<div class="mk-panes mock-read"><div class="mk-left">${readL}</div><div class="mk-right" id="mk-qs">${readR}</div></div>`}</div>`;
   app.querySelectorAll('.mk-sel').forEach(el=>el.addEventListener('change',()=>{const s2=store.get(SK);const k=qid(+el.dataset.qi);if(el.value==='')delete s2.ans[k];else s2.ans[k]=+el.value;store.set(SK,s2)}));
   app.querySelectorAll('#mk-qs input').forEach(r=>r.addEventListener('change',()=>{const s2=store.get(SK);s2.ans[r.name.slice(3)]=+r.value;store.set(SK,s2)}));
   const timerEl=document.getElementById('mk-timer');
   let moved=false;const go=()=>{if(moved)return;moved=true;clearAll();const s2=store.get(SK);if(!s2||s2.i!==st.i)return renderMock(id,sec);s2.i++;s2.deadline=null;store.set(SK,s2);renderMock(id,sec);window.scrollTo(0,0)};
   const startTimer=()=>{let s2=store.get(SK);if(!s2.deadline){s2.deadline=Date.now()+secs*1000;store.set(SK,s2)}
-    const tick=()=>{const cur2=store.get(SK);if(moved||!cur2||!cur2.deadline||cur2.i!==st.i){clearInterval(iv);return}const left=Math.max(0,Math.round((cur2.deadline-Date.now())/1000));timerEl.textContent=fmt(left);timerEl.classList.toggle('low',left<=30);if(left<=0){clearInterval(iv);go()}};const iv=every(tick,1000);tick()};
+    const tick=()=>{const cur2=store.get(SK);if(moved||!cur2||!cur2.deadline||cur2.i!==st.i){clearInterval(iv);return}const left=Math.max(0,Math.round((cur2.deadline-Date.now())/1000));timerEl.textContent=fmtLeft(left);timerEl.classList.toggle('low',left<=30);if(left<=0){clearInterval(iv);go()}};const iv=every(tick,1000);tick()};
   document.getElementById('mk-next').onclick=()=>{const unanswered=sc.qs.filter((_,qi)=>store.get(SK).ans[qid(qi)]==null).length;
     if(unanswered&&!confirm(`${unanswered} question${unanswered>1?'s are':' is'} not answered. A guess cannot lose points. Go on anyway?`))return;go()};
   if(!listen){startTimer();return}
-  timerEl.textContent=fmt(secs);
+  timerEl.textContent=fmtLeft(secs);
   const reveal=()=>{const s2=store.get(SK);s2.played[st.i]=true;store.set(SK,s2);document.getElementById('mk-player').classList.remove('playing');document.getElementById('mk-pst').textContent='Recording finished. Answer the questions.';
     document.getElementById('mk-qs').hidden=false;document.getElementById('mk-next').hidden=false;startTimer()};
   if(st.played[st.i]){document.getElementById('mk-play').disabled=true;document.getElementById('mk-pst').textContent='This recording has already played.';startTimer();return}
