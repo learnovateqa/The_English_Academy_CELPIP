@@ -1571,7 +1571,10 @@ const TTS=(()=>{
   const NOVELTY=/^(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Deranged|Good News|Hysterical|Jester|Junior|Organ|Superstar|Trinoids|Whisper|Wobble|Zarvox|Fred|Ralph|Kathy|Princess|Grandma|Grandpa|Eddy|Flo|Reed|Rocko|Sandy|Shelley)\b/i;
   const FEM=/female|google us english|samantha|karen|moira|tessa|victoria|allison|ava\b|susan|zira|aria|jenny|clara|libby|sonia|serena|fiona|catherine|nicky|emma|michelle|natasha|hazel|kate\b|zoe|linda|heather|nora|olivia|sara|amy|joanna|kendra|kimberly|salli|ivy|ruth|nancy|sonia|maisie|isla|sienna/i;
   const MAL=/\bmale|richard|daniel|alex\b|tom\b|oliver|david|mark\b|guy\b|ryan|liam|arthur|aaron|evan|nathan|thomas|george|james|rishi|christopher|eric|andrew|brian|william|matthew|roger|steffan|joey|justin|kevin|stephen|connor|elliot|davis|tony|jason|reed/i;
-  const GENDER={Dana:'f',Okafor:'m',Mei:'f',Jordan:'m',Librarian:'f',Farah:'f',Lucas:'m',Grace:'f',Reporter:'f',Customer:'f',Pharmacist:'m',Sam:'m',Priya:'f',Receptionist:'f',Leo:'m',Omar:'m',Lena:'f',Joy:'f'};
+  // every speaker in every listening script, so each person always gets a voice of the right gender
+  const GENDER={Reporter:'f',Woman:'f',Man:'m',Customer:'f',Pharmacist:'m',Librarian:'f',Receptionist:'f',Advisor:'f',Staff:'f',Clerk:'m',Agent:'m',Employee:'m',Worker:'m',Visitor:'m',
+    Aisha:'f',Dana:'f',Diane:'f',Elena:'f',Ellen:'f',Farah:'f',Grace:'f',Hannah:'f',Joy:'f',Leila:'f',Lena:'f',Linda:'f',Lisa:'f',Lucy:'f',Mei:'f',Mia:'f',Nora:'f',Olivia:'f',Priya:'f',Rosa:'f',Sarah:'f',Tara:'f',
+    Ahmed:'m',Amir:'m',Ben:'m',Daniel:'m',Hassan:'m',Jake:'m',Jordan:'m',Jun:'m',Kevin:'m',Kofi:'m',Leo:'m',Lucas:'m',Marcus:'m',Okafor:'m',Omar:'m',Paul:'m',Raj:'m',Sam:'m',Tom:'m',Victor:'m'};
   let voices=[],gen=0;
   const load=()=>{try{voices=speechSynthesis.getVoices().filter(v=>/^en([-_]|$)/i.test(v.lang)&&!NOVELTY.test(v.name))}catch(e){voices=[]}};
   const ready=()=>new Promise(res=>{if(!OK)return res();load();if(voices.length)return res();let done=false;const fin=()=>{if(done)return;done=true;load();res()};
@@ -1585,16 +1588,17 @@ const TTS=(()=>{
     speakers.forEach((sp,i)=>{const want=GENDER[sp]||(i%2?'m':'f');
       const free=pool.filter(x=>!used.has(x)),top=free.length?score(free[0]):0;
       // a voice of the right gender only if it is nearly as good (same accent family)
-      const v=free.find(x=>gOf(x)===want&&score(x)>=top-25)||free[0]||pool.find(x=>gOf(x)===want)||pool[0]||null;
+      // never give a speaker the wrong gender: if no unused voice fits, reuse a good one of the right gender at a different pitch
+      const v=free.find(x=>gOf(x)===want&&score(x)>=top-25)||pool.find(x=>gOf(x)===want&&score(x)>=(pool.length?score(pool[0]):0)-25)||free[0]||pool.find(x=>gOf(x)===want)||pool[0]||null;
       if(v)used.add(v);const k=v?v.name:'_';count[k]=(count[k]||0)+1;
       // only when the device has too few voices: a small pitch change so speakers still sound different
-      map[sp]={voice:v,pitch:count[k]===1?1:count[k]===2?.92:1.1}});return map}
-  const clean=t=>String(t).replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/\bIT\b/g,'I.T.').replace(/…/g,'... ');
+      map[sp]={voice:v,pitch:count[k]===1?1:want==='f'?(count[k]===2?1.15:.9):(count[k]===2?.85:1.1)}});return map}
+  const clean=t=>String(t).replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/\bIT\b/g,'I.T.').replace(/\bID\b/g,'I.D.').replace(/…/g,'... ');
   const split=t=>{const c=clean(t);let parts;try{parts=c.split(/(?<!\b(?:Mr|Mrs|Ms|Dr|St|a\.m|p\.m)\.)(?<=[.!?]["']?)\s+(?=["']?[A-Z0-9])/)}catch(e){parts=[c]}return parts.map(x=>x.trim()).filter(Boolean)};
   function play(lines,o={}){const my=++gen;let timer=null;
     if(!OK){o.onEnd&&o.onEnd(false);return ()=>{}}
     (async()=>{try{speechSynthesis.cancel()}catch(e){}await ready();if(my!==gen)return;
-      const sp=[...new Set(lines.map(l=>l[0]))],cs=cast(sp),q=[];
+      const sp=[...new Set([...(o.cast||[]),...lines.map(l=>l[0])])],cs=cast(sp),q=[];
       lines.forEach(([who,text],li)=>split(text).forEach((t,pi)=>q.push({who,t,li,first:pi===0,pause:pi?160:li===0?0:who===lines[li-1][0]?350:who==='Reporter'?1500:450})));
       let i=0;const next=()=>{clearTimeout(timer);if(my!==gen)return;if(i>=q.length){o.onEnd&&o.onEnd(true);return}
         const it=q[i++];setTimeout(()=>{if(my!==gen)return;if(it.first&&o.onLine)o.onLine(it.li);
@@ -2007,7 +2011,7 @@ function renderMock(id,sec){const m=MOCKS[id];if(!m||!m[sec]){app.innerHTML='<di
   if(st.played[st.i]){document.getElementById('mk-play').disabled=true;document.getElementById('mk-pst').textContent='This recording has already played.';startTimer();return}
   document.getElementById('mk-play').onclick=e=>{e.currentTarget.disabled=true;document.getElementById('mk-player').classList.add('playing');document.getElementById('mk-pst').textContent='Playing… listen carefully.';
     if(!TTS.OK){document.getElementById('mk-pst').textContent='Audio is not available in this browser.';reveal();return}
-    TTS.play(sc.audio,{onEnd:()=>reveal()})}}
+    TTS.play(sc.audio,{onEnd:()=>reveal(),cast:(p.screens||[p]).flatMap(x=>(x.audio||[]).map(l=>l[0]))})}}
 function mockFinish(id,sec,st,head){const screens=mockScreens(id,sec);let score=0,total=0;
   screens.filter(cur=>!cur.part.practice).forEach(cur=>cur.sc.qs.forEach((x,qi)=>{total++;const a=st.ans[`${cur.pi}-${cur.si}-${qi}`];if(a===x.a)score++;
     else addLog({session:'Mock '+id,skill:MOCK_SEC[sec][0],item:`${MOCKS[id].title} · ${cur.part.name}: ${x.q}`,yours:a!=null?x.o[a]:'(no answer)',correct:x.o[x.a]})}));
