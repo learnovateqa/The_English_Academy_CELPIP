@@ -1041,7 +1041,7 @@ function PathBoard(){const ph=[['O','Start'],['L','Listening'],['L',''],['R','Re
 function InfoCards(kind){
   const cards=kind==='teacher'
     ?[['Batches','Batches and access codes','Open a batch, add students and send each one a personal code by email or WhatsApp.',['Any number of batches','Codes you choose']],
-      ['Progress','Progress and error logs','See every student’s Hub tasks, scores, writing and the mistakes they logged.',['Per session','Per skill']],
+      ['Progress','Progress and error logs','See every student’s practice steps, scores, writing and the mistakes they logged.',['Per session','Per skill']],
       ['Coaching','Messages and email tasks','Write to one student or a whole batch, and send CELPIP Writing Task 1 email prompts.',['In-site and email','27-minute replies']]]
     :[['Listening','Hear it once. Answer with confidence.','Single-play audio, prediction and note-taking strategies, and distractor analysis.',['Sessions 2–3','Auto-graded']],
       ['Reading','Scan fast. Match the paraphrase.','Correspondence, diagrams, information and viewpoints passages on a timer.',['Sessions 4–5','Timed']],
@@ -1852,6 +1852,14 @@ function balanceMock(m){let n=0;
     const target=(n++*3+1)%q.o.length,shift=(q.a-target+q.o.length)%q.o.length;
     q.o=q.o.slice(shift).concat(q.o.slice(0,shift));q.a=target}}
 Object.values(MOCKS).forEach(balanceMock);
+// the Study Hub practice sets get the same treatment, so "always B" is not a winning strategy
+{let n=0;for(const q of Object.values(QUIZ)){
+  // sets where every question has the same labels (Agree / Disagree / Hedge) keep their order
+  if(q.qs.length>1&&q.qs.every(x=>x.o.join('|')===q.qs[0].o.join('|')))continue;
+  for(const x of q.qs){
+  if(x.fixed||x.o.every(o=>/^([A-E]|E \(not given\))$/.test(o))||x.o.every(o=>/^\$?\d[\d:,.]*$/.test(o)))continue;
+  const len=x.o.length,target=(n++*(len-1)+1)%len,shift=(x.a-target+len)%len;
+  x.o=x.o.slice(shift).concat(x.o.slice(0,shift));x.a=target}}}
 // make each mock follow the real test layout: an unscored practice task first, and one screen per Reading part
 const MOCK_PRACTICE={
  L:{name:'Practice Task (not scored)',practice:true,ctx:'This practice task is not scored. It shows you how the Listening test works. You will hear a short conversation once.',
@@ -2130,12 +2138,12 @@ function Quiz(host,s,key){
 function Writer(host,s,key){
   const w=WRITE[key];const dk='w:'+s.n+':'+key;const rk=s.n+':'+key;let remaining=w.minutes*60,tid=null,firstAt=0,timerOn=false;
   const prev=(results()[rk]||{}).ai;
-  host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">Timed writing · AI scored</span><h3>${esc(w.title)}</h3><span class="spacer"></span><span class="timer" data-timer>${fmt(remaining)}</span></div>
+  host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">${store.get('aiOff',false)?'Timed writing':'Timed writing · AI scored'}</span><h3>${esc(w.title)}</h3><span class="spacer"></span><span class="timer" data-timer>${fmt(remaining)}</span></div>
   <div class="tool-body"><div class="prompt">${w.prompt}</div><a class="tpl-link" href="downloads/CELPIP-Templates-${/survey/i.test(w.type||'')?'Survey':'Email'}.pdf" target="_blank" rel="noopener">📄 Stuck? Open the ${/survey/i.test(w.type||'')?'survey':'email'} template (PDF)</a>
    <div class="row"><button class="btn hub" data-start>Start ${w.minutes}-minute timer</button><span class="muted" style="font-size:13px">Pasting is turned off, as on the real test.</span><span class="spacer"></span><span class="wc" data-wc>0 words</span></div>
    <label for="ta-${rk}" class="eyebrow">Your response</label>
    <textarea class="write" id="ta-${rk}" spellcheck="false" placeholder="Start typing your response here…"></textarea>
-   <div class="row"><button class="btn primary" data-submit>Submit and get my score</button><span class="muted" data-msg style="font-size:13px"></span></div>
+   <div class="row"><button class="btn primary" data-submit>${store.get('aiOff',false)?'Submit my writing':'Submit and get my score'}</button><span class="muted" data-msg style="font-size:13px"></span></div>
    <div data-ai-out>${prev?`<div class="eyebrow" style="margin-bottom:8px">Your last score</div>${AIFeedback(prev,w)}`:''}</div>
    <details class="selfbox" data-self ${prev?'':'hidden'}><summary>Score yourself too (optional)</summary>
      <div class="rubric" style="margin-top:10px">${['Content & coherence','Vocabulary','Readability','Task fulfillment'].map((c,i)=>`<label>${c}<select data-rub="${i}"><option value="">–</option>${[1,2,3,4,5].map(v=>`<option>${v}</option>`).join('')}</select></label>`).join('')}</div>
@@ -2157,9 +2165,10 @@ function Writer(host,s,key){
     const btn=host.querySelector('[data-submit]');btn.disabled=true;
     out.innerHTML=`<div class="aiwait"><span class="spin"></span><div><b>Scoring your writing…</b><span class="muted">This takes about 30–60 seconds. Keep this page open.</span></div></div>`;
     try{const j=await api('student.score',{code:cloud.code,text:ta.value,seconds,task:{type:w.type||'',minutes:w.minutes,prompt:w.plain,reqs:w.reqs||[]}});
-      const rr=results();rr[rk]=Object.assign(rr[rk]||{},{ai:j.result,aiLevel:j.result.overall_level});store.set('res',rr);
+      const rr=results();rr[rk]=Object.assign(rr[rk]||{},{ai:j.result,aiLevel:j.result.overall_level});store.set('res',rr);store.set('aiOff',false);
       out.innerHTML=AIFeedback(j.result,w)+(j.remaining!=null?`<p class="muted" style="font-size:12.5px;margin-top:8px">${j.remaining} AI scoring${j.remaining===1?'':'s'} left today.</p>`:'');bindAIFeedback(out)}
-    catch(e){const M={ai_off:'AI scoring is not turned on yet. Score yourself below, and your teacher will give feedback.',ai_limit:'You have used today\u2019s AI scorings. Try again tomorrow, or score yourself below.',ai_short:'Write at least 20 words before scoring.',ai_busy:'The scorer is busy right now. Wait a minute and click Submit again.',ai_key:'AI scoring is not working right now. Please tell your teacher.'};
+    catch(e){const M={ai_off:'Your writing is saved for your teacher. AI scoring is not turned on yet, so score yourself below with the checklist.',ai_limit:'You have used today\u2019s AI scorings. Try again tomorrow, or score yourself below.',ai_short:'Write at least 20 words before scoring.',ai_busy:'The scorer is busy right now. Wait a minute and click Submit again.',ai_key:'AI scoring is not working right now. Please tell your teacher.'};
+      if(e.code==='ai_off'){store.set('aiOff',true);const ch=host.querySelector('.tool-head .chip');if(ch)ch.textContent='Timed writing';btn.textContent='Submit my writing'}
       out.innerHTML=`<div class="notice">${esc(M[e.code]||errMsg(e))}</div>`}
     btn.disabled=false;host.querySelector('[data-self]').hidden=false}
   host.querySelector('[data-submit]').addEventListener('click',()=>submit(false));
