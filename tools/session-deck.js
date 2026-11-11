@@ -404,6 +404,7 @@ const plain = t => parseMarks(t).map(x => x[0]).join('');
         oval(s, 8.1, y + 0.05, 0.36, kk(sl), j + 1, 'Q' + (j + 1));
         const parts = [{ text: q, options: { bold: true, breakLine: true } }];
         if (key) parts.push({ text: '✓ ' + (opts ? opts[a] : a), options: { color: '17803D', bold: true, breakLine: !!proof } }), proof && parts.push({ text: proof, options: { color: MUTED, fontSize: 10.5 } });
+        else if (opts && opts.length > 3) opts.forEach((o, k) => parts.push({ text: `${'ABCD'[k]})  ${o}`, options: { fontSize: 11, color: '3D4A66', breakLine: k < opts.length - 1 } }));
         else if (opts) parts.push({ text: opts.map((o, k) => `${'ABCD'[k]}) ${o}`).join('   '), options: { fontSize: 11 } });
         T(s, parts, { x: 8.6, y, w: 3.8, h: qh - 0.05, fontSize: 12, valign: 'top' });
       });
@@ -459,17 +460,25 @@ const plain = t => parseMarks(t).map(x => x[0]).join('');
     s.addNotes(notes(sl));
   };
   // exit ticket: true / false statements, answers in the notes
+  // true / false: a question slide, plus an answer slide when reveal is set
   L.tf = async sl => {
-    const s = newSlide(); eyebrow(s, sl.eb || 'Exit ticket', kk(sl)); title(s, sl.h || 'True or false?');
+    for (const key of sl.reveal ? [false, true] : [false]) {
+    const s = newSlide(); eyebrow(s, key ? 'Answers' : (sl.eb || 'Exit ticket'), kk(sl)); title(s, key ? (sl.h || 'True or false?') + ' · answers' : (sl.h || 'True or false?'));
     const R = sl.items, rh = Math.min(0.72, (4.7 - (R.length - 1) * 0.1) / R.length);
-    R.forEach(([st], j) => {
+    R.forEach(([st, ans, why], j) => {
       const y = 1.95 + j * (rh + 0.1);
-      card(s, 0.75, y, 11.8, rh, j % 2 ? 'FFFFFF' : 'F6F7FB', 'Statement ' + (j + 1), false, j % 2 ? LINE : null);
+      card(s, 0.75, y, 11.8, rh, key ? (ans ? 'E6F6EC' : 'FDECEC') : (j % 2 ? 'FFFFFF' : 'F6F7FB'), 'Statement ' + (j + 1), false, key ? (ans ? '17803D' : 'B42318') : (j % 2 ? LINE : null));
       oval(s, 0.95, y + (rh - 0.46) / 2, 0.46, ROT[j % 5], j + 1, 'Number ' + (j + 1));
-      T(s, st, { x: 1.65, y, w: 8.4, h: rh, fontSize: 16 });
-      softPill(s, 10.25, y + (rh - 0.4) / 2, 2.1, 0.4, 'G', 'True  /  False', 'TF ' + (j + 1));
+      if (key) {
+        T(s, why ? [{ text: st, options: { breakLine: true } }, { text: '→ ' + why, options: { fontSize: 12, color: ans ? '17603A' : '9B1C1C', italic: true } }] : st, { x: 1.65, y, w: 8.4, h: rh, fontSize: why ? 14.5 : 16 });
+        T(s, ans ? '✓  True' : '✗  False', { x: 10.25, y: y + (rh - 0.4) / 2, w: 2.1, h: 0.4, fontSize: 15, bold: true, align: 'center', color: ans ? '17803D' : 'B42318' });
+      } else {
+        T(s, st, { x: 1.65, y, w: 8.4, h: rh, fontSize: 16 });
+        softPill(s, 10.25, y + (rh - 0.4) / 2, 2.1, 0.4, 'G', 'True  /  False', 'TF ' + (j + 1));
+      }
     });
-    s.addNotes(notes(sl, 'Students answer with fingers (1 = true, 2 = false).\nANSWERS: ' + R.map(([, a, w], j) => `${j + 1} ${a ? 'True' : 'False'}${w ? ' (' + w + ')' : ''}`).join(' · ')));
+    s.addNotes(key ? 'Go through each answer. For every false statement, ask a student to say the correct rule.' : notes(sl, 'Students answer with fingers (1 = true, 2 = false).' + (sl.reveal ? ' The next slide shows the answers.' : '') + '\nANSWERS: ' + R.map(([, a, w], j) => `${j + 1} ${a ? 'True' : 'False'}${w ? ' (' + w + ')' : ''}`).join(' · ')));
+    }
   };
   L.closing = async sl => {
     sec = 'Wrap-up'; pres.addSection({ title: sec });
