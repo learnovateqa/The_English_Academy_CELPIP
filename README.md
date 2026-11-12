@@ -114,6 +114,7 @@ These features need the latest `Code.gs` (see below). The first time, Google ask
 - **Updating the backend:** after you change `Code.gs`, go to **Deploy → Manage deployments → Edit → Version: New version → Deploy**. The URL stays the same.
 - **Changing a student's code:** this keeps their progress and feedback. Send them the new code.
 - **Deleting a student:** this removes their progress and feedback from the Sheet.
+- **Removing a mock test attempt:** open the student in the Teacher Portal, open the mock test and click **Remove this attempt**. It deletes that mock's answers, scores, Error Log entries and your ratings, and the student can take it again. It disappears from the student's device the next time they open the site. A Listening or Reading section submitted with no answers is never saved.
 - **Privacy:** an access code is the student's key, so keep codes private. The Sheet is only visible to your Google account.
 - **Offline:** if a student goes offline, their practice is kept on their device and retried automatically.
 - **Speaking practice:** students record on their phone while the timer runs, then upload the file to play it back and score themselves. Recordings are not sent to the server.

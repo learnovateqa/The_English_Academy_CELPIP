@@ -982,11 +982,19 @@ function refreshIf(rs){if(!rs.includes(curRoute()))return;const a=document.activ
   if(a&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)&&app.contains(a)){pendingRefresh=true;return}view(true)}
 document.addEventListener('focusout',()=>{if(!pendingRefresh)return;setTimeout(()=>{const a=document.activeElement;if(pendingRefresh&&!(a&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName))){pendingRefresh=false;view(true)}},700)});
 
+// The teacher removed a mock attempt: drop it from this device too, so it is not uploaded again.
+function applyResets(resets){let res=store.get('res',{}),log=store.get('log',[]),ch=false;
+  resets.forEach(x=>{const at=+x.at||0,re=new RegExp('^mock:M'+x.mock+'[LRWS]');
+    Object.keys(res).forEach(k=>{if(re.test(k)&&((res[k]&&+res[k].at)||0)<=at){delete res[k];ch=true}});
+    const n=log.length;log=log.filter(e=>!(String(e.session)==='Mock '+x.mock&&(+e.id||0)<=at));if(log.length!==n)ch=true;
+    if((+store.get('mockreset:'+x.mock,0))<at){_set('mockreset:'+x.mock,at);_set('mockst:'+x.mock+':L',null);_set('mockst:'+x.mock+':R',null);_set('mockfull:'+x.mock,false)}});
+  if(ch){_set('res',res);_set('log',log)}}
 function applyStudent(j){cloud.code=j.student.code;PREFIX='bcs:'+cloud.code+':';cloud.student=j.student;cloud.batch=j.batch;cloud.feedback=j.feedback;cloud.messages=j.messages||[];cloud.settings=j.settings||cloud.settings||{};if(j.mockScores)cloud.mockScores=j.mockScores;
   writeSession({code:cloud.code,student:j.student,batch:j.batch,feedback:j.feedback,settings:cloud.settings,mockScores:cloud.mockScores||{}});
   const r=j.progress;const localT=store.get('updatedAt',0);
   if(r&&(r.updatedAt||0)>localT){SYNC_KEYS.forEach(k=>{if(r[k]!==undefined)_set(k,r[k])});_set('updatedAt',r.updatedAt)}
   else if(localT>((r&&r.updatedAt)||0))schedulePush();
+  if(r&&Array.isArray(r.resets))applyResets(r.resets);
   if(cloud.state!=='saving'||!pushPending)cloud.state='synced';renderNav()}
 async function initCloud(){const s=readSession();cloud.tpass=readTPass();
   if(s&&s.code){cloud.code=s.code;PREFIX='bcs:'+s.code+':';cloud.student=s.student;cloud.batch=s.batch;cloud.feedback=s.feedback;cloud.settings=s.settings||{};cloud.mockScores=s.mockScores||{};cloud.state='saving'}
@@ -2040,6 +2048,11 @@ function renderMock(id,sec){const m=MOCKS[id];if(!m||!m[sec]){app.innerHTML='<di
     if(!TTS.OK){document.getElementById('mk-pst').textContent='Audio is not available in this browser.';reveal();return}
     TTS.play(sc.audio,{onEnd:()=>reveal(),cast:(p.screens||[p]).flatMap(x=>(x.audio||[]).map(l=>l[0]))})}}
 function mockFinish(id,sec,st,head){const screens=mockScreens(id,sec);let score=0,total=0;
+  if((sec==='L'||sec==='R')&&!screens.some(cur=>!cur.part.practice&&cur.sc.qs.some((x,qi)=>st.ans[`${cur.pi}-${cur.si}-${qi}`]!=null))){
+    store.set('mockst:'+id+':'+sec,null);store.set('mockfull:'+id,false);
+    app.innerHTML=`<div class="stack">${head}<section class="panel stack mock-intro" style="${skv(sec)};gap:12px"><div class="eyebrow">${esc(MOCKS[id].title)}</div><h1>No answers, so nothing was saved</h1>
+     <p class="lead">You did not answer any ${MOCK_SEC[sec][0]} questions, so this try does not count and nothing was added to your Error Log. Start again whenever you are ready.</p>
+     <div class="row"><a class="btn primary" href="#mocks">Back to Mock Tests</a></div></section></div>`;return}
   screens.filter(cur=>!cur.part.practice).forEach(cur=>cur.sc.qs.forEach((x,qi)=>{total++;const a=st.ans[`${cur.pi}-${cur.si}-${qi}`];if(a===x.a)score++;
     else addLog({session:'Mock '+id,skill:MOCK_SEC[sec][0],item:`${MOCKS[id].title} · ${cur.part.name}: ${x.q}`,yours:a!=null?x.o[a]:'(no answer)',correct:x.o[x.a]})}));
   const r=results();r[mockKey(id,sec)]={score,total,pct:Math.round(score/total*100),at:Date.now(),ans:st.ans};store.set('res',r);
@@ -2989,7 +3002,7 @@ function bindClassSlides(){const b=document.getElementById('dash-slides');if(b)b
   app.querySelectorAll('[data-hub]').forEach(a=>a.addEventListener('click',()=>store.set('tab','hub')))}
 
 /* ---------- Teacher portal ---------- */
-let tSel=null,tStudent=null,tNewOpen=false,tConfirmDel=false,tLogFilter='',tForm=null,tConfirmStuDel=false,tShare=null,tBatchMsg=false,tFlash='';const fbDraft={};
+let tSel=null,tStudent=null,tNewOpen=false,tConfirmDel=false,tLogFilter='',tForm=null,tConfirmStuDel=false,tShare=null,tBatchMsg=false,tFlash='',tResetMock=null;const fbDraft={};
 const SAMPLE_TASKS=[
  {subject:'Email task: A noisy neighbour',body:'Your new neighbour has been doing renovation work late in the evening for two weeks. The noise is affecting your sleep and your work.\n\nWrite an email to your neighbour in about 150–200 words. In your email:\n• introduce yourself and describe the problem\n• explain how it is affecting you\n• suggest a solution that could work for both of you'},
  {subject:'Email task: A cancelled class',body:'You paid for a six-week evening cooking class at a community centre. After two classes, the centre cancelled the course without explanation.\n\nWrite an email to the centre manager in about 150–200 words. In your email:\n• describe the course and what happened\n• explain why you are disappointed\n• say what you would like the centre to do'},
@@ -3115,11 +3128,12 @@ function TMockPanel(r){const res=r.res||{};const saved=(cloud.t.mockScores||{})[
          ${v.self?`<span class="chip">Self ${(v.self/20).toFixed(1)}/5</span>`:''}</div>
          ${k==='W'&&v.text?`<details><summary>Read the response</summary><pre>${esc(v.text)}</pre></details>`:''}
          <div class="ms-crit">${RATE_CRIT[k].map(([c,n])=>`<label>${n}<select data-ms="${id}|${k}|${x.no}|${c}">${opt(rr[c])}</select></label>`).join('')}</div></div>`};
-     return `<details class="subm ms" ${msDraft[dk]?'open':''}><summary>${esc(MOCKS[id].title)} · ${sum}</summary><div class="stack" style="gap:12px;margin-top:10px">
+     return `<details class="subm ms" ${msDraft[dk]||tResetMock===dk?'open':''}><summary>${esc(MOCKS[id].title)} · ${sum}</summary><div class="stack" style="gap:12px;margin-top:10px">
        <p class="muted" style="font-size:13px;margin:0">Listening ${lv.L?`${lv.L.raw}/${lv.L.total} → level ${lvTxt(lv.L.level)}`:'not taken'} · Reading ${lv.R?`${lv.R.raw}/${lv.R.total} → level ${lvTxt(lv.R.level)}`:'not taken'} (scored automatically).</p>
        <h4 style="margin:0">Writing</h4>${mockRealTasks(id,'W').map(x=>task('W',x)).join('')}
        <h4 style="margin:0">Speaking</h4>${mockRealTasks(id,'S').map(x=>task('S',x)).join('')}
        <label class="field">Comments for the student (shown on their score report)<textarea data-ms-note="${id}" placeholder="Strengths, what to fix, and one goal for the next mock.">${esc(d.note||'')}</textarea></label>
+       <div class="row ms-reset">${tResetMock===dk?`<span style="font-size:13px"><b>Remove ${esc(MOCKS[id].title)} for this student?</b> Their answers, scores, Error Log entries and your ratings for this mock are deleted. They can take it again.</span><button class="btn sm" data-mr-yes="${id}">Yes, remove</button><button class="btn sm" data-mr-no>Cancel</button>`:`<button class="btn sm" data-mr="${id}">Remove this attempt</button><span class="muted" style="font-size:12.5px">For an accidental or unfinished try.</span>`}<span class="muted" data-mr-msg="${id}" style="font-size:13px"></span></div>
        <div class="row"><button class="btn primary" data-ms-save="${id}">Save ratings</button><span class="muted" data-ms-msg="${id}" style="font-size:13px">${saved[id]&&saved[id].at?'Saved '+ago(saved[id].at)+'. The student sees the levels on their score report.':'Each criterion: choose a level from M to 12. The section level is the average, like the real test.'}</span></div>
      </div></details>`}).join('')}</div>`}
 function msCollect(id){const d={W:{},S:{},note:''};app.querySelectorAll(`[data-ms^="${id}|"]`).forEach(el=>{const [,k,no,c]=el.dataset.ms.split('|');d[k][no]=d[k][no]||{};if(el.value!=='')d[k][no][c]=+el.value});
@@ -3216,6 +3230,12 @@ function bindTeacher(){document.querySelectorAll('#sched,#decks').forEach(d=>{if
       const lv=mockLevels(id,(tRoster().find(x=>x.id===code)||{}).res||{},cloud.t.mockScores[code][id]);
       msg.textContent=`Saved. Writing ${lvTxt(lv.W.level)} · Speaking ${lvTxt(lv.S.level)}${lv.W.level==null||lv.S.level==null?' (a section shows a level once every task is rated)':''}. The student sees this on their score report.`}
     catch(err){msg.textContent=err&&err.message==='Unknown action'?'Update your Apps Script first (README: “Updating to a new version of Code.gs”).':errMsg(err)}b.disabled=false}));
+  app.querySelectorAll('[data-mr]').forEach(b=>b.addEventListener('click',()=>{tResetMock=tStudent+'|'+b.dataset.mr;view(true)}));
+  app.querySelectorAll('[data-mr-no]').forEach(b=>b.addEventListener('click',()=>{tResetMock=null;view(true)}));
+  app.querySelectorAll('[data-mr-yes]').forEach(b=>b.addEventListener('click',async()=>{const id=b.dataset.mrYes,code=tStudent;const msg=app.querySelector(`[data-mr-msg="${id}"]`);b.disabled=true;msg.innerHTML=wait('Removing');
+    try{const j=await tcall('teacher.mockreset',{code,mock:id});if(j.progress)cloud.t.progress[code]=j.progress;cloud.t.mockScores=cloud.t.mockScores||{};cloud.t.mockScores[code]=j.mockScores||{};delete msDraft[code+'|'+id];tResetMock=null;
+      tFlash=`${MOCKS[id].title} was removed. It disappears from the student’s device the next time they open the site.`;view(true)}
+    catch(err){b.disabled=false;msg.textContent=err&&err.message==='Unknown action'?'Update your Apps Script first (README: “Updating to a new version of Code.gs”).':errMsg(err)}}));
   on('t-fb-send','click',async e=>{const text=fb.value.trim();const msg=document.getElementById('t-fb-msg');if(!text){msg.textContent='Write some feedback first.';return}
     e.target.disabled=true;msg.innerHTML=wait('Sending');const code=tStudent;
     try{await tcall('teacher.feedback',{code,text});cloud.t.feedback[code]={text,updatedAt:Date.now()};delete fbDraft[code];msg.textContent='Sent. The student sees it on their dashboard.'}

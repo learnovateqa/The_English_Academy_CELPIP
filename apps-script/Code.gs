@@ -275,6 +275,25 @@ function route_(q) {
         return { mockScores: all };
       }
 
+      case 'teacher.mockreset': {
+        const code = normCode_(q.code);
+        if (!find_('Students', 'code', code)) fail_('bad_code', 'Student not found');
+        const mock = String(q.mock || '');
+        if (!/^\d{1,2}$/.test(mock)) fail_('bad_request', 'Unknown mock test');
+        const p = readProgress_(find_('Progress', 'code', code)) || {};
+        p.resets = (Array.isArray(p.resets) ? p.resets : []).filter(function (x) { return String(x.mock) !== mock; });
+        p.resets.push({ mock: mock, at: Date.now() });
+        p.updatedAt = Date.now();
+        saveProgress_(code, p, true);
+        const all = mockScores_(code);
+        if (all[mock]) {
+          delete all[mock];
+          const ex = find_('MockScores', 'code', code);
+          write_('MockScores', { code: code, data: JSON.stringify(all), updatedAt: Date.now() }, ex && ex._row);
+        }
+        return { progress: readProgress_(find_('Progress', 'code', code)), mockScores: all };
+      }
+
       case 'teacher.feedback': {
         const code = normCode_(q.code);
         if (!find_('Students', 'code', code)) fail_('bad_code', 'Student not found');
@@ -347,17 +366,30 @@ function teacherData_() {
   };
 }
 
-function saveProgress_(code, p) {
+// A removed mock attempt (teacher.mockreset) stays removed: anything from that mock
+// saved before the removal is dropped, even if an older copy is uploaded again later.
+function applyResets_(p, resets) {
+  (resets || []).forEach(function (x) {
+    const at = Number(x.at) || 0, re = new RegExp('^mock:M' + x.mock + '[LRWS]');
+    Object.keys(p.res).forEach(function (k) { if (re.test(k) && (Number(p.res[k] && p.res[k].at) || 0) <= at) delete p.res[k]; });
+    p.log = p.log.filter(function (e) { return !(String(e.session) === 'Mock ' + x.mock && (Number(e.id) || 0) <= at); });
+  });
+}
+
+function saveProgress_(code, p, keepResets) {
   if (!p || typeof p !== 'object') fail_('bad_request', 'Missing progress');
-  const json = JSON.stringify({
+  const existing = find_('Progress', 'code', code);
+  const resets = keepResets ? (p.resets || []) : ((readProgress_(existing) || {}).resets || []);
+  const clean = {
     tasks: p.tasks || {}, res: p.res || {}, targets: p.targets || {},
     log: Array.isArray(p.log) ? p.log.slice(0, 200) : [],
-    updatedAt: Number(p.updatedAt) || Date.now()
-  });
+    updatedAt: Number(p.updatedAt) || Date.now(), resets: resets
+  };
+  applyResets_(clean, resets);
+  const json = JSON.stringify(clean);
   if (json.length > CHUNK * 8) fail_('too_large', 'Progress is too large');
   const row = { code: code, updatedAt: Date.now() };
   for (let i = 0; i < 8; i++) row['p' + (i + 1)] = json.slice(i * CHUNK, (i + 1) * CHUNK);
-  const existing = find_('Progress', 'code', code);
   write_('Progress', row, existing && existing._row);
 }
 
