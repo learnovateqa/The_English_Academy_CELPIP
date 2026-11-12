@@ -824,6 +824,8 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 @media print{header.bar,footer,.noprint,nav{display:none!important}body{background:#fff}.panel{box-shadow:none;border:1px solid #ccc;break-inside:avoid}}
 .sprog{background:var(--surface);border-radius:14px;padding:12px 14px;max-width:640px}.sprog-in{display:flex;flex-direction:column;gap:8px}.sprog .ring{width:48px;height:48px;flex:none}.sprog .pbar{margin-top:6px}
 .srow-sc{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}.srow-sc .rchip{font-size:11px}
+.mk-oneq .qt{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mk-qtext{font-weight:600;font-size:16px;margin:0}
 hr.mock-sep{border:0;border-top:2px dashed var(--line);margin:14px 0}
 .mock-read .passage{max-height:72vh}
 .tpl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
@@ -1572,7 +1574,7 @@ const TTS=(()=>{
   const FEM=/female|google us english|samantha|karen|moira|tessa|victoria|allison|ava\b|susan|zira|aria|jenny|clara|libby|sonia|serena|fiona|catherine|nicky|emma|michelle|natasha|hazel|kate\b|zoe|linda|heather|nora|olivia|sara|amy|joanna|kendra|kimberly|salli|ivy|ruth|nancy|sonia|maisie|isla|sienna/i;
   const MAL=/\bmale|richard|daniel|alex\b|tom\b|oliver|david|mark\b|guy\b|ryan|liam|arthur|aaron|evan|nathan|thomas|george|james|rishi|christopher|eric|andrew|brian|william|matthew|roger|steffan|joey|justin|kevin|stephen|connor|elliot|davis|tony|jason|reed/i;
   // every speaker in every listening script, so each person always gets a voice of the right gender
-  const GENDER={Reporter:'f',Woman:'f',Man:'m',Customer:'f',Pharmacist:'m',Librarian:'f',Receptionist:'f',Advisor:'f',Staff:'f',Clerk:'m',Agent:'m',Employee:'m',Worker:'m',Visitor:'m',
+  const GENDER={Reporter:'f',Narrator:'f',Woman:'f',Man:'m',Customer:'f',Pharmacist:'m',Librarian:'f',Receptionist:'f',Advisor:'f',Staff:'f',Clerk:'m',Agent:'m',Employee:'m',Worker:'m',Visitor:'m',
     Aisha:'f',Dana:'f',Diane:'f',Elena:'f',Ellen:'f',Farah:'f',Grace:'f',Hannah:'f',Joy:'f',Leila:'f',Lena:'f',Linda:'f',Lisa:'f',Lucy:'f',Mei:'f',Mia:'f',Nora:'f',Olivia:'f',Priya:'f',Rosa:'f',Sarah:'f',Tara:'f',
     Ahmed:'m',Amir:'m',Ben:'m',Daniel:'m',Hassan:'m',Jake:'m',Jordan:'m',Jun:'m',Kevin:'m',Kofi:'m',Leo:'m',Lucas:'m',Marcus:'m',Okafor:'m',Omar:'m',Paul:'m',Raj:'m',Sam:'m',Tom:'m',Victor:'m'};
   let voices=[],gen=0;
@@ -1965,7 +1967,7 @@ function renderMock(id,sec){const m=MOCKS[id];if(!m||!m[sec]){app.innerHTML='<di
   if(!st||st.reset){const prior=results()[mockKey(id,sec)];
     app.innerHTML=`<div class="stack">${head}<section class="panel stack mock-intro" style="${skv(sec)};gap:12px"><div class="eyebrow">${esc(m.title)}</div><h1>${MOCK_SEC[sec][0]}</h1>
       <ul class="si-list"><li>${m[sec].length} parts</li><li>${total} questions</li><li>${MOCK_SEC[sec][1]}</li>${sec==='L'?'<li>You need: headphones</li>':''}</ul>
-      <ul class="mock-rules"><li>${sec==='L'?'Each recording plays <b>once</b>. The questions appear after it ends.':'Each part has its own timer. When it reaches 0:00, the test moves on.'}</li><li>Once you press <b>Next</b>, you cannot go back.</li><li>There is no penalty for wrong answers. Answer every question.</li><li>Some questions on the real test are unscored. You cannot tell which, so try your best on all of them.</li></ul>
+      <ul class="mock-rules">${sec==='L'?'<li>Each recording plays <b>once</b>. The questions come after it ends.</li><li><b>Parts 1–3:</b> each question is read aloud once and appears alone. You have 30 seconds for each one.</li><li><b>Parts 4–6:</b> all the questions are on one screen. Complete each statement from a drop-down menu.</li><li>Have paper and a pen ready for notes, like at the test centre.</li>':'<li>Each part has its own timer. When it reaches 0:00, the test moves on.</li>'}<li>Once you press <b>Next</b>, you cannot go back.</li><li>There is no penalty for wrong answers. Answer every question.</li><li>Some questions on the real test are unscored. You cannot tell which, so try your best on all of them.</li></ul>
       ${prior?`<p class="muted">Your last score: <b>${prior.score}/${prior.total}</b>. Starting again replaces it.</p>`:''}
       <div class="row" style="gap:8px"><button class="btn primary" id="mk-start">Start ${MOCK_SEC[sec][0]} →</button>${sec==='L'?'<button class="btn" id="mk-sound">🔊 Sound check</button>':''}${prior?'<button class="btn" id="mk-review">Review last attempt</button>':''}</div></section></div>`;
     const sb=document.getElementById('mk-sound');if(sb)sb.onclick=()=>TTS.test();
@@ -1974,7 +1976,10 @@ function renderMock(id,sec){const m=MOCKS[id];if(!m||!m[sec]){app.innerHTML='<di
   if(st.i>=screens.length)return mockFinish(id,sec,st,head);
   const cur=screens[st.i],p=cur.part,sc=cur.sc,listen=sec==='L';
   const qid=(qi)=>`${cur.pi}-${cur.si}-${qi}`;
-  const secs=listen?Math.max(60,sc.qs.length*40):Math.round((sc.minutes||p.minutes||10)*60);
+  // Listening follows the official format: Parts 1–3 (and the practice task) give one question at a time, read aloud, 30 seconds each;
+  // Parts 4–6 are sentence completions with drop-down menus, all on one screen
+  const oneBy=listen&&(p.practice||/^Part [123] /.test(p.name));const qNow=oneBy?Math.min(st.q||0,sc.qs.length-1):0;
+  const secs=listen?(oneBy?30:Math.max(60,sc.qs.length*40)):Math.round((sc.minutes||p.minutes||10)*60);
   const nScreensInPart=(p.screens||[p]).length;const realN=screens.filter(x=>!x.part.practice).length,realI=screens.slice(0,st.i+1).filter(x=>!x.part.practice).length;
   const kind=listen||p.practice?0:/Correspondence/.test(p.name)?1:/Diagram/.test(p.name)?2:/Information/.test(p.name)?3:/Viewpoints/.test(p.name)?4:0;
   const opts=(x,qi,ph='Select…')=>`<option value="">${ph}</option>${x.o.map((o,j)=>`<option value="${j}" ${st.ans[qid(qi)]===j?'selected':''}>${esc(kind===3?o.charAt(0):o)}</option>`).join('')}`;
@@ -1996,27 +2001,38 @@ function renderMock(id,sec){const m=MOCKS[id];if(!m||!m[sec]){app.innerHTML='<di
     readR=blanks.has(0)?rBox+qBox:qBox+rBox}
   const barTitle=p.practice?`${esc(m.title)} - ${MOCK_SEC[sec][0]} Practice Task`:`${esc(m.title)} - ${MOCK_SEC[sec][0]} ${esc(p.name.replace(' · ',': '))}`;
   app.innerHTML=`<div class="stack">${head}
-   <div class="mock-bar test" style="${skv(sec)}"><div class="mb-t"><b>${barTitle}</b><span>${p.practice?'Practice (not scored)':`Screen ${realI} of ${realN}`}</span></div><span class="spacer"></span><span class="mb-time">Time remaining: <span class="timer" id="mk-timer"></span></span><button class="btn mb-next" id="mk-next" ${listen&&!st.played[st.i]?'hidden':''}>NEXT</button></div>
+   <div class="mock-bar test" style="${skv(sec)}"><div class="mb-t"><b>${barTitle}</b><span id="mk-sub">${p.practice?'Practice (not scored)':`Screen ${realI} of ${realN}`}${oneBy&&st.played[st.i]?` · Question ${qNow+1} of ${sc.qs.length}`:''}</span></div><span class="spacer"></span><span class="mb-time">Time remaining: <span class="timer" id="mk-timer"></span></span><button class="btn mb-next" id="mk-next" ${listen&&!st.played[st.i]?'hidden':''}>NEXT</button></div>
    ${listen?`<section class="panel stack" style="gap:14px">
     ${sc.ctx||p.ctx?`<p class="mock-ctx">${sc.ctx||p.ctx}</p>`:''}
     <div class="player" id="mk-player"><button class="btn hub" id="mk-play">▶ Play (plays once)</button><div class="wave">${'<i></i>'.repeat(14)}</div><span class="muted" id="mk-pst" style="font-size:13px">The questions appear after the recording.</span></div>
-     <div class="stack" id="mk-qs" ${!st.played[st.i]?'hidden':''}>${sc.qs.map((x,qi)=>`<fieldset class="q" style="border:0;margin:0;padding-inline:0"><legend class="qt">${esc(x.q)}</legend>
-       ${x.o.map((o,j)=>`<label class="opt"><input type="radio" name="mk-${qid(qi)}" value="${j}" ${st.ans[qid(qi)]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}</fieldset>`).join('')}</div>
+     <div class="stack" id="mk-qs" ${!st.played[st.i]?'hidden':''}>${oneBy?[sc.qs[qNow]].map(x=>{const qi=qNow;return `<fieldset class="q mk-oneq" style="border:0;margin:0;padding-inline:0"><legend class="qt">Question ${qi+1} of ${sc.qs.length}</legend>
+       <p class="mk-info" id="mk-qaudio"><span class="i" aria-hidden="true">i</span><span>Listen to the question. You will hear it only once. Then choose the best answer.</span></p>
+       <p class="mk-qtext" id="mk-qtext" hidden>${esc(x.q)}</p>
+       ${x.o.map((o,j)=>`<label class="opt"><input type="radio" name="mk-${qid(qi)}" value="${j}" ${st.ans[qid(qi)]===j?'checked':''}><span>${esc(o)}</span></label>`).join('')}</fieldset>`}).join('')
+      :`<p class="mk-info"><span class="i" aria-hidden="true">i</span><span>Choose the best way to complete each statement from the drop-down menu (▾).</span></p>
+       <div class="mk-box">${sc.qs.map((x,qi)=>`<label class="mk-row">${qi+1}. ${esc(x.q)} <select class="mk-sel" data-qi="${qi}">${opts(x,qi,'')}</select></label>`).join('')}</div>`}</div>
    </section>`
    :`${sc.ctx||p.ctx?`<p class="mock-ctx">${sc.ctx||p.ctx}</p>`:''}<div class="mk-panes mock-read"><div class="mk-left">${readL}</div><div class="mk-right" id="mk-qs">${readR}</div></div>`}</div>`;
   app.querySelectorAll('.mk-sel').forEach(el=>el.addEventListener('change',()=>{const s2=store.get(SK);const k=qid(+el.dataset.qi);if(el.value==='')delete s2.ans[k];else s2.ans[k]=+el.value;store.set(SK,s2)}));
   app.querySelectorAll('#mk-qs input').forEach(r=>r.addEventListener('change',()=>{const s2=store.get(SK);s2.ans[r.name.slice(3)]=+r.value;store.set(SK,s2)}));
   const timerEl=document.getElementById('mk-timer');
-  let moved=false;const go=()=>{if(moved)return;moved=true;clearAll();const s2=store.get(SK);if(!s2||s2.i!==st.i)return renderMock(id,sec);s2.i++;s2.deadline=null;store.set(SK,s2);renderMock(id,sec);window.scrollTo(0,0)};
+  let moved=false;const go=()=>{if(moved)return;moved=true;clearAll();const s2=store.get(SK);if(!s2||s2.i!==st.i)return renderMock(id,sec);
+    if(oneBy&&qNow<sc.qs.length-1){s2.q=qNow+1}else{s2.i++;s2.q=0}s2.deadline=null;store.set(SK,s2);renderMock(id,sec);window.scrollTo(0,0)};
   const startTimer=()=>{let s2=store.get(SK);if(!s2.deadline){s2.deadline=Date.now()+secs*1000;store.set(SK,s2)}
-    const tick=()=>{const cur2=store.get(SK);if(moved||!cur2||!cur2.deadline||cur2.i!==st.i){clearInterval(iv);return}const left=Math.max(0,Math.round((cur2.deadline-Date.now())/1000));timerEl.textContent=fmtLeft(left);timerEl.classList.toggle('low',left<=30);if(left<=0){clearInterval(iv);go()}};const iv=every(tick,1000);tick()};
-  document.getElementById('mk-next').onclick=()=>{const unanswered=sc.qs.filter((_,qi)=>store.get(SK).ans[qid(qi)]==null).length;
+    const tick=()=>{const cur2=store.get(SK);if(moved||!cur2||!cur2.deadline||cur2.i!==st.i||(oneBy&&(cur2.q||0)!==qNow)){clearInterval(iv);return}const left=Math.max(0,Math.round((cur2.deadline-Date.now())/1000));timerEl.textContent=fmtLeft(left);timerEl.classList.toggle('low',left<=30);if(left<=0){clearInterval(iv);go()}};const iv=every(tick,1000);tick()};
+  document.getElementById('mk-next').onclick=()=>{const unanswered=(oneBy?[qNow]:sc.qs.map((_,qi)=>qi)).filter(qi=>store.get(SK).ans[qid(qi)]==null).length;
     if(unanswered&&!confirm(`${unanswered} question${unanswered>1?'s are':' is'} not answered. A guess cannot lose points. Go on anyway?`))return;go()};
   if(!listen){startTimer();return}
   timerEl.textContent=fmtLeft(secs);
-  const reveal=()=>{const s2=store.get(SK);s2.played[st.i]=true;store.set(SK,s2);document.getElementById('mk-player').classList.remove('playing');document.getElementById('mk-pst').textContent='Recording finished. Answer the questions.';
-    document.getElementById('mk-qs').hidden=false;document.getElementById('mk-next').hidden=false;startTimer()};
-  if(st.played[st.i]){document.getElementById('mk-play').disabled=true;document.getElementById('mk-pst').textContent='This recording has already played.';startTimer();return}
+  // Parts 1–3: read the question aloud once, then the 30 seconds run. If the device cannot speak, show the question as text.
+  const askQ=()=>{const sub=document.getElementById('mk-sub');if(sub&&!/Question \d/.test(sub.textContent))sub.textContent+=` · Question ${qNow+1} of ${sc.qs.length}`;
+    const showText=()=>{const el=document.getElementById('mk-qtext');if(el)el.hidden=false;const a=document.getElementById('mk-qaudio');if(a)a.hidden=true};
+    const fresh=!store.get(SK).deadline;startTimer();
+    if(!fresh||!TTS.OK){showText();return}
+    TTS.play([['Narrator',sc.qs[qNow].q]],{onEnd:ok=>{if(!ok)showText()}})};
+  const reveal=()=>{const s2=store.get(SK);s2.played[st.i]=true;store.set(SK,s2);document.getElementById('mk-player').classList.remove('playing');document.getElementById('mk-pst').textContent=oneBy?'Recording finished. The questions come one at a time.':'Recording finished. Complete the statements.';
+    document.getElementById('mk-qs').hidden=false;document.getElementById('mk-next').hidden=false;if(oneBy)askQ();else startTimer()};
+  if(st.played[st.i]){document.getElementById('mk-play').disabled=true;document.getElementById('mk-pst').textContent='This recording has already played.';if(oneBy)askQ();else startTimer();return}
   document.getElementById('mk-play').onclick=e=>{e.currentTarget.disabled=true;document.getElementById('mk-player').classList.add('playing');document.getElementById('mk-pst').textContent='Playing… listen carefully.';
     if(!TTS.OK){document.getElementById('mk-pst').textContent='Audio is not available in this browser.';reveal();return}
     TTS.play(sc.audio,{onEnd:()=>reveal(),cast:(p.screens||[p]).flatMap(x=>(x.audio||[]).map(l=>l[0]))})}}
