@@ -826,6 +826,9 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 .srow-sc{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}.srow-sc .rchip{font-size:11px}
 .mk-oneq .qt{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .mk-qtext{font-weight:600;font-size:16px;margin:0}
+.gd-h{display:flex;align-items:center;gap:10px}.gd-h .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--c);color:var(--ci);flex:none}
+.gd-list{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:14.5px}.gd h3{font-size:16px;margin:4px 0 0}.gd p{margin:0;font-size:14.5px}
+.gd td{font-size:14px;vertical-align:top}.gd a{color:var(--ci)}
 hr.mock-sep{border:0;border-top:2px dashed var(--line);margin:14px 0}
 .mock-read .passage{max-height:72vh}
 .tpl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
@@ -1657,7 +1660,7 @@ const qicon=k=>`<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stro
 function firstOpen(ns){const s=ns.map(n=>SESSIONS[n-1]).find(x=>sessionProgress(x).pct<100);return '#session-'+(s?s.n:ns[0])}
 function QuickTiles(){const log=store.get('log',[]);const unread=typeof unreadCount==='function'?unreadCount():0;
   const T=[['L','Listening','Sessions 2–3',firstOpen([2,3]),'L'],['R','Reading','Sessions 4–5',firstOpen([4,5]),'R'],['W','Writing','Sessions 6–8',firstOpen([6,7,8]),'W'],['S','Speaking','Sessions 9–11',firstOpen([9,10,11]),'S'],
-    ['O','Templates','Email · Survey · Speaking','#templates','map'],['R','Error Log',log.length?`${log.length} to review`:'No errors yet','#log','log'],
+    ['O','Guide & Templates','Test guide · Templates','#templates','map'],['R','Error Log',log.length?`${log.length} to review`:'No errors yet','#log','log'],
     ['W','Messages',cloud.code?(unread?`${unread} new`:'Write to your teacher'):'Students only',cloud.code?'#messages':'#home','msg'],['T','Test Day','Session 12','#session-12','flag']];
   const PAS=['#D9F7E8','#DCEBFF','#FFF1BF','#ECE3FF','#FFE0E6','#D6F7F2','#FCE3F3','#F3E5FF'];
   return `<section class="qtiles" aria-label="Quick access">${T.map(([k,t,sub,href,ic],i)=>`<a class="qtile" href="${href}" style="${skv(k)};--qbg:${PAS[i]}"><span class="qic">${qicon(ic)}</span><b>${t}</b><small>${esc(sub)}</small></a>`).join('')}</section>`}
@@ -2093,13 +2096,30 @@ const TEMPLATES=[
  {k:'W',title:'Writing Task 2 · The Survey Response',file:'downloads/CELPIP-Templates-Survey.pdf',pages:'1 page',what:'The 5-part template (position, 2 reasons, concession, conclusion), a full model answer and key phrases.',tips:['Choose the option you can support best','Reason + example + result','Admittedly…, however…']},
  {k:'S',title:'Speaking · Tasks 1–8',file:'downloads/CELPIP-Templates-Speaking.pdf',pages:'2 pages',what:'A fill-in template for every speaking task, with prep and speaking times, and recovery phrases.',tips:['Prep notes: 3 key words','Keep talking until the clock stops','Close clearly in the last 10 seconds']}];
 function TemplatesView(){return `<div class="stack">
-  <section class="hero2 slim"><div class="stack" style="gap:10px"><div class="eyebrow">Study tools</div><h1>CELPIP templates</h1>
+  <section class="hero2 slim"><div class="stack" style="gap:10px"><div class="eyebrow">Study tools</div><h1>Guide &amp; templates</h1>
    <p class="lead">Download, print and fill in. Use them to plan faster, but always change the words to fit each task. Raters reward answers that fit the prompt, not memorized speeches.</p>
    <div class="row" style="gap:8px"><a class="btn primary" href="downloads/CELPIP-Templates-All.pdf" download>⬇ Download all templates (PDF, 4 pages)</a></div></div></section>
   <div class="tpl-grid">${TEMPLATES.map(t=>`<article class="panel stack tpl-card" style="${skv(t.k)};gap:10px"><div class="row" style="gap:10px;flex-wrap:nowrap"><span class="ic">${icon(t.k,22)}</span><div style="min-width:0"><h3>${esc(t.title)}</h3><span class="muted" style="font-size:12.5px">PDF · ${esc(t.pages)}</span></div></div>
     <p style="font-size:14px">${esc(t.what)}</p><ul class="tpl-tips">${t.tips.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
     <div class="row" style="gap:8px;margin-top:auto"><a class="btn primary sm" href="${t.file}" download>⬇ Download</a><a class="btn sm" href="${t.file}" target="_blank" rel="noopener">Open</a></div></article>`).join('')}</div>
-  <p class="muted" style="font-size:13px">Tip: print the templates and keep them next to you while you practise in the Study Hub and the mock tests.</p></div>`}
+  <p class="muted" style="font-size:13px">Tip: print the templates and keep them next to you while you practise in the Study Hub and the mock tests.</p>
+  ${TestGuide()}</div>`}
+// test guide: the official format and strategy points, written in our own words
+function TestGuide(){const sec=(k,h,body)=>`<section class="panel stack gd" style="${skv(k)};gap:12px"><h2 class="gd-h"><span class="ic">${icon(k,20)}</span>${h}</h2>${body}</section>`;
+  const ul=a=>`<ul class="gd-list">${a.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+  const tbl=(head,rows)=>`<div class="tablewrap"><table class="log"><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map((c,i)=>i?`<td>${c}</td>`:`<td><b>${c}</b></td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  return `<section class="hero2 slim" id="guide"><div class="stack" style="gap:10px"><div class="eyebrow">Test guide</div><h1>How the CELPIP works</h1>
+    <p class="lead">The format, the three question types, what raters look for, and a time plan for each Reading part.</p></div></section>
+  ${sec('O','The three question types',`<p>Every Listening and Reading question is one of three types. Naming the type helps you decide where to look.</p>
+    ${tbl(['Type','What it asks','Clue in the question'],[['General meaning','The big picture: the topic or main idea of the whole text or a large part of it.','"mainly about", "the main idea", "all the speakers agree"'],['Specific information','One detail from one place: a date, a name, a place, a reason.','Names, numbers, days, "because…"'],['Inference','Something not said directly: a feeling, a tone, what will probably happen next.','"probably", "most likely", "sounds…", "would agree"']])}`)}
+  ${sec('L','Listening: what to expect',ul(['Each recording plays <b>once</b>. The questions come after it.','<b>Parts 1–3:</b> each question is read aloud and appears on its own, with 4 answer choices. You have about 30 seconds for each one.','<b>Parts 4–6:</b> all the questions appear on one screen as sentences to complete, with a drop-down menu for each.','All speakers have Canadian accents. In two-person conversations, one speaker is a man and one is a woman.','In Part 5 (a video), use facial expressions and body language to understand feelings. You are not tested on what people wear or how they look.','Questions follow the order of the recording, so keep your notes in order.'])+
+    `<h3>Note-taking</h3>`+ul(['You get paper and a pen at the test centre. Ask for more if you need it. Nobody reads your notes.','Use point form, abbreviations and symbols: write key words only.','Set up your notes before the audio starts. For Part 5, make one column per speaker.','In news reports (Part 4) and viewpoints (Part 6), write people’s last names: speakers use them after the first mention.','Practise with pen and paper, not a keyboard, so test day feels the same.']))}
+  ${sec('R','Reading: a time plan for each part',`<p>The text is on the left; questions with drop-down menus are on the right. Each part has its own timer, and you cannot go back.</p>
+    ${tbl(['Part','Time','Suggested plan'],[['1 · Correspondence (11 Qs)','about 11 min','Preview who wrote to whom and why (30 sec) → read questions 1–6 and find keywords (1.5 min) → answer them (4 min) → complete the reply, 7–11 (4.5 min) → check every answer is chosen (30 sec)'],['2 · Apply a diagram (8 Qs)','about 9 min','Preview the diagram: what it is and who made it (30 sec) → preview the email (30 sec) → fill blanks 1–5 (5 min) → answer 6–8 (2.5 min) → check (30 sec)'],['3 · Information (9 Qs)','about 10 min','Find the topic of each paragraph A–D (1 min) → match each statement and prove it in the text; choose E if no paragraph has it (8.5 min) → check (30 sec)'],['4 · Viewpoints (10 Qs)','about 13 min','Read questions 1–5 for keywords (1 min) → read the article: who believes what, and why (3 min) → answer 1–5 (4.5 min) → complete the comment, 6–10 (4 min) → check (30 sec)']])}
+    <h3>Keywords</h3>${ul(['Most answers are paraphrased, so look for the same idea in different words.','Some words cannot be paraphrased: names of people and places, special terms, and words in quotation marks. These are the best keywords to scan for.'])}`)}
+  ${sec('W','What raters look for: Writing',tbl(['Category','What raters check'],[['Content / Coherence','How many ideas, how good they are, how well they are organized, examples and details'],['Vocabulary','Word choice, using words correctly, range, precision'],['Readability','Format and paragraphs, connectors, grammar and sentence structure, spelling and punctuation'],['Task Fulfillment','Answering every part of the task, the right tone, the word count']])+ul(['Task 1 (email): 27 minutes, 150–200 words. Do every point in the prompt. Not too formal, not too casual.','Task 2 (survey): 26 minutes, 150–200 words. Choose one option and explain why it is better. No email format needed.','The test has a word counter and spellcheck. Leave time to proofread.']))}
+  ${sec('S','What raters look for: Speaking',tbl(['Category','What raters check'],[['Content / Coherence','How many ideas, how good they are, organization, examples and details'],['Vocabulary','Word choice, using words correctly, range, precision'],['Listenability','Rhythm, pronunciation and intonation; pauses, fillers ("uh") and self-correction; grammar; variety of sentences'],['Task Fulfillment','Staying on topic, covering the task, the right tone, using the time']])+ul(['Each task has preparation time, then speaking time. A bar shows the time left.','Speak to the person in the task ("You should…"), not about them.','Picture tasks: start with an overview of the scene, then describe details. Your listener cannot see the picture.','Task 5 has two screens: first you only choose an option, then you prepare and speak.','Keep your voice steady and loud enough: the microphone must hear you clearly.']))}
+  ${sec('T','Official free resources',`<p>Free materials from the test maker. They open on the official CELPIP website.</p>`+ul(['<a href="https://www.celpip.ca/prepare-for-celpip/free-practice-tests/" target="_blank" rel="noopener">Two free official practice tests</a>, with answer keys and Listening transcripts','<a href="https://www.celpip.ca/prepare-for-celpip/score-comparison-chart/" target="_blank" rel="noopener">Sample Writing and Speaking answers at every CELPIP level</a>','<a href="https://www.celpip.ca/prepare-for-celpip/webinars-workshops/" target="_blank" rel="noopener">Free live webinars</a> and <a href="https://www.youtube.com/celpipofficial" target="_blank" rel="noopener">recorded webinars on YouTube</a>','<a href="https://www.celpip.ca/take-celpip/test-results/" target="_blank" rel="noopener">Understanding your test scores</a> and <a href="https://www.celpip.ca/take-celpip/test-day-information/" target="_blank" rel="noopener">test day procedures</a>'])+`<p class="muted" style="font-size:12.5px;margin:0">This course is independent and is not affiliated with the test publisher.</p>`)}`}
 /* ---------- Quiz tool (listening / reading / mc) ---------- */
 function Quiz(host,s,key){
   const q=QUIZ[key];const rk=s.n+':'+key;
@@ -2156,9 +2176,9 @@ function Writer(host,s,key){
   const prev=(results()[rk]||{}).ai;
   host.innerHTML=`<div class="tool"><div class="tool-head"><span class="chip hub">${store.get('aiOff',false)?'Timed writing':'Timed writing · AI scored'}</span><h3>${esc(w.title)}</h3><span class="spacer"></span><span class="timer" data-timer>${fmt(remaining)}</span></div>
   <div class="tool-body"><div class="prompt">${w.prompt}</div><a class="tpl-link" href="downloads/CELPIP-Templates-${/survey/i.test(w.type||'')?'Survey':'Email'}.pdf" target="_blank" rel="noopener">📄 Stuck? Open the ${/survey/i.test(w.type||'')?'survey':'email'} template (PDF)</a>
-   <div class="row"><button class="btn hub" data-start>Start ${w.minutes}-minute timer</button><span class="muted" style="font-size:13px">Pasting is turned off, as on the real test.</span><span class="spacer"></span><span class="wc" data-wc>0 words</span></div>
+   <div class="row"><button class="btn hub" data-start>Start ${w.minutes}-minute timer</button><span class="muted" style="font-size:13px">Spellcheck is on, as on the real test. Pasting text from outside is turned off.</span><span class="spacer"></span><span class="wc" data-wc>0 words</span></div>
    <label for="ta-${rk}" class="eyebrow">Your response</label>
-   <textarea class="write" id="ta-${rk}" spellcheck="false" placeholder="Start typing your response here…"></textarea>
+   <textarea class="write" id="ta-${rk}" spellcheck="true" placeholder="Start typing your response here…"></textarea>
    <div class="row"><button class="btn primary" data-submit>${store.get('aiOff',false)?'Submit my writing':'Submit and get my score'}</button><span class="muted" data-msg style="font-size:13px"></span></div>
    <div data-ai-out>${prev?`<div class="eyebrow" style="margin-bottom:8px">Your last score</div>${AIFeedback(prev,w)}`:''}</div>
    <details class="selfbox" data-self ${prev?'':'hidden'}><summary>Score yourself too (optional)</summary>
@@ -2169,7 +2189,7 @@ function Writer(host,s,key){
   ta.value=store.get(dk,'');
   const count=()=>{const n=(ta.value.trim().match(/\S+/g)||[]).length;wc.textContent=n+' words';wc.className='wc '+(n===0?'':(n>=150&&n<=200?'ok':'bad'));return n};count();
   ta.addEventListener('input',()=>{if(!firstAt)firstAt=Date.now();count();store.set(dk,ta.value)});
-  ta.addEventListener('paste',e=>{e.preventDefault();msg.textContent='Paste is turned off. Type your answer.'});
+  ta.addEventListener('paste',e=>{e.preventDefault();msg.textContent='Pasting text from outside is turned off. Type your answer.'});
   host.querySelector('[data-start]').addEventListener('click',e=>{e.target.disabled=true;timerOn=true;ta.focus();tid=every(()=>{remaining--;timer.textContent=fmt(Math.max(0,remaining));timer.classList.toggle('low',remaining<=180);
     if(remaining===180)msg.textContent='3 minutes left. Start your proofreading pass.';
     if(remaining<=0){clearInterval(tid);ta.readOnly=true;submit(true)}},1000)});
@@ -2388,7 +2408,7 @@ function MessagesView(){
   const comp=task?`<section class="panel stack composer" style="gap:12px" id="s-comp">
       <div class="row"><span class="chip kind-task">Email-writing task</span><h3 style="flex:1;min-width:0">Reply: ${esc(task.subject||'Email task')}</h3><span class="timer" id="s-timer">27:00</span></div>
       <div class="prompt" style="white-space:pre-wrap">${esc(task.body)}</div>
-      <div class="row"><button class="btn hub" id="s-start">Start 27-minute timer</button><span class="muted" style="font-size:13px">Pasting is turned off, as on the real test.</span><span class="spacer"></span><span class="wc" id="s-wc">0 words</span></div>
+      <div class="row"><button class="btn hub" id="s-start">Start 27-minute timer</button><span class="muted" style="font-size:13px">Spellcheck is on, as on the real test. Pasting text from outside is turned off.</span><span class="spacer"></span><span class="wc" id="s-wc">0 words</span></div>
       <label class="field" for="s-body">Your email<textarea class="write" id="s-body" placeholder="Dear …"></textarea></label>
       <div class="row"><button class="btn primary" id="s-send">Send my reply</button><button class="btn" id="s-cancel">Cancel</button><span class="muted" id="s-msg" style="font-size:13px"></span></div></section>`
     :`<section class="panel stack composer" style="gap:12px" id="s-comp"><h3>Write to Ms. Maria</h3>
@@ -2410,7 +2430,7 @@ function bindMessages(){if(!cloud.code)return;
   const ta=document.getElementById('s-body');const wc=document.getElementById('s-wc');
   const dk='msgdraft:'+(sReply||'free');if(ta){ta.value=store.get(dk,'');ta.addEventListener('input',()=>{store.set(dk,ta.value);count()})}
   const count=()=>{if(!wc)return 0;const n=(ta.value.trim().match(/\S+/g)||[]).length;wc.textContent=n+' words';wc.className='wc '+(n===0?'':(n>=150&&n<=200?'ok':'bad'));return n};count();
-  if(sReply&&ta)ta.addEventListener('paste',e=>{e.preventDefault();document.getElementById('s-msg').textContent='Paste is turned off. Type your reply.'});
+  if(sReply&&ta)ta.addEventListener('paste',e=>{e.preventDefault();document.getElementById('s-msg').textContent='Pasting text from outside is turned off. Type your reply.'});
   on('s-start','click',e=>{e.target.disabled=true;let left=27*60;const tm=document.getElementById('s-timer');ta.focus();
     const iv=every(()=>{left--;tm.textContent=fmt(Math.max(0,left));tm.classList.toggle('low',left<=180);if(left<=0){clearInterval(iv);ta.readOnly=true;document.getElementById('s-msg').textContent='Time is up. Send your reply.'}},1000)});
   on('s-send','click',async e=>{const body=ta.value.trim();const msg=document.getElementById('s-msg');if(!body){msg.textContent='Write something first.';return}
