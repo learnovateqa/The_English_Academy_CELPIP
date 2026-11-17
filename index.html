@@ -2966,6 +2966,17 @@ const SAMPLE_EMAILS={6:[
    ['n','Next step','Could you please let me know your decision by Friday, May 23? I look forward to your reply.'],
    ['g','Closing','Sincerely,<br>Omar Haddad']],
   why:[['Content','Every note from the plan becomes a full sentence with a detail: Room 418, May 12 to 14, the elevator, the presentation.'],['Vocabulary','Formal, precise words: “disappointment”, “resolve”, “convenient location”, “acceptable”.'],['Readability','One paragraph per bullet. Connectors: “Unfortunately”, “As a result”, “therefore”, “Alternatively”.'],['Task fulfillment','All three bullets in order, formal tone, no contractions, and a next step with a date.']]},
+ {title:'Semi-formal · welcome a new neighbour (from the class slides)',reader:'New neighbour → semi-formal: friendly but polite. “Hi Sam,” … “Best regards,”',
+  prompt:'A new family has just moved in next door. You have not met them yet. Write an email to your new neighbour. In your email:',
+  bullets:['welcome your neighbour','describe something useful in the neighbourhood','offer to help with something'],
+  parts:[['g','Greeting','Hi Sam,'],
+   ['p','Who you are + purpose','My name is Leila, and I live next door at number 14. I am writing to welcome you to the street and to share a few things that might help you settle in.'],
+   ['1','Bullet 1 · welcome','We are delighted to have a family next door again, as the house has been empty since last spring. My children are seven and nine, so they are already hoping to meet yours, and we would be happy to invite you over for tea once you have unpacked.'],
+   ['2','Bullet 2 · something useful','One place you will enjoy is Riverside Park, which is only a five-minute walk from here. It has a large playground, and on Saturday mornings there is a farmers’ market where you can buy fresh bread and local vegetables.'],
+   ['3','Bullet 3 · an offer to help','Moving can be exhausting, so please let me know if you need to borrow any tools, such as a drill or a ladder. Also, garbage is collected every Tuesday morning, so remember to put your bins out the night before.'],
+   ['n','Next step','Would Saturday afternoon suit you for a visit? Just knock on our door.'],
+   ['g','Closing','Best regards,<br>Leila']],
+  why:[['Content','Every note from the plan becomes a full sentence with a detail: number 14, the children’s ages, the farmers’ market, Tuesday garbage day.'],['Vocabulary','Warm, natural phrases: “settle in”, “delighted”, “once you have unpacked”, “exhausting”.'],['Readability','One paragraph per bullet, with “as”, “so”, “which” and “Also” linking the ideas.'],['Task fulfillment','Semi-formal: friendly but never casual (“Hi Sam,” not “Hey!”), no contractions, and a next step with a day.']]},
  {title:'Formal · a complaint to a building manager',reader:'Building manager → formal',
   prompt:'You live in an apartment building. The heating in your apartment has not worked properly for two weeks. Write an email to the building manager. In your email:',
   bullets:['describe the problem','explain how it is affecting you','say what you want the manager to do'],
@@ -3004,7 +3015,7 @@ function hiLinks(t){return SAMPLE_LINKS.reduce((h,w)=>h.replace(new RegExp('(^|[
 function SampleEmails(s){const list=SAMPLE_EMAILS[s.n];if(!list)return '';
   const words=e=>e.parts.map(x=>x[2].replace(/<br>/g,' ')).join(' ').split(/\s+/).filter(Boolean).length;
   return `<section class="panel stack samples" style="gap:12px"><div><div class="eyebrow">Model answers · Writing Task 1</div><h3>Sample emails</h3>
-    <p class="muted" style="font-size:14px;margin:4px 0 0;max-width:68ch">Four Level 9+ emails for different readers. The first one is the noisy hotel email from class. Each colour is one part of the email, and the <b class="lnk">bold</b> words are connectors. Read one before you write your own. Use the structure, not the sentences.</p></div>
+    <p class="muted" style="font-size:14px;margin:4px 0 0;max-width:68ch">Five Level 9+ emails for different readers. The first two are the noisy hotel and new neighbour emails from class. Each colour is one part of the email, and the <b class="lnk">bold</b> words are connectors. Read one before you write your own. Use the structure, not the sentences.</p></div>
    ${list.map((e,i)=>`<details class="se" ${i?'':'open'}><summary><span>${esc(e.title)}</span><span class="chip">${words(e)} words</span></summary>
      <div class="se-body">
       <div class="se-prompt"><b>The task.</b> ${esc(e.prompt)}<ul>${e.bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul><span class="muted">Reader and tone: ${esc(e.reader)}</span></div>
