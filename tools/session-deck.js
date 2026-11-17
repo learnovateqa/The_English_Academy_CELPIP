@@ -449,9 +449,18 @@ const plain = t => parseMarks(t).map(x => x[0]).join('');
       T(s, 'THE TASK', { x: 1.0, y: 2.1, w: 3.3, h: 0.35, fontSize: 11, bold: true, color: SK[kk(sl)][1], charSpacing: 3 });
       T(s, [{ text: sl.task, options: { breakLine: true } }, ...(sl.bullets || []).map((b, i) => ({ text: b, options: { bullet: { indent: 12 }, breakLine: i < sl.bullets.length - 1 } }))], { x: 1.0, y: 2.5, w: 3.4, h: 4.0, fontSize: 13, valign: 'top', paraSpaceAfter: 6 });
     }
-    const P = sl.parts, ph = Math.min(1.25, (4.75 - (P.length - 1) * 0.1) / P.length);
+    const P = sl.parts, ph0 = Math.min(1.25, (4.75 - (P.length - 1) * 0.1) / P.length);
+    // fit: true sizes each box to its text (longer parts get taller boxes), filling the same area
+    let hs = P.map(() => ph0);
+    if (sl.fit) {
+      const fs = sl.size || 13, cpl = ((11.8 - tw - 0.45) * 72) / (fs * 0.5), lh = fs * 1.3 / 72;
+      const need = P.map(([, t]) => 0.68 + Math.ceil(String(t).length / cpl) * lh);
+      const room = 4.75 - (P.length - 1) * 0.1, extra = Math.max(0, room - need.reduce((x, v) => x + v, 0)) / P.length;
+      hs = need.map(v => v + extra);
+    }
+    let yy = 1.95;
     P.forEach(([lab, txt], j) => {
-      const y = 1.95 + j * (ph + 0.1), k = ROT[j % 5], x = 0.75 + tw, w = 11.8 - tw;
+      const ph = hs[j], y = yy, k = ROT[j % 5], x = 0.75 + tw, w = 11.8 - tw; yy += ph + 0.1;
       card(s, x, y, w, ph, j % 2 ? 'FFFFFF' : 'F6F7FB', 'Part ' + (j + 1), j % 2 === 1, j % 2 ? LINE : null);
       const lw = Math.max(1.3, Math.min(2.2, 0.3 + String(lab).length * 0.1));
       softPill(s, x + 0.2, y + 0.15, lw, 0.38, k, lab, 'Label ' + (j + 1));
