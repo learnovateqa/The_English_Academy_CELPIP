@@ -873,7 +873,7 @@ nav.main a:not([aria-current="page"]):hover{background:color-mix(in srgb,var(--s
 @keyframes fall{to{transform:translate(var(--x,0),105vh) rotate(var(--r,540deg));opacity:.9}}
 @media (max-width:760px){
   header.bar{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--surface)!important}
-  header.bar .wrap{flex-wrap:nowrap;gap:10px}
+  header.bar .wrap{flex-wrap:nowrap;gap:10px}header.bar .ibtn.ext{padding-inline:9px}header.bar .ibtn.ext span:last-child{display:none}
   #signout{margin-left:auto}
   header.bar .brand-t small{display:none}
   .sync{font-size:0;padding:6px;gap:0}.sync::before{width:9px;height:9px}
@@ -906,8 +906,8 @@ nav.main a:not([aria-current="page"]):hover{background:color-mix(in srgb,var(--s
     <a href="#teacher" data-nav="teacher" id="nav-teacher-a" hidden><svg class="nic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5c1.6.8 2.6 2.6 3 5.5"/></svg><span id="nav-teacher">Teacher Portal</span></a>
   </nav>
   <span id="sync" class="sync" hidden></span>
-  <a class="ibtn" href="https://learnovateqa.github.io/the-english-academy/dictionary/" target="_blank" rel="noopener" title="Dictionary & Thesaurus: English ⇄ Spanish, Bengali, Malayalam, Arabic"><span aria-hidden="true">📖</span><span>Dictionary</span></a>
-  <a class="ibtn" href="https://learnovateqa.github.io/the-english-academy/guide/" target="_blank" rel="noopener" title="How to use The English Academy websites"><span aria-hidden="true">❓</span><span>How to use</span></a>
+  <a class="ibtn ext" href="https://learnovateqa.github.io/the-english-academy/dictionary/" aria-label="Dictionary" target="_blank" rel="noopener" title="Dictionary & Thesaurus: English ⇄ Spanish, Bengali, Malayalam, Arabic"><span aria-hidden="true">📖</span><span>Dictionary</span></a>
+  <a class="ibtn ext" href="https://learnovateqa.github.io/the-english-academy/guide/" aria-label="How to use" target="_blank" rel="noopener" title="How to use The English Academy websites"><span aria-hidden="true">❓</span><span>How to use</span></a>
   <a class="ibtn" href="#teacher" id="tp-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/></svg><span>Teacher portal</span></a>
   <button class="ibtn" id="signout" hidden>Sign out</button>
 </div></header>
@@ -997,6 +997,7 @@ function applyStudent(j){cloud.code=j.student.code;PREFIX='bcs:'+cloud.code+':';
   if(r&&(r.updatedAt||0)>localT){SYNC_KEYS.forEach(k=>{if(r[k]!==undefined)_set(k,r[k])});_set('updatedAt',r.updatedAt)}
   else if(localT>((r&&r.updatedAt)||0))schedulePush();
   if(r&&Array.isArray(r.resets))applyResets(r.resets);
+  autoTagLog();
   if(cloud.state!=='saving'||!pushPending)cloud.state='synced';renderNav()}
 async function initCloud(){const s=readSession();cloud.tpass=readTPass();
   if(s&&s.code){cloud.code=s.code;PREFIX='bcs:'+s.code+':';cloud.student=s.student;cloud.batch=s.batch;cloud.feedback=s.feedback;cloud.settings=s.settings||{};cloud.mockScores=s.mockScores||{};cloud.state='saving'}
@@ -1575,7 +1576,34 @@ function skillScores(r){r=r||results();const out={L:[],R:[],W:[],S:[]};
     else if(WRITE[tool]&&v.self)out.W.push(v.self);else if(SPEAK[tool]&&v.self)out.S.push(v.self);}
   return out}
 const sessLabel=v=>/^\d+$/.test(String(v))?'S'+v:String(v);
-function addLog(entry){const log=store.get('log',[]);log.unshift(Object.assign({id:Date.now()+Math.random(),date:new Date().toISOString().slice(0,10),cause:''},entry));store.set('log',log)}
+/* ---------- Automatic error causes ----------
+   Every wrong answer gets a cause straight away; the student can change it.
+   no answer → timing · question about attitude, feeling, opinion or what is implied → inference
+   chosen answer uses words that are really in the recording/text → distractor · otherwise → vocabulary (missed paraphrase) */
+const STOPW=new Set('the a an and or but of to in on at for with from by is are was were be been it its this that these those he she they them his her their you your i we our my me not no do does did will would can could should have has had there here what when where which who why how than then so as if about into over after before more most very just also only all some any one two'.split(' '));
+const stemW=w=>w.replace(/(ing|ed|es|s)$/,'');
+const wordsOf=t=>String(t||'').toLowerCase().replace(/<[^>]+>/g,' ').replace(/[’']/g,"'").match(/[a-z0-9']+/g)||[];
+const keyWords=t=>wordsOf(t).filter(w=>w.length>=4&&!STOPW.has(w)).map(stemW);
+function textOf(o,skip){const out=[];(function walk(v,k){if(k==='qs'||k==='o'||k==='why'||k==='img')return;if(typeof v==='string')out.push(v);else if(Array.isArray(v))v.forEach(x=>walk(x));else if(v&&typeof v==='object')Object.keys(v).forEach(kk=>walk(v[kk],kk))})(o);return out.join(' ')}
+let QINDEX=null;
+function qIndex(){if(QINDEX)return QINDEX;const ix=[];
+  Object.values(QUIZ).forEach(q=>{const src=textOf(q);(q.qs||[]).forEach(x=>ix.push({q:x.q,o:x.o,a:x.a,src,title:q.title||''}))});
+  Object.values(window.MOCKS||{}).forEach(m=>['L','R'].forEach(sec=>(m[sec]||[]).forEach(p=>(p.screens||[p]).forEach(sc=>{const src=textOf(p)+' '+textOf(sc);(sc.qs||[]).forEach(x=>ix.push({q:x.q,o:x.o,a:x.a,src,title:p.name||''}))}))));
+  return QINDEX=ix}
+const INFER_RE=/\b(attitude|feel|feels|feeling|felt|probably|likely|impl(y|ies|ied)|suggest|infer|tone|mood|opinion|think|thinks|believe|believes|agree|agrees|concern|concerned|worried|sounds?|seems?|main idea|mainly|purpose|intend|expect)\b/i;
+function autoCause(e){if(!e)return '';const yours=String(e.yours||'');
+  if(!yours||yours==='(no answer)')return 'timing';
+  const item=String(e.item||'');const hit=qIndex().find(x=>x.q&&item.endsWith(x.q)&&(!e.correct||!x.o||x.o[x.a]===e.correct))||qIndex().find(x=>x.q&&item.endsWith(x.q));
+  const stem=hit?hit.q:item.replace(/^.*?:\s*(Q\d+\s*)?/,'');const title=(hit&&hit.title)||item;
+  if(INFER_RE.test(stem)||/attitude|tone|feeling|opinion|infer/i.test(title.split(':')[0]))return 'inference';
+  if(hit&&hit.src){const srcW=new Set(keyWords(hit.src));const yw=keyWords(yours);
+    if(yw.length&&yw.filter(w=>srcW.has(w)).length/yw.length>=0.6)return 'distractor'}
+  return 'vocabulary'}
+// fill in a cause for every entry that has none; marks it auto so the student knows they can change it
+function withAutoCause(log){return (log||[]).map(e=>e&&!e.cause?Object.assign({},e,{cause:autoCause(e),auto:true}):e)}
+function autoTagLog(){const log=store.get('log',[]);if(!log.some(e=>e&&!e.cause))return;store.set('log',withAutoCause(log))}
+const causeSel=e=>`<select data-id="${esc(e.id)}" aria-label="Cause"><option value="">Choose…</option>${CAUSES.map(c=>`<option value="${c}" ${e.cause===c?'selected':''}>${c}${e.auto&&e.cause===c?' (auto)':''}</option>`).join('')}</select>`;
+function addLog(entry){const log=store.get('log',[]);const e=Object.assign({id:Date.now()+Math.random(),date:new Date().toISOString().slice(0,10),cause:''},entry);if(!e.cause){e.cause=autoCause(e);e.auto=true}log.unshift(e);store.set('log',log)}
 
 /* ---------- timers registry ---------- */
 let intervals=[];const every=(fn,ms)=>{const id=setInterval(fn,ms);intervals.push(id);return id};
@@ -2416,13 +2444,13 @@ function ErrorSection(){const log=store.get('log',[]);const untagged=log.filter(
   return `<section class="panel stack" style="gap:16px" id="errors">
     <div class="row"><div><div class="eyebrow">My error log</div><h2>${log.length?`${log.length} mistake${log.length>1?'s':''} to learn from`:'No mistakes logged yet'}</h2></div><span class="spacer"></span><a href="#log" class="btn">Open full log</a></div>
     ${log.length?`<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:18px" id="err-grid">
-      <div class="stack" style="gap:10px">${causeBars(log)}<p class="muted" style="font-size:13px">${untagged?`<b>${untagged}</b> still need a cause. Choosing one shows you your pattern.`:'Every mistake is tagged. Nice work.'}</p></div>
+      <div class="stack" style="gap:10px">${causeBars(log)}<p class="muted" style="font-size:13px">${untagged?`<b>${untagged}</b> still need a cause. Choosing one shows you your pattern.`:'Every mistake has a cause. Causes marked “auto” were chosen for you: change any that do not fit.'}</p></div>
       <div class="tablewrap"><table class="log"><thead><tr><th>Session</th><th>Question</th><th>Your answer</th><th>Correct</th><th>Cause</th></tr></thead><tbody>
-        ${log.slice(0,6).map(e=>`<tr><td class="mono">${esc(sessLabel(e.session))}</td><td style="min-width:200px">${esc(e.item)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td><select data-id="${esc(e.id)}" aria-label="Cause"><option value="">Choose…</option>${CAUSES.map(c=>`<option value="${c}" ${e.cause===c?'selected':''}>${c}</option>`).join('')}</select></td></tr>`).join('')}
+        ${log.slice(0,6).map(e=>`<tr><td class="mono">${esc(sessLabel(e.session))}</td><td style="min-width:200px">${esc(e.item)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td>${causeSel(e)}</td></tr>`).join('')}
       </tbody></table>${log.length>6?`<p class="muted" style="font-size:13px;margin-top:8px">Showing the 6 newest. <a href="#log">See all ${log.length}</a></p>`:''}</div></div>`
     :'<p class="muted">Wrong answers from listening, reading and drill sets land here automatically. Tag each one as distractor, vocabulary, timing or inference to find your pattern.</p>'}
   </section>`}
-function bindCauseSelects(){app.querySelectorAll('select[data-id]').forEach(sel=>sel.addEventListener('change',()=>{const log=store.get('log',[]);const e=log.find(x=>String(x.id)===sel.dataset.id);if(e){e.cause=sel.value;store.set('log',log)}}))}
+function bindCauseSelects(){app.querySelectorAll('select[data-id]').forEach(sel=>sel.addEventListener('change',()=>{const log=store.get('log',[]);const e=log.find(x=>String(x.id)===sel.dataset.id);if(e){e.cause=sel.value;delete e.auto;store.set('log',log)}}))}
 
 /* ---------- messages (student) ---------- */
 const seenSet=()=>new Set(store.get('seenMsgs',[]));
@@ -3037,7 +3065,7 @@ async function loadTeacher(){if(cloud.t.loading)return;cloud.t.loading=true;clou
   try{const j=await tcall('teacher.data');Object.assign(cloud.t,{batches:j.batches||[],students:j.students||[],progress:j.progress||{},feedback:j.feedback||{},mockScores:j.mockScores||{},messages:j.messages||[],loaded:true,at:Date.now()});cloud.settings=j.settings||{}}
   catch(e){if(e.code==='bad_password'){writeTPass(null);cloud.tpass=null;renderNav()}cloud.t.error=errMsg(e)}
   finally{cloud.t.loading=false;refreshIf(['teacher','session','home'])}}
-function tRoster(){return cloud.t.students.map(st=>Object.assign({},cloud.t.progress[st.code]||{},{id:st.code,code:st.code,profile:{name:st.name,email:st.email,phone:st.phone},batch:st.batch}))}
+function tRoster(){return cloud.t.students.map(st=>{const pg=cloud.t.progress[st.code]||{};return Object.assign({},pg,{log:withAutoCause(pg.log),id:st.code,code:st.code,profile:{name:st.name,email:st.email,phone:st.phone},batch:st.batch})})}
 function stuStats(r){const res=r.res||{};const done=SESSIONS.reduce((a,s)=>a+sessionProgress(s,res).done,0);
   const cur=SESSIONS.find(s=>sessionProgress(s,res).pct<100)||SESSIONS[11];
   const sc=skillScores(r.res||{});const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null;
@@ -3159,12 +3187,12 @@ function StudentDetail(){const r=tRoster().find(x=>x.id===tStudent);if(!r)return
     ${TMockPanel(r)}
     <div class="grid g2">
       <div class="stack" style="gap:10px"><div class="eyebrow">Writing submissions</div>${subs.length?subs.map(x=>`<details class="subm"><summary>Session ${esc(x.n)} · ${esc(WRITE[x.t]?WRITE[x.t].title:(x.v.task?'Email task reply: '+x.v.task:x.t))} · ${x.v.words||0} words${x.v.ai?` · <b>AI level ${clampL(x.v.ai.overall_level)}</b>`:''}${x.v.self?` · self ${(x.v.self/20).toFixed(1)}/5`:''}</summary><pre>${esc(x.v.text)}</pre>${x.v.ai?AIFeedback(x.v.ai,WRITE[x.t]):''}</details>`).join(''):'<p class="muted">No writing submitted yet.</p>'}</div>
-      <div class="stack" style="gap:10px"><div class="eyebrow">Error causes</div>${s.log.length?`<div class="cause-bars">${causes.map(([c,n])=>`<div><span style="text-transform:capitalize">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${n/max*100}%"></div></div><span class="mono">${n}</span></div>`).join('')}</div><p class="muted" style="font-size:13px">${s.log.length} logged · ${s.untagged} not tagged yet</p>`:'<p class="muted">No errors logged yet.</p>'}</div>
+      <div class="stack" style="gap:10px"><div class="eyebrow">Error causes</div>${s.log.length?`<div class="cause-bars">${causes.map(([c,n])=>`<div><span style="text-transform:capitalize">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${n/max*100}%"></div></div><span class="mono">${n}</span></div>`).join('')}</div><p class="muted" style="font-size:13px">${s.log.length} logged · ${s.log.filter(e=>e.auto).length} tagged automatically</p>`:'<p class="muted">No errors logged yet.</p>'}</div>
     </div>
     <div class="stack" style="gap:10px"><div class="row"><div class="eyebrow">Error log · ${s.log.length} entr${s.log.length===1?'y':'ies'}</div><span class="spacer"></span>
       ${s.log.length?`<label class="field" for="t-logf" style="flex-direction:row;align-items:center;gap:8px">Show<select id="t-logf"><option value="">All causes</option>${CAUSES.map(c=>`<option value="${c}" ${tLogFilter===c?'selected':''}>${c}</option>`).join('')}<option value="__none" ${tLogFilter==='__none'?'selected':''}>Not tagged</option></select></label>`:''}</div>
       ${s.log.length?`<div class="tablewrap"><table class="log"><thead><tr><th>Date</th><th>Session</th><th>Question</th><th>Their answer</th><th>Correct</th><th>Cause</th></tr></thead><tbody>
-      ${s.log.filter(e=>!tLogFilter||(tLogFilter==='__none'?!e.cause:e.cause===tLogFilter)).map(e=>`<tr><td class="mono">${esc(e.date)}</td><td class="mono">${esc(sessLabel(e.session))}</td><td style="min-width:220px">${esc(e.item)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td>${e.cause?`<span class="chip" style="text-transform:capitalize">${esc(e.cause)}</span>`:'<span class="muted">Not tagged</span>'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="muted">This student has no logged errors yet.</p>'}</div>
+      ${s.log.filter(e=>!tLogFilter||(tLogFilter==='__none'?!e.cause:e.cause===tLogFilter)).map(e=>`<tr><td class="mono">${esc(e.date)}</td><td class="mono">${esc(sessLabel(e.session))}</td><td style="min-width:220px">${esc(e.item)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td>${e.cause?`<span class="chip" style="text-transform:capitalize">${esc(e.cause)}</span>${e.auto?'<span class="muted" style="font-size:12px"> auto</span>':''}`:'<span class="muted">Not tagged</span>'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="muted">This student has no logged errors yet.</p>'}</div>
     <div class="stack" style="gap:10px"><label class="field" for="t-fb">Feedback for ${esc(pr.name)}<textarea id="t-fb" placeholder="What to keep doing, what to fix, and one task for this week.">${esc(draft)}</textarea></label>
       <div class="row"><button class="btn primary" id="t-fb-send">${fb&&fb.text?'Update feedback':'Send feedback'}</button><span class="muted" id="t-fb-msg" style="font-size:13px">${fb&&fb.updatedAt?'Last sent '+ago(fb.updatedAt):''}</span></div></div>
   </section>`}
@@ -3247,15 +3275,15 @@ function bindTeacher(){document.querySelectorAll('#sched,#decks').forEach(d=>{if
 
 /* ---------- Error log ---------- */
 function LogView(){const log=store.get('log',[]);
-  return `<div class="stack"><div><div class="eyebrow">Study Hub</div><h1>Error Log</h1><p class="muted" style="margin-top:8px;max-width:62ch">Every wrong answer from a Hub quiz lands here. Give each one a cause. Your instructor groups the class’s causes to plan the next live session.</p></div>
+  return `<div class="stack"><div><div class="eyebrow">Study Hub</div><h1>Error Log</h1><p class="muted" style="margin-top:8px;max-width:62ch">Every wrong answer from a quiz or mock test lands here, with a cause chosen automatically (marked “auto”). Check each one and change it if it is wrong. Your instructor groups the class’s causes to plan the next live session.</p></div>
   <div class="grid g2"><div class="panel stack" style="gap:10px"><h3>By cause</h3>${log.length?causeBars(log):'<p class="muted">No entries yet.</p>'}</div>
   <div class="panel stack" style="gap:8px"><h3>The four causes</h3><p><b>Distractor:</b> you picked a detail that was mentioned but corrected or rejected.</p><p><b>Vocabulary:</b> you missed a paraphrase or did not know a word.</p><p><b>Timing:</b> you ran out of time or rushed.</p><p><b>Inference:</b> you missed what was implied.</p></div></div>
   <div class="panel"><div class="row" style="margin-bottom:10px"><h3>Entries</h3><span class="spacer"></span>${log.length?'<button class="btn" data-clear>Clear log</button>':''}</div>
   ${log.length?`<div class="tablewrap"><table class="log"><thead><tr><th>Date</th><th>Session</th><th>Question</th><th>Your answer</th><th>Correct</th><th>Cause</th></tr></thead><tbody>
-  ${log.map(e=>`<tr><td class="mono">${e.date}</td><td class="mono">${esc(sessLabel(e.session))}</td><td style="min-width:220px">${esc(e.item)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td><select data-id="${e.id}" aria-label="Cause"><option value="">Choose…</option>${CAUSES.map(c=>`<option value="${c}" ${e.cause===c?'selected':''}>${c}</option>`).join('')}</select></td></tr>`).join('')}</tbody></table></div>`
+  ${log.map(e=>`<tr><td class="mono">${e.date}</td><td class="mono">${esc(sessLabel(e.session))}</td><td style="min-width:220px">${esc(e.item)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td>${causeSel(e)}</td></tr>`).join('')}</tbody></table></div>`
   :'<p class="muted">Finish a listening or reading set in any session’s Study Hub. Your misses appear here.</p>'}
   <div data-confirm hidden class="notice" style="margin-top:12px">Delete every entry? <button class="btn" data-yes>Delete all</button> <button class="btn" data-no>Keep</button></div></div></div>`}
-function bindLog(){app.querySelectorAll('select[data-id]').forEach(sel=>sel.addEventListener('change',()=>{const log=store.get('log',[]);const e=log.find(x=>String(x.id)===sel.dataset.id);if(e){e.cause=sel.value;store.set('log',log)}}));
+function bindLog(){app.querySelectorAll('select[data-id]').forEach(sel=>sel.addEventListener('change',()=>{const log=store.get('log',[]);const e=log.find(x=>String(x.id)===sel.dataset.id);if(e){e.cause=sel.value;delete e.auto;store.set('log',log)}}));
   const c=app.querySelector('[data-clear]');if(c){const box=app.querySelector('[data-confirm]');c.addEventListener('click',()=>box.hidden=false);
     app.querySelector('[data-no]').addEventListener('click',()=>box.hidden=true);app.querySelector('[data-yes]').addEventListener('click',()=>{store.set('log',[]);view()})}}
 
