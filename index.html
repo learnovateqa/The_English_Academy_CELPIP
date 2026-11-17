@@ -688,7 +688,7 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 .habit{background:var(--lav);border-radius:12px;padding:10px 14px;font-size:14.5px}
 .studyn{display:flex;flex-direction:column;gap:2px;background:var(--surface-2);border-radius:12px;padding:10px 12px;font-size:14px}
 .studyn .chip{align-self:flex-start;text-decoration:none}
-.selfbox{background:var(--surface-2);border-radius:14px;padding:10px 14px}.fixbox{margin-top:6px;font-size:13.5px}.fixbox summary{cursor:pointer;color:var(--accent,#1F7BFF);font-weight:600}.fixbox p{margin:6px 0 0}.selfbox summary{cursor:pointer;font-weight:600}
+.selfbox{background:var(--surface-2);border-radius:14px;padding:10px 14px}.samples details.se{border:1px solid var(--line);border-radius:14px;background:var(--surface)}.samples details.se>summary{cursor:pointer;display:flex;gap:10px;align-items:center;justify-content:space-between;padding:12px 16px;font-weight:600;list-style:none}.samples details.se>summary::-webkit-details-marker{display:none}.samples details.se>summary::before{content:"▸";color:var(--skWi);margin-right:2px}.samples details.se[open]>summary::before{content:"▾"}.samples details.se>summary>span:first-child{flex:1;min-width:0}.se-body{display:grid;gap:14px;padding:0 16px 16px}.se-prompt{background:var(--surface-2);border-radius:12px;padding:12px 14px;font-size:14px}.se-prompt ul{margin:6px 0;padding-left:20px}.se-mail{display:grid;gap:8px;font-size:15.5px;line-height:1.6}.se-part{border-left:5px solid var(--line);border-radius:10px;padding:8px 14px;background:var(--surface-2)}.se-part p{margin:2px 0 0}.se-lab{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}.se-part.kp{border-color:var(--skLi);background:var(--skL)}.se-part.kp .se-lab{color:var(--skLi)}.se-part.k1{border-color:var(--skRi);background:var(--skR)}.se-part.k1 .se-lab{color:var(--skRi)}.se-part.k2{border-color:var(--skWi);background:var(--skW)}.se-part.k2 .se-lab{color:var(--skWi)}.se-part.k3{border-color:var(--skSi);background:var(--skS)}.se-part.k3 .se-lab{color:var(--skSi)}.se-part.kn{border-color:var(--skOi);background:var(--skO)}.se-part.kn .se-lab{color:var(--skOi)}.se-part.kg .se-lab{color:var(--muted,#64748b)}b.lnk{color:inherit;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;text-decoration-color:var(--skWi)}.se-why{display:grid;gap:4px;font-size:14px}.se-why p{margin:0}.fixbox{margin-top:6px;font-size:13.5px}.fixbox summary{cursor:pointer;color:var(--accent,#1F7BFF);font-weight:600}.fixbox p{margin:6px 0 0}.selfbox summary{cursor:pointer;font-weight:600}
 
 .chk{display:inline-flex;gap:6px;align-items:center;font-size:13.5px}
 .th-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
@@ -1823,6 +1823,7 @@ function renderSession(s){
   <section id="pane-live" ${tab==='live'?'':'hidden'} class="stack">
     <div class="boundary">${icon('S',20)}<p><b>What happens in class.</b> Your instructor teaches and models every strategy live. There are no quizzes and no quiet work during class time.</p></div>
     ${DeckPanel(s)}
+    ${SampleEmails(s)}
     <div class="grid g2" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
       <div class="panel"><h3 style="margin-bottom:6px">Teaching breakdown</h3><ol class="timeline">${s.live.map(([a,b,t,d])=>`<li><span class="t">${a}–${b}<span class="len">${len(a,b)} min</span></span><div><b>${esc(t)}</b><span class="muted">${esc(d)}</span></div></li>`).join('')}</ol></div>
       <div class="panel"><h3 style="margin-bottom:12px">Live tools</h3><ul class="tools">${s.liveTools.map(([t,d])=>`<li><b>${esc(t)}</b>${esc(d)}</li>`).join('')}</ul></div>
@@ -1835,6 +1836,7 @@ function renderSession(s){
     ${gated?`<div class="notice" id="gate">Finish the Session ${prev.n} module first. You have done ${sessionProgress(prev).done} of ${sessionProgress(prev).total} practice steps. <a href="#session-${prev.n}">Go to Session ${prev.n}</a> · <button class="btn" id="gate-open" style="margin-left:6px">Preview anyway</button></div>`:''}
     <div id="hub-body" class="stack" ${gated?'hidden':''}>
       <div class="panel pathcard" id="pathcard"></div>
+      ${SampleEmails(s)}
       <div class="steplist">${s.tools.map(t=>`<div id="tool-${t}" class="stephost"></div>`).join('')}</div>
       <details class="panel todo" id="todo"><summary class="row" style="flex-wrap:nowrap"><div class="ring" id="hubring"><span id="hubprog"></span></div><div style="min-width:0"><h3>Class checklist</h3><p class="muted" style="font-size:13.5px">Tick each task when it is done. Tap to open.</p></div></summary>
         <ul class="tasks">${s.tasks.map(([t,d],i)=>`<li><input type="checkbox" id="t-${s.n}-${i}" data-task="${s.n}:${i}" ${tasksDone()[s.n+':'+i]?'checked':''}><label for="t-${s.n}-${i}"><b>${esc(t)}</b><span>${esc(d)}</span></label></li>`).join('')}</ul></details>
@@ -2950,6 +2952,55 @@ function normDeck(raw){let v=String(raw||'').trim();const m=v.match(/src\s*=\s*[
   return {err:'Use a Canva, Google Slides, PowerPoint Online, Pitch or Gamma link.'}}
 function deckOpen(url){if(/canva\.com/.test(url))return url.replace('?embed','');if(/docs\.google\.com/.test(url))return url.replace(/\/embed.*$/,/\/d\/e\//.test(url)?'/pub':'/present');return url}
 let deckEdit={};
+/* ---------- Sample emails (original models, Level 9+) ---------- */
+// part kinds: g = greeting/closing, p = who you are + purpose, 1/2/3 = bullets, n = next step
+const SAMPLE_EMAILS={6:[
+ {title:'Formal · a complaint to a building manager',reader:'Building manager → formal',
+  prompt:'You live in an apartment building. The heating in your apartment has not worked properly for two weeks. Write an email to the building manager. In your email:',
+  bullets:['describe the problem','explain how it is affecting you','say what you want the manager to do'],
+  parts:[['g','Greeting','Dear Ms. Patel,'],
+   ['p','Who you are + purpose','I have lived in unit 1207 at Lakeview Towers for three years, and I am writing about a heating problem that has not been resolved.'],
+   ['1','Bullet 1 · the problem','For the past two weeks, the radiator in my living room has produced only weak, lukewarm heat, even when the thermostat is set to 24 degrees. I reported the issue to the front desk on November 3, but no technician has come to inspect it yet.'],
+   ['2','Bullet 2 · how it affects you','As a result, my apartment has been uncomfortably cold, especially at night, when the temperature inside drops to about 16 degrees. Since I work from home three days a week, I have had to wear a winter jacket at my desk, and my seven-year-old daughter has caught a cold.'],
+   ['3','Bullet 3 · what you want + next step','I would therefore appreciate it if you could send a technician to repair the radiator as soon as possible. In the meantime, could the building provide a portable heater? Please let me know by Friday, November 21, when the repair can be scheduled.'],
+   ['g','Closing','Thank you for your attention to this matter.<br><br>Sincerely,<br>Daniel Reyes']],
+  why:[['Content','Real, specific facts: unit 1207, 24 and 16 degrees, November 3, a daughter with a cold.'],['Vocabulary','Precise words: “resolved”, “lukewarm”, “inspect”, “uncomfortably cold”.'],['Readability','One paragraph per bullet. Connectors show cause and result: “As a result”, “Since”, “therefore”, “In the meantime”.'],['Task fulfillment','All three bullets, formal tone, no contractions, and a clear next step with a date.']]},
+ {title:'Formal · a request to a manager at work',reader:'Your manager → formal, polite',
+  prompt:'You want to take an evening course that starts soon, but it clashes with your work hours. Write an email to your manager. In your email:',
+  bullets:['describe the course','explain why it is important to you','suggest how your work will be covered'],
+  parts:[['g','Greeting','Dear Mr. Thompson,'],
+   ['p','Purpose','I am writing to ask whether it would be possible to adjust my work schedule for the next four months.'],
+   ['1','Bullet 1 · the course','In January, I will begin an evening course in project management at Centennial College. Classes take place every Tuesday and Thursday from 5:30 to 8:30 p.m., so I would need to leave the office by 4:30 on those days.'],
+   ['2','Bullet 2 · why it matters','This course is important to me because it would allow me to take on more responsibility in our team. In particular, I hope to lead the upcoming warehouse software project, which requires exactly the planning skills that the course teaches.'],
+   ['3','Bullet 3 · covering your work','To make sure my work is not affected, I would start at 7:30 a.m. on Tuesdays and Thursdays instead of 8:30. Furthermore, Priya has kindly agreed to answer urgent client calls after 4:30 on those days, and I would cover her calls on Fridays in return.'],
+   ['n','Next step','Could we discuss this at our meeting next Monday? I would be grateful for your decision before the course registration deadline on December 15.'],
+   ['g','Closing','Best regards,<br>Amina Yusuf']],
+  why:[['Content','Exact days, times and dates, plus a real plan that makes it easy for the manager to say yes.'],['Vocabulary','Workplace language: “adjust my schedule”, “take on more responsibility”, “registration deadline”.'],['Readability','A mix of sentence types, including a “which” clause. Connectors: “so”, “because”, “In particular”, “Furthermore”.'],['Task fulfillment','Every bullet is answered in order. Polite, formal requests, and a next step with a deadline.']]},
+ {title:'Semi-formal · a favour from a neighbour',reader:'A neighbour you know → semi-formal: friendly but polite',
+  prompt:'You are going away for two weeks. Write an email to your neighbour. In your email:',
+  bullets:['explain where you are going and when','ask for help with something specific','offer something in return'],
+  parts:[['g','Greeting','Dear Mrs. Chen,'],
+   ['p','Who you are + purpose','I hope you are well. As you know, I live next door at number 42, and I am writing to ask you for a small favour.'],
+   ['1','Bullet 1 · where and when','My husband and I are travelling to Manila for my sister’s wedding from December 5 to 19. It will be our first trip home in four years, so we are very excited, although we are a little worried about leaving the house empty.'],
+   ['2','Bullet 2 · the favour','Would you be able to collect our mail and water the plants in our front window twice a week? I will leave a spare key and a short list of instructions in your mailbox before we leave. If it is not convenient, please do not hesitate to say so.'],
+   ['3','Bullet 3 · something in return','In return, we would love to bring you something special from the Philippines, perhaps some dried mangoes, which I remember you enjoyed at our summer barbecue. We would also be happy to look after your cat when you visit your son in Calgary in January.'],
+   ['n','Next step','Could you let me know by this weekend? Thank you so much.'],
+   ['g','Closing','Warm regards,<br>Grace Santos']],
+  why:[['Content','Personal, concrete details: number 42, the dates, the dried mangoes, the cat.'],['Vocabulary','Warm but polite phrases: “a small favour”, “do not hesitate to say so”, “look after”.'],['Readability','Varied sentences joined with “so”, “although”, “In return” and a “which” clause.'],['Task fulfillment','Semi-formal tone: friendly, never casual. It makes saying no easy and ends with a clear next step.']]}
+]};
+const SAMPLE_LINKS=['As a result','Since','therefore','In the meantime','Please let me know by','so','because','In particular','Furthermore','Could we','although','In return','perhaps','Would you be able to','Could you let me know by'];
+function hiLinks(t){return SAMPLE_LINKS.reduce((h,w)=>h.replace(new RegExp('(^|[^A-Za-z])('+w.replace(/ /g,' ')+')(?=[^A-Za-z])'),'$1<b class="lnk">$2</b>'),t)}
+function SampleEmails(s){const list=SAMPLE_EMAILS[s.n];if(!list)return '';
+  const words=e=>e.parts.map(x=>x[2].replace(/<br>/g,' ')).join(' ').split(/\s+/).filter(Boolean).length;
+  return `<section class="panel stack samples" style="gap:12px"><div><div class="eyebrow">Model answers · Writing Task 1</div><h3>Sample emails</h3>
+    <p class="muted" style="font-size:14px;margin:4px 0 0;max-width:68ch">Three Level 9+ emails for three different readers. Each colour is one part of the email, and the <b class="lnk">bold</b> words are connectors. Read one before you write your own. Use the structure, not the sentences.</p></div>
+   ${list.map((e,i)=>`<details class="se" ${i?'':'open'}><summary><span>${esc(e.title)}</span><span class="chip">${words(e)} words</span></summary>
+     <div class="se-body">
+      <div class="se-prompt"><b>The task.</b> ${esc(e.prompt)}<ul>${e.bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul><span class="muted">Reader and tone: ${esc(e.reader)}</span></div>
+      <div class="se-mail">${e.parts.map(([k,l,t])=>`<div class="se-part k${k}"><span class="se-lab">${esc(l)}</span><p>${k==='g'?t:hiLinks(t)}</p></div>`).join('')}</div>
+      <div class="se-why"><div class="eyebrow">Why it scores well</div>${e.why.map(([c,t])=>`<p><b>${esc(c)}:</b> ${esc(t)}</p>`).join('')}</div>
+     </div></details>`).join('')}
+  </section>`}
 function DeckPanel(s){const url=(cloud.settings||{})['deck:'+s.n];const T=!!cloud.tpass;const editing=T&&(deckEdit[s.n]||!url);
   if(!url&&!T)return '';
   const editor=editing?`<div class="deck-edit stack" style="gap:10px">
