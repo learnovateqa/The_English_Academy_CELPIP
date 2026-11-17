@@ -688,7 +688,7 @@ pre.clean{white-space:pre-wrap;font-family:var(--body);font-size:14.5px;backgrou
 .habit{background:var(--lav);border-radius:12px;padding:10px 14px;font-size:14.5px}
 .studyn{display:flex;flex-direction:column;gap:2px;background:var(--surface-2);border-radius:12px;padding:10px 12px;font-size:14px}
 .studyn .chip{align-self:flex-start;text-decoration:none}
-.selfbox{background:var(--surface-2);border-radius:14px;padding:10px 14px}.selfbox summary{cursor:pointer;font-weight:600}
+.selfbox{background:var(--surface-2);border-radius:14px;padding:10px 14px}.fixbox{margin-top:6px;font-size:13.5px}.fixbox summary{cursor:pointer;color:var(--accent,#1F7BFF);font-weight:600}.fixbox p{margin:6px 0 0}.selfbox summary{cursor:pointer;font-weight:600}
 
 .chk{display:inline-flex;gap:6px;align-items:center;font-size:13.5px}
 .th-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
@@ -1587,8 +1587,8 @@ const keyWords=t=>wordsOf(t).filter(w=>w.length>=4&&!STOPW.has(w)).map(stemW);
 function textOf(o,skip){const out=[];(function walk(v,k){if(k==='qs'||k==='o'||k==='why'||k==='img')return;if(typeof v==='string')out.push(v);else if(Array.isArray(v))v.forEach(x=>walk(x));else if(v&&typeof v==='object')Object.keys(v).forEach(kk=>walk(v[kk],kk))})(o);return out.join(' ')}
 let QINDEX=null;
 function qIndex(){if(QINDEX)return QINDEX;const ix=[];
-  Object.values(QUIZ).forEach(q=>{const src=textOf(q);(q.qs||[]).forEach(x=>ix.push({q:x.q,o:x.o,a:x.a,src,title:q.title||''}))});
-  Object.values(window.MOCKS||{}).forEach(m=>['L','R'].forEach(sec=>(m[sec]||[]).forEach(p=>(p.screens||[p]).forEach(sc=>{const src=textOf(p)+' '+textOf(sc);(sc.qs||[]).forEach(x=>ix.push({q:x.q,o:x.o,a:x.a,src,title:p.name||''}))}))));
+  Object.values(QUIZ).forEach(q=>{const src=textOf(q);(q.qs||[]).forEach(x=>ix.push({q:x.q,o:x.o,a:x.a,why:x.why||'',src,title:q.title||''}))});
+  Object.values(window.MOCKS||{}).forEach(m=>['L','R'].forEach(sec=>(m[sec]||[]).forEach(p=>(p.screens||[p]).forEach(sc=>{const src=textOf(p)+' '+textOf(sc);(sc.qs||[]).forEach(x=>ix.push({q:x.q,o:x.o,a:x.a,why:x.why||'',src,title:p.name||''}))}))));
   return QINDEX=ix}
 const INFER_RE=/\b(attitude|feel|feels|feeling|felt|probably|likely|impl(y|ies|ied)|suggest|infer|tone|mood|opinion|think|thinks|believe|believes|agree|agrees|concern|concerned|worried|sounds?|seems?|main idea|mainly|purpose|intend|expect)\b/i;
 function autoCause(e){if(!e)return '';const yours=String(e.yours||'');
@@ -1602,6 +1602,34 @@ function autoCause(e){if(!e)return '';const yours=String(e.yours||'');
 // fill in a cause for every entry that has none; marks it auto so the student knows they can change it
 function withAutoCause(log){return (log||[]).map(e=>e&&!e.cause?Object.assign({},e,{cause:autoCause(e),auto:true}):e)}
 function autoTagLog(){const log=store.get('log',[]);if(!log.some(e=>e&&!e.cause))return;store.set('log',withAutoCause(log))}
+/* ---------- How to improve, by cause ---------- */
+const CAUSE_HELP={
+  distractor:{name:'Distractor',what:'You chose something that was mentioned, but it was not the answer.',
+    L:['Keep listening after the first detail. Speakers change their minds: “Actually…”, “No, wait…”, “Instead…”. The final decision is the answer.','In your notes, cross out a detail as soon as it is corrected or rejected.','Be careful with an option that repeats the exact words you heard. The right answer is usually a paraphrase.'],
+    R:['Find the exact sentence that proves your answer. A matching word is not proof.','Look around the detail for “but”, “however”, “instead”, “no longer” and “only”. They often turn a detail into the wrong answer.','Be careful with an option that copies words from the text. The right answer is usually a paraphrase.']},
+  vocabulary:{name:'Vocabulary',what:'The answer said the same idea in different words, and you missed the match.',
+    L:['Expect paraphrases: the answer will rarely use the speaker’s exact words.','After each set, read the transcript and write the pair: what you heard → how the answer said it.','Learn common pairs, e.g. “call off” = “cancel”, “costs less” = “cheaper”, “put off” = “delay”.'],
+    R:['Expect paraphrases: the answer will rarely copy the text.','After each set, underline the proof in the text and write the pair: text words → answer words.','Learn common pairs, e.g. “call off” = “cancel”, “costs less” = “cheaper”, “put off” = “delay”.']},
+  timing:{name:'Timing',what:'You ran out of time or left the question blank.',
+    L:['Read the question as soon as it appears and choose within the 30 seconds.','Never leave a blank: a guess can be right, a blank never is.','Write key words only in your notes, so you keep up with the speaker.'],
+    R:['Follow the time plan for each part in the Test Guide, and check the timer after each question.','If you are stuck for more than a minute, guess, mark it, and move on.','Never leave a blank: a guess can be right, a blank never is.']},
+  inference:{name:'Inference',what:'The answer was implied, not said directly.',
+    L:['Ask “how does the speaker feel?” and “why did they say this?”, not only “what did they say?”.','Listen for tone and attitude words: “I suppose”, “to some extent”, “I’m not convinced”, “absolutely”.','Choose the answer that the whole conversation supports, not one sentence.'],
+    R:['Ask “what does the writer think?” and “what will probably happen?”, not only “what does it say?”.','Look for opinion words: “unfortunately”, “surprisingly”, “I doubt”, “it is clear that”.','Choose the answer the whole paragraph supports, not one sentence.']}};
+const helpSkill=e=>/read/i.test(String(e.skill||e.item||''))?'R':'L';
+function causeTip(e){const h=CAUSE_HELP[e.cause];return h?h[helpSkill(e)][0]:''}
+function whyOf(e){const item=String(e.item||'');const x=qIndex().find(q=>q.q&&item.endsWith(q.q)&&(!e.correct||q.o[q.a]===e.correct));return x&&x.why||''}
+function fixBox(e){const why=whyOf(e),tip=causeTip(e);if(!why&&!tip)return '';
+  return `<details class="fixbox"><summary>How to fix</summary>${why?`<p><b>Why “${esc(e.correct)}” is right:</b> ${esc(why)}</p>`:''}${tip?`<p><b>${esc(CAUSE_HELP[e.cause].name)} tip:</b> ${esc(tip)}</p>`:''}</details>`}
+function topCauses(log){return CAUSES.map(c=>[c,log.filter(e=>e.cause===c).length]).filter(x=>x[1]).sort((a,b)=>b[1]-a[1])}
+function practiceFor(log,c){const L=log.filter(e=>e.cause===c&&helpSkill(e)==='L').length,R=log.filter(e=>e.cause===c&&helpSkill(e)==='R').length;
+  return R>L?['R','<a href="#session-4">Session 4</a> and <a href="#session-5">Session 5</a> Study Hub reading sets']:['L','<a href="#session-2">Session 2</a> and <a href="#session-3">Session 3</a> Study Hub listening sets']}
+function ImprovePanel(log){const top=topCauses(log).slice(0,2);if(!top.length)return '';
+  return `<div class="panel stack improve" style="gap:14px"><div><div class="eyebrow">Based on your mistakes</div><h3>How to improve</h3></div>
+   ${top.map(([c,n],i)=>{const h=CAUSE_HELP[c];const [sk,prac]=practiceFor(log,c);
+     return `<div class="stack" style="gap:6px"><p style="margin:0"><b>${i?'Next':'Your biggest cause'}: ${h.name}</b> · ${n} mistake${n>1?'s':''}. ${esc(h.what)}</p>
+      <ul class="gd-list">${h[sk].map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
+      <p class="muted" style="margin:0;font-size:13px">Practise: ${prac}, then a <a href="#mocks">mock test</a>. Open “How to fix” on each mistake below to see why the answer is right.</p></div>`}).join('')}</div>`}
 const causeSel=e=>`<select data-id="${esc(e.id)}" aria-label="Cause"><option value="">Choose…</option>${CAUSES.map(c=>`<option value="${c}" ${e.cause===c?'selected':''}>${c}${e.auto&&e.cause===c?' (auto)':''}</option>`).join('')}</select>`;
 function addLog(entry){const log=store.get('log',[]);const e=Object.assign({id:Date.now()+Math.random(),date:new Date().toISOString().slice(0,10),cause:''},entry);if(!e.cause){e.cause=autoCause(e);e.auto=true}log.unshift(e);store.set('log',log)}
 
@@ -2444,7 +2472,7 @@ function ErrorSection(){const log=store.get('log',[]);const untagged=log.filter(
   return `<section class="panel stack" style="gap:16px" id="errors">
     <div class="row"><div><div class="eyebrow">My error log</div><h2>${log.length?`${log.length} mistake${log.length>1?'s':''} to learn from`:'No mistakes logged yet'}</h2></div><span class="spacer"></span><a href="#log" class="btn">Open full log</a></div>
     ${log.length?`<div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:18px" id="err-grid">
-      <div class="stack" style="gap:10px">${causeBars(log)}<p class="muted" style="font-size:13px">${untagged?`<b>${untagged}</b> still need a cause. Choosing one shows you your pattern.`:'Every mistake has a cause. Causes marked “auto” were chosen for you: change any that do not fit.'}</p></div>
+      <div class="stack" style="gap:10px">${causeBars(log)}<p class="muted" style="font-size:13px">${untagged?`<b>${untagged}</b> still need a cause. Choosing one shows you your pattern.`:'Every mistake has a cause. Causes marked “auto” were chosen for you: change any that do not fit.'}</p>${(()=>{const t=topCauses(log)[0];if(!t)return '';const h=CAUSE_HELP[t[0]];return `<p style="font-size:13.5px;margin:0"><b>Focus on ${h.name}:</b> ${esc(h[practiceFor(log,t[0])[0]][0])} <a href="#log">How to improve →</a></p>`})()}</div>
       <div class="tablewrap"><table class="log"><thead><tr><th>Session</th><th>Question</th><th>Your answer</th><th>Correct</th><th>Cause</th></tr></thead><tbody>
         ${log.slice(0,6).map(e=>`<tr><td class="mono">${esc(sessLabel(e.session))}</td><td style="min-width:200px">${esc(e.item)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td>${causeSel(e)}</td></tr>`).join('')}
       </tbody></table>${log.length>6?`<p class="muted" style="font-size:13px;margin-top:8px">Showing the 6 newest. <a href="#log">See all ${log.length}</a></p>`:''}</div></div>`
@@ -3187,12 +3215,12 @@ function StudentDetail(){const r=tRoster().find(x=>x.id===tStudent);if(!r)return
     ${TMockPanel(r)}
     <div class="grid g2">
       <div class="stack" style="gap:10px"><div class="eyebrow">Writing submissions</div>${subs.length?subs.map(x=>`<details class="subm"><summary>Session ${esc(x.n)} · ${esc(WRITE[x.t]?WRITE[x.t].title:(x.v.task?'Email task reply: '+x.v.task:x.t))} · ${x.v.words||0} words${x.v.ai?` · <b>AI level ${clampL(x.v.ai.overall_level)}</b>`:''}${x.v.self?` · self ${(x.v.self/20).toFixed(1)}/5`:''}</summary><pre>${esc(x.v.text)}</pre>${x.v.ai?AIFeedback(x.v.ai,WRITE[x.t]):''}</details>`).join(''):'<p class="muted">No writing submitted yet.</p>'}</div>
-      <div class="stack" style="gap:10px"><div class="eyebrow">Error causes</div>${s.log.length?`<div class="cause-bars">${causes.map(([c,n])=>`<div><span style="text-transform:capitalize">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${n/max*100}%"></div></div><span class="mono">${n}</span></div>`).join('')}</div><p class="muted" style="font-size:13px">${s.log.length} logged · ${s.log.filter(e=>e.auto).length} tagged automatically</p>`:'<p class="muted">No errors logged yet.</p>'}</div>
+      <div class="stack" style="gap:10px"><div class="eyebrow">Error causes</div>${s.log.length?`<div class="cause-bars">${causes.map(([c,n])=>`<div><span style="text-transform:capitalize">${c}</span><div class="bar-track"><div class="bar-fill" style="width:${n/max*100}%"></div></div><span class="mono">${n}</span></div>`).join('')}</div><p class="muted" style="font-size:13px">${s.log.length} logged · ${s.log.filter(e=>e.auto).length} tagged automatically</p>${(()=>{const t=topCauses(s.log)[0];if(!t)return '';const h=CAUSE_HELP[t[0]];return `<p style="font-size:13.5px;margin:0"><b>Coaching focus: ${h.name}</b> (${t[1]}). ${esc(h.what)} Try: ${esc(h[practiceFor(s.log,t[0])[0]][0])}</p>`})()}`:'<p class="muted">No errors logged yet.</p>'}</div>
     </div>
     <div class="stack" style="gap:10px"><div class="row"><div class="eyebrow">Error log · ${s.log.length} entr${s.log.length===1?'y':'ies'}</div><span class="spacer"></span>
       ${s.log.length?`<label class="field" for="t-logf" style="flex-direction:row;align-items:center;gap:8px">Show<select id="t-logf"><option value="">All causes</option>${CAUSES.map(c=>`<option value="${c}" ${tLogFilter===c?'selected':''}>${c}</option>`).join('')}<option value="__none" ${tLogFilter==='__none'?'selected':''}>Not tagged</option></select></label>`:''}</div>
       ${s.log.length?`<div class="tablewrap"><table class="log"><thead><tr><th>Date</th><th>Session</th><th>Question</th><th>Their answer</th><th>Correct</th><th>Cause</th></tr></thead><tbody>
-      ${s.log.filter(e=>!tLogFilter||(tLogFilter==='__none'?!e.cause:e.cause===tLogFilter)).map(e=>`<tr><td class="mono">${esc(e.date)}</td><td class="mono">${esc(sessLabel(e.session))}</td><td style="min-width:220px">${esc(e.item)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td>${e.cause?`<span class="chip" style="text-transform:capitalize">${esc(e.cause)}</span>${e.auto?'<span class="muted" style="font-size:12px"> auto</span>':''}`:'<span class="muted">Not tagged</span>'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="muted">This student has no logged errors yet.</p>'}</div>
+      ${s.log.filter(e=>!tLogFilter||(tLogFilter==='__none'?!e.cause:e.cause===tLogFilter)).map(e=>`<tr><td class="mono">${esc(e.date)}</td><td class="mono">${esc(sessLabel(e.session))}</td><td style="min-width:220px">${esc(e.item)}${fixBox(e)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td>${e.cause?`<span class="chip" style="text-transform:capitalize">${esc(e.cause)}</span>${e.auto?'<span class="muted" style="font-size:12px"> auto</span>':''}`:'<span class="muted">Not tagged</span>'}</td></tr>`).join('')}</tbody></table></div>`:'<p class="muted">This student has no logged errors yet.</p>'}</div>
     <div class="stack" style="gap:10px"><label class="field" for="t-fb">Feedback for ${esc(pr.name)}<textarea id="t-fb" placeholder="What to keep doing, what to fix, and one task for this week.">${esc(draft)}</textarea></label>
       <div class="row"><button class="btn primary" id="t-fb-send">${fb&&fb.text?'Update feedback':'Send feedback'}</button><span class="muted" id="t-fb-msg" style="font-size:13px">${fb&&fb.updatedAt?'Last sent '+ago(fb.updatedAt):''}</span></div></div>
   </section>`}
@@ -3278,9 +3306,10 @@ function LogView(){const log=store.get('log',[]);
   return `<div class="stack"><div><div class="eyebrow">Study Hub</div><h1>Error Log</h1><p class="muted" style="margin-top:8px;max-width:62ch">Every wrong answer from a quiz or mock test lands here, with a cause chosen automatically (marked “auto”). Check each one and change it if it is wrong. Your instructor groups the class’s causes to plan the next live session.</p></div>
   <div class="grid g2"><div class="panel stack" style="gap:10px"><h3>By cause</h3>${log.length?causeBars(log):'<p class="muted">No entries yet.</p>'}</div>
   <div class="panel stack" style="gap:8px"><h3>The four causes</h3><p><b>Distractor:</b> you picked a detail that was mentioned but corrected or rejected.</p><p><b>Vocabulary:</b> you missed a paraphrase or did not know a word.</p><p><b>Timing:</b> you ran out of time or rushed.</p><p><b>Inference:</b> you missed what was implied.</p></div></div>
+  ${ImprovePanel(log)}
   <div class="panel"><div class="row" style="margin-bottom:10px"><h3>Entries</h3><span class="spacer"></span>${log.length?'<button class="btn" data-clear>Clear log</button>':''}</div>
   ${log.length?`<div class="tablewrap"><table class="log"><thead><tr><th>Date</th><th>Session</th><th>Question</th><th>Your answer</th><th>Correct</th><th>Cause</th></tr></thead><tbody>
-  ${log.map(e=>`<tr><td class="mono">${e.date}</td><td class="mono">${esc(sessLabel(e.session))}</td><td style="min-width:220px">${esc(e.item)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td>${causeSel(e)}</td></tr>`).join('')}</tbody></table></div>`
+  ${log.map(e=>`<tr><td class="mono">${e.date}</td><td class="mono">${esc(sessLabel(e.session))}</td><td style="min-width:220px">${esc(e.item)}${fixBox(e)}</td><td>${esc(e.yours)}</td><td>${esc(e.correct)}</td><td>${causeSel(e)}</td></tr>`).join('')}</tbody></table></div>`
   :'<p class="muted">Finish a listening or reading set in any session’s Study Hub. Your misses appear here.</p>'}
   <div data-confirm hidden class="notice" style="margin-top:12px">Delete every entry? <button class="btn" data-yes>Delete all</button> <button class="btn" data-no>Keep</button></div></div></div>`}
 function bindLog(){app.querySelectorAll('select[data-id]').forEach(sel=>sel.addEventListener('change',()=>{const log=store.get('log',[]);const e=log.find(x=>String(x.id)===sel.dataset.id);if(e){e.cause=sel.value;delete e.auto;store.set('log',log)}}));
