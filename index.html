@@ -2955,6 +2955,17 @@ let deckEdit={};
 /* ---------- Sample emails (original models, Level 9+) ---------- */
 // part kinds: g = greeting/closing, p = who you are + purpose, 1/2/3 = bullets, n = next step
 const SAMPLE_EMAILS={6:[
+ {title:'Formal · the noisy hotel (from the class slides)',reader:'Hotel manager → formal. “Dear Manager,” … “Sincerely,”',
+  prompt:'You stayed at a hotel and were unhappy with your room. Write an email to the hotel manager. In your email:',
+  bullets:['say when you stayed and why','describe the problem','say what you want the hotel to do'],
+  parts:[['g','Greeting','Dear Manager,'],
+   ['p','Purpose','I am writing to express my disappointment with my recent stay at your hotel, and to ask you to resolve the problem.'],
+   ['1','Bullet 1 · when and why','I stayed in Room 418 from May 12 to 14 while I was attending a business conference downtown. I chose your hotel because of its convenient location and its excellent online reviews, so I expected a quiet and comfortable room.'],
+   ['2','Bullet 2 · the problem','Unfortunately, my room was right next to the elevator, and the noise continued all night. I asked the front desk to move me, but no other rooms were available. As a result, I slept only a few hours before my presentation and had to drink coffee all morning to stay awake.'],
+   ['3','Bullet 3 · what you want','I would therefore appreciate a partial refund for the two nights. Alternatively, a free night on my next visit would be acceptable, as I often travel to your city for work.'],
+   ['n','Next step','Could you please let me know your decision by Friday, May 23? I look forward to your reply.'],
+   ['g','Closing','Sincerely,<br>Omar Haddad']],
+  why:[['Content','Every note from the plan becomes a full sentence with a detail: Room 418, May 12 to 14, the elevator, the presentation.'],['Vocabulary','Formal, precise words: “disappointment”, “resolve”, “convenient location”, “acceptable”.'],['Readability','One paragraph per bullet. Connectors: “Unfortunately”, “As a result”, “therefore”, “Alternatively”.'],['Task fulfillment','All three bullets in order, formal tone, no contractions, and a next step with a date.']]},
  {title:'Formal · a complaint to a building manager',reader:'Building manager → formal',
   prompt:'You live in an apartment building. The heating in your apartment has not worked properly for two weeks. Write an email to the building manager. In your email:',
   bullets:['describe the problem','explain how it is affecting you','say what you want the manager to do'],
@@ -2988,12 +2999,12 @@ const SAMPLE_EMAILS={6:[
    ['g','Closing','Warm regards,<br>Grace Santos']],
   why:[['Content','Personal, concrete details: number 42, the dates, the dried mangoes, the cat.'],['Vocabulary','Warm but polite phrases: “a small favour”, “do not hesitate to say so”, “look after”.'],['Readability','Varied sentences joined with “so”, “although”, “In return” and a “which” clause.'],['Task fulfillment','Semi-formal tone: friendly, never casual. It makes saying no easy and ends with a clear next step.']]}
 ]};
-const SAMPLE_LINKS=['As a result','Since','therefore','In the meantime','Please let me know by','so','because','In particular','Furthermore','Could we','although','In return','perhaps','Would you be able to','Could you let me know by'];
+const SAMPLE_LINKS=['Unfortunately','Alternatively','As a result','Since','therefore','In the meantime','Please let me know by','so','because','In particular','Furthermore','Could we','although','In return','perhaps','Would you be able to','Could you let me know by'];
 function hiLinks(t){return SAMPLE_LINKS.reduce((h,w)=>h.replace(new RegExp('(^|[^A-Za-z])('+w.replace(/ /g,' ')+')(?=[^A-Za-z])'),'$1<b class="lnk">$2</b>'),t)}
 function SampleEmails(s){const list=SAMPLE_EMAILS[s.n];if(!list)return '';
   const words=e=>e.parts.map(x=>x[2].replace(/<br>/g,' ')).join(' ').split(/\s+/).filter(Boolean).length;
   return `<section class="panel stack samples" style="gap:12px"><div><div class="eyebrow">Model answers · Writing Task 1</div><h3>Sample emails</h3>
-    <p class="muted" style="font-size:14px;margin:4px 0 0;max-width:68ch">Three Level 9+ emails for three different readers. Each colour is one part of the email, and the <b class="lnk">bold</b> words are connectors. Read one before you write your own. Use the structure, not the sentences.</p></div>
+    <p class="muted" style="font-size:14px;margin:4px 0 0;max-width:68ch">Four Level 9+ emails for different readers. The first one is the noisy hotel email from class. Each colour is one part of the email, and the <b class="lnk">bold</b> words are connectors. Read one before you write your own. Use the structure, not the sentences.</p></div>
    ${list.map((e,i)=>`<details class="se" ${i?'':'open'}><summary><span>${esc(e.title)}</span><span class="chip">${words(e)} words</span></summary>
      <div class="se-body">
       <div class="se-prompt"><b>The task.</b> ${esc(e.prompt)}<ul>${e.bullets.map(b=>`<li>${esc(b)}</li>`).join('')}</ul><span class="muted">Reader and tone: ${esc(e.reader)}</span></div>
